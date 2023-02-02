@@ -4,11 +4,13 @@ import LoginPage from "./pages/LoginPage";
 import PersonalBoardPage from "./pages/PersonalBoardPage";
 import ProfilePage from "./pages/ProfilePage";
 import WishingCenterPage from "./pages/WishingCenterPage";
+import NavBar from "./components/NavBar";
 
 function App() {
   return (
     <div className="app">
         <BrowserRouter>
+            <NavBar/>
             <Routes>
                 <Route path={"/"} element={<LoginPage/>}/>
                 <Route path={"/home"} element={<HomePage/>}/>
