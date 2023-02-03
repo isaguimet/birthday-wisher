@@ -4,3 +4,14 @@ body {
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
 }
+
+.navbar {
+  margin: 0;
+  padding: 0;
+}
+
+.navbar > .container {
+  max-width: 100%;
+  margin: 0 1rem;
+  padding: 0;
+}
