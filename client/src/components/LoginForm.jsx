@@ -141,6 +141,12 @@ const LoginForm = () => {
                                 setFormType(isLogin ? "register" : "login");
                                 resetForm();
                             }}
+                            sx={{
+                                textDecoration: "underline",
+                                "&:hover": {
+                                    cursor: "pointer",
+                                },
+                            }}
                         >
                             {isLogin
                                 ? "Don't have an account? Sign up here."
