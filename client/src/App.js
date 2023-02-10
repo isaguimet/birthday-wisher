@@ -4,11 +4,13 @@ import LoginPage from "./pages/LoginPage";
 import PersonalBoardPage from "./pages/PersonalBoardPage";
 import ProfilePage from "./pages/ProfilePage";
 import WishingCenterPage from "./pages/WishingCenterPage";
-import NavBar from "./components/NavBar";
+import NavBar from "./components/navbar/NavBar";
 import PrivateRoute from "./components/PrivateRoute";
+import Theme from "./theme/Theme";
 
 function App() {
     return (
+        <Theme>
         <div className="app">
             <BrowserRouter>
                 <NavBar/>
@@ -33,6 +35,7 @@ function App() {
                 </Routes>
             </BrowserRouter>
         </div>
+        </Theme>
     );
 }
 
