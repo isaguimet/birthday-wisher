@@ -8,19 +8,19 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "messages")
-public class Message {
+@Document(collection = "boards")
+public class Board {
     @Id
     private ObjectId id;
+    private boolean isPublic;
+    private String year;
     @DocumentReference
-    private ObjectId fromUser;
+    private ObjectId user;
     @DocumentReference
-    private ObjectId toUser;
-    private LocalDate lastUpdatedDate;
-    private String msgText;
+    private List<Message> msgIds;
 }
