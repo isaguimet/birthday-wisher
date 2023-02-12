@@ -1,11 +1,14 @@
 package com.birthdaywisher.server.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,6 +23,5 @@ public class User {
     private String email;
     private String password;
     private LocalDate birthdate;
-
-    // TODO: Add rest of fields
+    private List<User> friendList;
 }
