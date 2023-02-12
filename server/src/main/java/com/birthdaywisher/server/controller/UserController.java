@@ -2,6 +2,7 @@ package com.birthdaywisher.server.controller;
 
 import com.birthdaywisher.server.model.User;
 import com.birthdaywisher.server.service.UserService;
+import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("users/{userId}")
-    public ResponseEntity<Optional<User>> getSingleUser(@PathVariable String userId) {
+    public ResponseEntity<Optional<User>> getSingleUser(@PathVariable ObjectId userId) {
         return new ResponseEntity<>(userService.getSingleUser(userId), HttpStatus.OK);
     }
 

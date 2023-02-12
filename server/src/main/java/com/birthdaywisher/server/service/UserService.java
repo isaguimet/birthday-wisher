@@ -2,6 +2,7 @@ package com.birthdaywisher.server.service;
 
 import com.birthdaywisher.server.model.User;
 import com.birthdaywisher.server.repository.UserRepository;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +20,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> getSingleUser(String id) {
+    public Optional<User> getSingleUser(ObjectId id) {
         return userRepository.findById(id);
     }
 
