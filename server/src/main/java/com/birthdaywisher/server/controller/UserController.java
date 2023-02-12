@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/users")
 public class UserController {
     private UserService userService;
 
@@ -20,17 +20,17 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("users")
+    @GetMapping("/")
     public ResponseEntity<List<User>> getAllUsers() {
         return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
     }
 
-    @GetMapping("users/{userId}")
+    @GetMapping("/{userId}")
     public ResponseEntity<Optional<User>> getSingleUser(@PathVariable ObjectId userId) {
         return new ResponseEntity<>(userService.getSingleUser(userId), HttpStatus.OK);
     }
 
-    @PostMapping("users/signUp")
+    @PostMapping("/signUp")
     public ResponseEntity<User> addUser(@RequestBody User user) {
         return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
     }
