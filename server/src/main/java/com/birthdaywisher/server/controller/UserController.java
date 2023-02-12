@@ -22,16 +22,36 @@ public class UserController {
 
     @GetMapping("/")
     public ResponseEntity<List<User>> getAllUsers() {
-        return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<Optional<User>> getSingleUser(@PathVariable ObjectId userId) {
-        return new ResponseEntity<>(userService.getSingleUser(userId), HttpStatus.OK);
+    public ResponseEntity<?> getSingleUser(@PathVariable ObjectId userId) {
+        Optional<User> optionalUser = userService.getSingleUser(userId);
+        try {
+            if (optionalUser.isPresent()) {
+                return new ResponseEntity<>(optionalUser, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("User ID not found: " + userId, HttpStatus.NOT_FOUND);
+                }
+        }
+        catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @PostMapping("/signUp")
     public ResponseEntity<User> addUser(@RequestBody User user) {
-        return new ResponseEntity<>(userService.addUser(user), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(userService.addUser(user), HttpStatus.CREATED);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
