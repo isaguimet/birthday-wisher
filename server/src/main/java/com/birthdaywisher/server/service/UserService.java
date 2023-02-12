@@ -27,4 +27,8 @@ public class UserService {
     public User addUser(User user) {
         return userRepository.save(user);
     }
+
+    public Optional<User> authorizeUser(String email, String password) {
+        return Optional.ofNullable(userRepository.findUserByEmailAndPassword(email, password));
+    }
 }
