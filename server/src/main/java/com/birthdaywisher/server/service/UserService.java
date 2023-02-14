@@ -34,6 +34,6 @@ public class UserService {
     }
 
     public Optional<User> authorizeUser(String email, String password) {
-        return Optional.ofNullable(userRepository.findUserByEmailAndPassword(email, password));
+        return userRepository.findUserByEmailAndPassword(email, password);
     }
 }
