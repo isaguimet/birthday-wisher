@@ -18,4 +18,7 @@ export const Navlink = styled(Nav.Link)`
     color: ${props => props.theme.color.ivory};
 `;
 
+export const StyledImg = styled.img`
+    height: 3rem
+`;
 // https://dev.to/aromanarguello/how-to-use-themes-in-styled-components-49h
