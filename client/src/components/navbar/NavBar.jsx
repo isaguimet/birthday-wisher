@@ -12,10 +12,10 @@ const NavBar = () => {
             <Container>
                 <StyledLogo>Brithday Wisher</StyledLogo>
                 <Nav>
-                    <Navlink href="#home"><StyledImg src={Icons[0]} /></Navlink>
-                    <Navlink href="#friends"><StyledImg src={Icons[1]} /></Navlink>
-                    <Navlink href="#notification"><StyledImg src={Icons[2]} /></Navlink>
-                    <Navlink href="#profile"><StyledImg  src={Icons[3]} /></Navlink>
+                    <Navlink href="/home"><StyledImg src={Icons[0]} /></Navlink>
+                    <Navlink href="/friends"><StyledImg src={Icons[1]} /></Navlink>
+                    <Navlink href="/notification"><StyledImg src={Icons[2]} /></Navlink>
+                    <Navlink href="/profile"><StyledImg  src={Icons[3]} /></Navlink>
                 </Nav>
             </Container>
         </StyledNavbar>

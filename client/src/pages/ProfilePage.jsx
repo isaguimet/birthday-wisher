@@ -1,7 +1,14 @@
+import Theme from "../theme/Theme";
+
 const ProfilePage = () => {
 
     return (
-        <h1>Profile Page</h1>
+        <Theme>
+        <div>
+            <h1>hello</h1>
+
+        </div>
+        </Theme>
     );
 };
 
