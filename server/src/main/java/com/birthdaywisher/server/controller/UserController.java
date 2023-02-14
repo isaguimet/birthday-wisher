@@ -48,12 +48,18 @@ public class UserController {
     }
 
     @PostMapping("/signUp")
-    public ResponseEntity<User> addUser(@RequestBody User user) {
+    public ResponseEntity<?> addUser(@RequestBody User user) {
         try {
-            return new ResponseEntity<>(userService.addUser(user), HttpStatus.CREATED);
+            Boolean newUser = userService.addUser(user);
+            if (newUser) {
+                return new ResponseEntity<>(user, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>("User is already registered under this email: " + user.getEmail(),
+                        HttpStatus.BAD_REQUEST);
+            }
         }
         catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 

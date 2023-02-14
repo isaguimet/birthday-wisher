@@ -24,8 +24,13 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User addUser(User user) {
-        return userRepository.save(user);
+    public Boolean addUser(User user) {
+        // Check if user already has an account. Emails need to be unique
+        Optional<User> optionalUser = userRepository.findUserByEmail(user.getEmail());
+        if (optionalUser.isEmpty()) {
+            userRepository.save(user);
+        }
+        return optionalUser.isEmpty();
     }
 
     public Optional<User> authorizeUser(String email, String password) {
