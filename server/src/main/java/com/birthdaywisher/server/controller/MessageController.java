@@ -3,7 +3,6 @@ package com.birthdaywisher.server.controller;
 import com.birthdaywisher.server.model.Message;
 import com.birthdaywisher.server.service.MessageService;
 import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,40 +13,41 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/messages")
 public class MessageController {
-    @Autowired
-    private MessageService messageService;
+    private MessageService msgService;
+
+    public MessageController(MessageService msgService) { this.msgService = msgService; }
 
     @PostMapping
-    public ResponseEntity<Message> createMessage(@RequestBody Message msg) {
+    public ResponseEntity createMessage(@RequestBody Message msg) {
         try {
-            return new ResponseEntity<Message>(messageService.createMessage(msg), HttpStatus.CREATED);
+            return new ResponseEntity<Message>(msgService.createMessage(msg), HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Message>> readMessage(@PathVariable ObjectId id) {
+    public ResponseEntity readMessage(@PathVariable ObjectId id) {
         try {
-            return new ResponseEntity<Optional<Message>>(messageService.getMsgById(id), HttpStatus.OK);
+            return new ResponseEntity<Optional<Message>>(msgService.getMsgById(id), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Message> updateMessage(@PathVariable ObjectId id, @RequestBody Map<String, String> payload) {
+    public ResponseEntity updateMessage(@PathVariable ObjectId id, @RequestBody Map<String, String> payload) {
         try {
-            return new ResponseEntity<Message>(messageService.updateMessage(id, payload), HttpStatus.OK);
+            return new ResponseEntity<Message>(msgService.updateMessage(id, payload), HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMessage(@PathVariable ObjectId id) {
         try {
-            messageService.deleteMessage(id);
+            msgService.deleteMessage(id);
             return new ResponseEntity<String>(
                     "Message with id " + id + " has been successfully deleted.", HttpStatus.OK);
         } catch (Exception e) {
