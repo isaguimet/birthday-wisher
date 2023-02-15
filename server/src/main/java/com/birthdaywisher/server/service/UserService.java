@@ -36,4 +36,8 @@ public class UserService {
     public Optional<User> authorizeUser(String email, String password) {
         return userRepository.findUserByEmailAndPassword(email, password);
     }
+
+    public void deleteUser(ObjectId id) {
+        userRepository.deleteById(id);
+    }
 }
