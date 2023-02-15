@@ -8,37 +8,38 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/messages")
 public class MessageController {
     private MessageService msgService;
 
-    public MessageController(MessageService msgService) { this.msgService = msgService; }
+    public MessageController(MessageService msgService) {
+        this.msgService = msgService;
+    }
 
     @PostMapping
-    public ResponseEntity createMessage(@RequestBody Message msg) {
+    public ResponseEntity<?> createMessage(@RequestBody Message msg) {
         try {
-            return new ResponseEntity<Message>(msgService.createMessage(msg), HttpStatus.CREATED);
+            return new ResponseEntity<>(msgService.createMessage(msg), HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity readMessage(@PathVariable ObjectId id) {
+    public ResponseEntity<?> readMessage(@PathVariable ObjectId id) {
         try {
-            return new ResponseEntity<Optional<Message>>(msgService.getMsgById(id), HttpStatus.OK);
+            return new ResponseEntity<>(msgService.getMsgById(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity updateMessage(@PathVariable ObjectId id, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> updateMessage(@PathVariable ObjectId id, @RequestBody Map<String, String> payload) {
         try {
-            return new ResponseEntity<Message>(msgService.updateMessage(id, payload), HttpStatus.OK);
+            return new ResponseEntity<>(msgService.updateMessage(id, payload), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -48,10 +49,10 @@ public class MessageController {
     public ResponseEntity<String> deleteMessage(@PathVariable ObjectId id) {
         try {
             msgService.deleteMessage(id);
-            return new ResponseEntity<String>(
+            return new ResponseEntity<>(
                     "Message with id " + id + " has been successfully deleted.", HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

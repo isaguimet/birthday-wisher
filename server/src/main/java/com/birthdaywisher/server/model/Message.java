@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
 import java.time.LocalDate;
 
@@ -17,10 +16,8 @@ import java.time.LocalDate;
 public class Message {
     @Id
     private ObjectId id;
-    @DocumentReference
-    private ObjectId fromUser;
-    @DocumentReference
-    private ObjectId toUser;
+    private User fromUser;
+    private User toUser;
     private LocalDate lastUpdatedDate;
     private String msgText;
 }
