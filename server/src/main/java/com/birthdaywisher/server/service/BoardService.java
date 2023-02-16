@@ -18,7 +18,7 @@ public class BoardService {
 
     public Board createBoard(Map<String, String> payload) {
         Board board = new Board();
-        board.setUser(new ObjectId(payload.get("user")));
+        board.setUserId(new ObjectId(payload.get("user")));
         return boardRepository.save(board);
     }
 

@@ -16,8 +16,8 @@ import java.time.LocalDate;
 public class Message {
     @Id
     private ObjectId id;
-    private ObjectId fromUser;
-    private ObjectId toUser;
+    private ObjectId fromUserId;
+    private ObjectId toUserId;
     private LocalDate lastUpdatedDate;
     private String msgText;
 }

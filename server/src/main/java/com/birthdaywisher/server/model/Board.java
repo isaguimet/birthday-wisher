@@ -21,7 +21,7 @@ public class Board {
     private ObjectId id;
     private boolean isPublic = true;
     private String year = String.valueOf(LocalDate.now().getYear());
-    private ObjectId user;
+    private ObjectId userId;
     @DocumentReference
     private List<Message> msgIds = new ArrayList<>();
 }
