@@ -91,4 +91,27 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
+
+    @PatchMapping("/friendRequest")
+    public ResponseEntity<?> sendFriendRequest(@RequestParam String userEmail,
+                                               @RequestParam String friendEmail) {
+        try {
+            Optional<User> optionalUser = userService.doesEmailExist(userEmail);
+            Optional<User> optionalFriend = userService.doesEmailExist(friendEmail);
+
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User email does not exist: " + userEmail, HttpStatus.NOT_FOUND);
+            }
+            if (optionalFriend.isEmpty()) {
+                return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
+            }
+
+            userService.sendFriendRequest(optionalUser, userEmail, optionalFriend, friendEmail);
+
+            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
 }

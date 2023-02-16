@@ -8,7 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.HashMap;
 
 @Data
 @AllArgsConstructor
@@ -23,5 +23,5 @@ public class User {
     private String email;
     private String password;
     private LocalDate birthdate;
-    private List<User> friendList;
+    private HashMap<String, Boolean> friendHashMap;
 }
