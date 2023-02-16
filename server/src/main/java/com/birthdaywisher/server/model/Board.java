@@ -8,6 +8,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -17,10 +19,9 @@ import java.util.List;
 public class Board {
     @Id
     private ObjectId id;
-    private boolean isPublic;
-    private String year;
-    @DocumentReference
+    private boolean isPublic = true;
+    private String year = String.valueOf(LocalDate.now().getYear());
     private ObjectId user;
     @DocumentReference
-    private List<Message> msgIds;
+    private List<Message> msgIds = new ArrayList<>();
 }
