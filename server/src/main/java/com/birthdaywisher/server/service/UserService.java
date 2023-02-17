@@ -40,7 +40,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
-    public Optional<User> doesEmailExist(String email) {
+    public Optional<User> findUserByEmail(String email) {
         return userRepository.findUserByEmail(email);
     }
 
@@ -81,6 +81,40 @@ public class UserService {
                 }
             });
             return pendingFriendRequests;
+        }
+    }
+
+    public void acceptFriendRequest(User user, String friendEmail, User friend) {
+        String userEmail = user.getEmail();
+
+        HashMap<String, Boolean> userFriendHashMap = user.getFriendHashMap();
+        HashMap<String, Boolean> friendHashMap = friend.getFriendHashMap();
+
+        if (userFriendHashMap.containsKey(friendEmail)) {
+            userFriendHashMap.put(friendEmail, true);
+            userRepository.save(user);
+        }
+
+        if (friendHashMap.containsKey(userEmail)) {
+            friendHashMap.put(userEmail, true);
+            userRepository.save(friend);
+        }
+    }
+
+    public void declineFriendRequest(User user, String friendEmail, User friend) {
+        String userEmail = user.getEmail();
+
+        HashMap<String, Boolean> userFriendHashMap = user.getFriendHashMap();
+        HashMap<String, Boolean> friendHashMap = friend.getFriendHashMap();
+
+        if (userFriendHashMap.containsKey(friendEmail)) {
+            userFriendHashMap.remove(friendEmail, false);
+            userRepository.save(user);
+        }
+
+        if (friendHashMap.containsKey(userEmail)) {
+            friendHashMap.remove(userEmail, false);
+            userRepository.save(friend);
         }
     }
 }

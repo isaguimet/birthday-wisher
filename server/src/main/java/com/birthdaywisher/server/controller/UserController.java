@@ -96,8 +96,8 @@ public class UserController {
     public ResponseEntity<?> sendFriendRequest(@RequestParam String userEmail,
                                                @RequestParam String friendEmail) {
         try {
-            Optional<User> optionalUser = userService.doesEmailExist(userEmail);
-            Optional<User> optionalFriend = userService.doesEmailExist(friendEmail);
+            Optional<User> optionalUser = userService.findUserByEmail(userEmail);
+            Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
 
             if (optionalUser.isEmpty()) {
                 return new ResponseEntity<>("User email does not exist: " + userEmail, HttpStatus.NOT_FOUND);
@@ -125,6 +125,52 @@ public class UserController {
                 List<String> pendingFriendRequests = userService.getPendingFriendRequests(optionalUser.get());
                 return new ResponseEntity<>(pendingFriendRequests, HttpStatus.OK);
             }
+        }
+        catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @PatchMapping("pendingFriendRequests/accept")
+    public ResponseEntity<?> acceptFriendRequest(@RequestParam ObjectId userId,
+                                                 @RequestParam String friendEmail) {
+        try {
+            Optional<User> optionalUser = userService.getSingleUser(userId);
+            Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
+
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
+            }
+            if (optionalFriend.isEmpty()) {
+                return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
+            }
+
+            userService.acceptFriendRequest(optionalUser.get(), friendEmail, optionalFriend.get());
+            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+
+        }
+        catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @PatchMapping("pendingFriendRequests/decline")
+    public ResponseEntity<?> declineFriendRequest(@RequestParam ObjectId userId,
+                                                  @RequestParam String friendEmail) {
+        try {
+            Optional<User> optionalUser = userService.getSingleUser(userId);
+            Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
+
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
+            }
+            if (optionalFriend.isEmpty()) {
+                return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
+            }
+
+            userService.declineFriendRequest(optionalUser.get(), friendEmail, optionalFriend.get());
+            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+
         }
         catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
