@@ -14,11 +14,12 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "embedded-boards")
+@Document(collection = "boards")
 public class Board {
     @Id
     private ObjectId id;
     private boolean isPublic = true;
+    private boolean isOpen = true;
     private String year = String.valueOf(LocalDate.now().getYear());
     private ObjectId userId;
     private Map<ObjectId, Message> messages = new HashMap<>();

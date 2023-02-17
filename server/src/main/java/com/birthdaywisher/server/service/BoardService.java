@@ -41,6 +41,18 @@ public class BoardService {
         return boardRepository.save(board);
     }
 
+    public Board setBoardOpen(ObjectId id) {
+        Board board = boardRepository.findById(id).get();
+        board.setOpen(true);
+        return boardRepository.save(board);
+    }
+
+    public Board setBoardClosed(ObjectId id) {
+        Board board = boardRepository.findById(id).get();
+        board.setOpen(false);
+        return boardRepository.save(board);
+    }
+
     public void deleteBoard(ObjectId id) {
         boardRepository.deleteById(id);
     }

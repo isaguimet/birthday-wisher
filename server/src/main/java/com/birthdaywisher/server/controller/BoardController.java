@@ -54,6 +54,24 @@ public class BoardController {
         }
     }
 
+    @PatchMapping("/setOpen/{id}")
+    public ResponseEntity<?> setBoardOpen(@PathVariable ObjectId id) {
+        try {
+            return new ResponseEntity<>(boardService.setBoardOpen(id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/setClosed/{id}")
+    public ResponseEntity<?> setBoardClosed(@PathVariable ObjectId id) {
+        try {
+            return new ResponseEntity<>(boardService.setBoardClosed(id), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBoard(@PathVariable ObjectId id) {
         try {
