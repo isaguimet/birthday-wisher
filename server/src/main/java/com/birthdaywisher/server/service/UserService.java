@@ -5,9 +5,7 @@ import com.birthdaywisher.server.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -62,8 +60,27 @@ public class UserService {
         } else {
             pendingFriendRequests = friendHashMap;
         }
+        // Pending friend requests are set to false. Accepted friends requests are set to true
         pendingFriendRequests.put(friendEmail, false);
         friend.setFriendHashMap(pendingFriendRequests);
         userRepository.save(friend);
+    }
+
+    public List<String> getPendingFriendRequests(User user) {
+        HashMap<String, Boolean> friendHashMap = user.getFriendHashMap();
+        List<String> pendingFriendRequests = new ArrayList<>();
+
+        if (friendHashMap == null) {
+            return Collections.emptyList();
+        }
+        else {
+            friendHashMap.forEach((key, value) -> {
+                // {email:false} means that this is a pending friend request
+                if (friendHashMap.containsValue(false)) {
+                    pendingFriendRequests.add(key);
+                }
+            });
+            return pendingFriendRequests;
+        }
     }
 }

@@ -114,4 +114,20 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
+
+    @GetMapping("/pendingFriendRequests/{userId}")
+    public ResponseEntity<?> getPendingFriendRequests(@PathVariable ObjectId userId) {
+        try {
+            Optional<User> optionalUser = userService.getSingleUser(userId);
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
+            } else {
+                List<String> pendingFriendRequests = userService.getPendingFriendRequests(optionalUser.get());
+                return new ResponseEntity<>(pendingFriendRequests, HttpStatus.OK);
+            }
+        }
+        catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
 }
