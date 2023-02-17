@@ -108,7 +108,7 @@ public class UserController {
 
             userService.sendFriendRequest(optionalUser, userEmail, optionalFriend, friendEmail);
 
-            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+            return new ResponseEntity<>(optionalFriend.get(), HttpStatus.OK);
         }
         catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

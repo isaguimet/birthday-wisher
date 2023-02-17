@@ -53,9 +53,6 @@ public class UserService {
 
         savePendingFriendRequests(friendEmail, user, user.getFriendHashMap());
         savePendingFriendRequests(userEmail, friend, friend.getFriendHashMap());
-
-        System.out.println("user: " + user);
-        System.out.println("friend " + friend);
     }
 
     private void savePendingFriendRequests(String friendEmail, User friend, HashMap<String, Boolean> friendHashMap) {
