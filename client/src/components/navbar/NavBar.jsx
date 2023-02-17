@@ -20,8 +20,6 @@ const NavBar = () => {
             </Container>
         </StyledNavbar>
         </Theme>
-
-
     );
 };
 
