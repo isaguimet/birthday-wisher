@@ -1,6 +1,12 @@
 # birthday-wisher
 
 ## Running the server
+
+### From Command Line
+* To build the project: `./gradlew build`
+* To run the project: `./gradlew bootRun`
+
+### For IntelliJ
 Recommended instructions for IntelliJ:
 * File > Project Structure:
     * Use SDK greater than 17? I used Oracle OpenJDK 19
