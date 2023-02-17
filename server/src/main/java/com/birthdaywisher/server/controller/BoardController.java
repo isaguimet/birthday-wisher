@@ -1,5 +1,6 @@
 package com.birthdaywisher.server.controller;
 
+import com.birthdaywisher.server.model.Message;
 import com.birthdaywisher.server.service.BoardService;
 import org.bson.types.ObjectId;
 import org.springframework.http.HttpStatus;
@@ -58,6 +59,52 @@ public class BoardController {
         try {
             boardService.deleteBoard(id);
             return new ResponseEntity<>("Board with id " + id + " has been successfully deleted.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/{boardId}/messages")
+    public ResponseEntity<?> createMessage(@PathVariable ObjectId boardId, @RequestBody Message msg) {
+        try {
+            return new ResponseEntity<>(boardService.createMessage(boardId, msg), HttpStatus.CREATED);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{boardId}/messages/{msgId}")
+    public ResponseEntity<?> readMessage(@PathVariable ObjectId boardId, @PathVariable ObjectId msgId) {
+        try {
+            return new ResponseEntity<>(boardService.getMsgById(boardId, msgId), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/{boardId}/messages/{msgId}")
+    public ResponseEntity<?> updateMessage(
+            @PathVariable ObjectId boardId, @PathVariable ObjectId msgId, @RequestBody Map<String, String> payload) {
+        try {
+            return new ResponseEntity<>(boardService.updateMessage(boardId, msgId, payload), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/{boardId}/messages/{msgId}")
+    public ResponseEntity<?> deleteMessage(@PathVariable ObjectId boardId, @PathVariable ObjectId msgId) {
+        try {
+            return new ResponseEntity<>(boardService.deleteMessage(boardId, msgId), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/byUserId/{userId}")
+    public ResponseEntity<?> getBoardsByUserId(@PathVariable ObjectId userId) {
+        try {
+            return new ResponseEntity<>(boardService.getBoardsByUserId(userId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }

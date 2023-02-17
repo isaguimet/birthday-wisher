@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Service
 public class MessageService {
+    // TODO: delete this class
     private MessageRepository msgRepository;
 
     public MessageService(MessageRepository msgRepository) { this.msgRepository = msgRepository; }

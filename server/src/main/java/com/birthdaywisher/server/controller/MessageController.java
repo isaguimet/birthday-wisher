@@ -12,6 +12,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/messages")
 public class MessageController {
+    // TODO: delete this class
     private MessageService msgService;
 
     public MessageController(MessageService msgService) {
