@@ -23,4 +23,6 @@ public class Board {
     private String year = String.valueOf(LocalDate.now().getYear());
     private ObjectId userId;
     private Map<ObjectId, Message> messages = new HashMap<>();
+
+    public Board(ObjectId userId) { this.userId = userId; }
 }
