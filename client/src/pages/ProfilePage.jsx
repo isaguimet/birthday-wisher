@@ -13,7 +13,6 @@ const ProfilePage = () => {
                 <p>Bobby@gmail.com</p>
                 <p className="title">Birthday</p>
                 <p>January 1, 2000</p>
-                <PrimaryButton buttonText="Edit"></PrimaryButton>
             </div>
         </div>
     );
