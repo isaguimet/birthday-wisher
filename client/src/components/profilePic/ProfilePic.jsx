@@ -1,12 +1,12 @@
-import { ProfilePicture } from "./ProfilePic.style";
-
-
+import { ProfilePicture, ProfileContainer } from "./ProfilePic.style";
 
 const ProfilePic = (props) => {
     
     return (
-        <ProfilePicture src={props.src} />
-
+        <ProfileContainer>
+            <ProfilePicture src={props.src} />
+        </ProfileContainer>
+    
     );
 
 
