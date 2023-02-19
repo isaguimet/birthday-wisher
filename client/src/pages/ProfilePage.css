@@ -1,11 +1,7 @@
-img {
+.profile-picture {
     border-radius: 50%;
     height: 12.5rem;
   }
-
-/* .app {
-    background-color: #fae5df;
-} */
 
 .container {
     display: flex;
