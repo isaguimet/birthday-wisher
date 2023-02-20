@@ -74,10 +74,9 @@ public class BoardController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBoard(@PathVariable ObjectId id) {
+    public ResponseEntity<?> deleteBoard(@PathVariable ObjectId id) {
         try {
-            boardService.deleteBoard(id);
-            return new ResponseEntity<>("Board with id " + id + " has been successfully deleted.", HttpStatus.OK);
+            return new ResponseEntity<>(boardService.deleteBoard(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
