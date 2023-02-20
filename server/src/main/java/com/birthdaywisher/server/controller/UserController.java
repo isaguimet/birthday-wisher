@@ -8,9 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.MonthDay;
+import java.util.*;
 
 @RestController
 @RequestMapping("/users")
@@ -154,7 +153,7 @@ public class UserController {
         }
     }
 
-    @PatchMapping("pendingFriendRequests/decline")
+    @PatchMapping("/pendingFriendRequests/decline")
     public ResponseEntity<?> declineFriendRequest(@RequestParam ObjectId userId,
                                                   @RequestParam String friendEmail) {
         try {
@@ -173,6 +172,24 @@ public class UserController {
 
         }
         catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @GetMapping("/friendList/{userId}")
+    public ResponseEntity<?> getFriendList(@PathVariable ObjectId userId) {
+        try {
+            Optional<User> optionalUser = userService.getSingleUser(userId);
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
+            }
+            List<User> friendList = userService.getFriendListByUser(optionalUser.get());
+
+            // Sorts friends of this user by their birthdate (ignores the year so sorting by month and day)
+            friendList.sort(Comparator.comparing(friend -> MonthDay.from(friend.getBirthdate())));
+
+            return new ResponseEntity<>(friendList, HttpStatus.OK);
+        } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }

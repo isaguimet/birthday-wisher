@@ -112,4 +112,17 @@ public class UserService {
             userRepository.save(friend);
         }
     }
+
+    public List<User> getFriendListByUser(User user) {
+        HashMap<ObjectId, Boolean> friendHashMap = user.getFriends();
+        List<User> friendList = new ArrayList<>();
+        friendHashMap.forEach((userId, value) -> {
+            // Reminder: value set to true means friend whereas value set to false means pending friend
+            if (value && userRepository.findById(userId).isPresent()) {
+                User friend = userRepository.findById(userId).get();
+                friendList.add(friend);
+            }
+        });
+        return friendList;
+    }
 }
