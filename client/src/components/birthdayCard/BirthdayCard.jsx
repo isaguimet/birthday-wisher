@@ -1,7 +1,8 @@
 import Card from 'react-bootstrap/Card';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {useState} from "react";
-import {updateMsg} from "../../store/board";
+import {updateMsg, deleteMsg} from "../../store/board";
 import {useDispatch} from "react-redux";
 
 /**
@@ -33,10 +34,20 @@ const BirthdayCard = (props) => {
         dispatch(updateMsg(data));
     }
 
+    const handleDelete = () => {
+        const data = {boardId: props.boardId, msgId: props.msgId};
+        dispatch(deleteMsg(data));
+    }
+
     return (
         <Card style={{ width: '18rem' }}>
         <Card.Body>
-            {!isEditing && <EditOutlinedIcon onClick={()=>setEditing(true)}/>}
+            {!isEditing && (
+                <>
+                    <EditOutlinedIcon onClick={()=>setEditing(true)}/>
+                    <DeleteOutlineOutlinedIcon onClick={handleDelete}/>
+                </>
+            )}
             {isEditing && (
                 <form onSubmit={handleSubmit}>
                     <input type={"text"} value={input} onChange={handleChange}/>
