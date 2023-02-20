@@ -12,9 +12,21 @@ import { useState } from 'react';
 
 const ProfilePage = (props) => {
 
-    const [wishes, setWishes] = useState([])
+    const [wishes, setWishes] = useState([]);
+    const [wishMessage, setWishMessage] = useState('');
+    const [updated, setUpdated] = useState(wishMessage); 
+
+    const handleChange = (event) => {
+        setWishMessage(event.target.value);
+      };
+    
+    const handleClick = () => {
+        setUpdated(wishMessage);
+    };
+    
+
     const addWish = () => {
-        setWishes([...wishes, "wish"])
+        setWishes([...wishes, updated])
     }
 
     return (
@@ -44,7 +56,14 @@ const ProfilePage = (props) => {
             <BoardContainer>
                 2022
                 <button onClick={addWish}>Add Wish</button>
-
+                <input
+                    type="text"
+                    id="wish"
+                    name="wish"
+                    onChange={handleChange}
+                    value={wishMessage}
+                />
+                <button onClick={handleClick}>Submit Wish</button>
                        
                 {/* if no item it doesn't render anything, if no item it should just render blank */}
             <Board>
