@@ -30,7 +30,7 @@ public class Application {
         return () -> {
             // This is just a placeholder for now. This is a list of IDs taken from documents that currently exist in
             // users collection of our database.
-            List<ObjectId> userIds = Arrays.asList(new ObjectId("63f12b1424e25937d0545ac1"), new ObjectId("63f12b1f24e25937d0545ac2"), new ObjectId("63f12b3224e25937d0545ac3"), new ObjectId("63f12b4724e25937d0545ac4"));
+            List<ObjectId> userIds = Arrays.asList(new ObjectId("63f300a9aa937b2f68a15e23"), new ObjectId("63f300bbaa937b2f68a15e24"), new ObjectId("63f300c8aa937b2f68a15e25"), new ObjectId("63f300d2aa937b2f68a15e26"));
             // TODO: once user stuff is merged, do a similar process as below to clear & populate the user collection
             // then use those user IDs as the userId field when creating the following boards.
 
