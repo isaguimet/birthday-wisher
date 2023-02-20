@@ -7,10 +7,23 @@ import BirthdayCard from '../components/birthdayCard/BirthdayCard';
 import ProfilePic from '../components/profilePic/ProfilePic';
 import Icons from '../Icons';
 import ListWishes from '../components/listWishes/ListWishes';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+import {useDispatch, useSelector} from "react-redux";
+import {getBoards} from "../store/board";
 
 
 const ProfilePage = (props) => {
+
+    // const [data, setData] = useState(props.data);
+    // const [error, setError] = useState(props.error);
+    // const [loading, setLoading] = useState(props.loading);
+
+    const dispatch = useDispatch();
+    const board = useSelector(state => state.board)
+
+    useEffect(() => {
+        dispatch(getBoards())
+    }, []);
 
     const [wishes, setWishes] = useState([])
     const addWish = () => {
