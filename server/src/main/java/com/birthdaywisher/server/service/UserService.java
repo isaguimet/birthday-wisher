@@ -44,76 +44,71 @@ public class UserService {
         return userRepository.findUserByEmail(email);
     }
 
-    public void sendFriendRequest(Optional<User> optionalUser, String userEmail,
-                                  Optional<User> optionalFriend, String friendEmail) {
+    public void sendFriendRequest(Optional<User> optionalUser, Optional<User> optionalFriend) {
         User user = optionalUser.get();
         User friend = optionalFriend.get();
 
-        savePendingFriendRequests(friendEmail, user, user.getFriendHashMap());
-        savePendingFriendRequests(userEmail, friend, friend.getFriendHashMap());
+        savePendingFriendRequests(friend, user);
+        savePendingFriendRequests(user, friend);
     }
 
-    private void savePendingFriendRequests(String friendEmail, User friend, HashMap<String, Boolean> friendHashMap) {
-        HashMap<String, Boolean> pendingFriendRequests;
-        if (friend.getFriendHashMap() == null) {
+    private void savePendingFriendRequests(User user, User friend) {
+        HashMap<ObjectId, Boolean> pendingFriendRequests;
+        if (friend.getFriends() == null) {
             pendingFriendRequests = new HashMap<>();
         } else {
-            pendingFriendRequests = friendHashMap;
+            pendingFriendRequests = friend.getFriends();
         }
         // Pending friend requests are set to false. Accepted friends requests are set to true
-        pendingFriendRequests.put(friendEmail, false);
-        friend.setFriendHashMap(pendingFriendRequests);
+        pendingFriendRequests.put(user.getId(), false);
+        friend.setFriends(pendingFriendRequests);
         userRepository.save(friend);
     }
 
-    public List<String> getPendingFriendRequests(User user) {
-        HashMap<String, Boolean> friendHashMap = user.getFriendHashMap();
-        List<String> pendingFriendRequests = new ArrayList<>();
+    public List<User> getPendingFriendRequests(User user) {
+        HashMap<ObjectId, Boolean> friendHashMap = user.getFriends();
+        List<User> pendingFriendRequests = new ArrayList<>();
 
         if (friendHashMap == null) {
             return Collections.emptyList();
         }
         else {
             friendHashMap.forEach((key, value) -> {
-                // {email:false} means that this is a pending friend request
-                if (friendHashMap.containsValue(false)) {
-                    pendingFriendRequests.add(key);
+                // value=false means that this is a pending friend request
+                if (!value && userRepository.findById(key).isPresent()) {
+                    pendingFriendRequests.add(userRepository.findById(key).get());
                 }
             });
             return pendingFriendRequests;
         }
     }
 
-    public void acceptFriendRequest(User user, String friendEmail, User friend) {
-        String userEmail = user.getEmail();
+    public void acceptFriendRequest(User user, User friend) {
+        HashMap<ObjectId, Boolean> userFriendHashMap = user.getFriends();
+        HashMap<ObjectId, Boolean> friendHashMap = friend.getFriends();
 
-        HashMap<String, Boolean> userFriendHashMap = user.getFriendHashMap();
-        HashMap<String, Boolean> friendHashMap = friend.getFriendHashMap();
-
-        if (userFriendHashMap.containsKey(friendEmail)) {
-            userFriendHashMap.put(friendEmail, true);
+        if (userFriendHashMap.containsKey(friend.getId())) {
+            userFriendHashMap.put(friend.getId(), true);
             userRepository.save(user);
         }
 
-        if (friendHashMap.containsKey(userEmail)) {
-            friendHashMap.put(userEmail, true);
+        if (friendHashMap.containsKey(user.getId())) {
+            friendHashMap.put(user.getId(), true);
             userRepository.save(friend);
         }
     }
 
-    public void declineFriendRequest(User user, String friendEmail, User friend) {
-        String userEmail = user.getEmail();
+    public void declineFriendRequest(User user, User friend) {
+        HashMap<ObjectId, Boolean> userFriendHashMap = user.getFriends();
+        HashMap<ObjectId, Boolean> friendHashMap = friend.getFriends();
 
-        HashMap<String, Boolean> userFriendHashMap = user.getFriendHashMap();
-        HashMap<String, Boolean> friendHashMap = friend.getFriendHashMap();
-
-        if (userFriendHashMap.containsKey(friendEmail)) {
-            userFriendHashMap.remove(friendEmail, false);
+        if (userFriendHashMap.containsKey(friend.getId())) {
+            userFriendHashMap.remove(friend.getId(), false);
             userRepository.save(user);
         }
 
-        if (friendHashMap.containsKey(userEmail)) {
-            friendHashMap.remove(userEmail, false);
+        if (friendHashMap.containsKey(user.getId())) {
+            friendHashMap.remove(user.getId(), false);
             userRepository.save(friend);
         }
     }

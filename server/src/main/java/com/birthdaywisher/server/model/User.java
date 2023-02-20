@@ -23,5 +23,6 @@ public class User {
     private String email;
     private String password;
     private LocalDate birthdate;
-    private HashMap<String, Boolean> friendHashMap;
+    private HashMap<ObjectId, Boolean> friends;
+    private String profilePic;
 }

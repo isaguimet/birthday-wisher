@@ -82,7 +82,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable ObjectId id) {
+    public ResponseEntity<String> deleteUser(@PathVariable ObjectId id) {
         try {
             userService.deleteUser(id);
             return new ResponseEntity<>("User has been deleted by id: " + id, HttpStatus.OK);
@@ -106,7 +106,7 @@ public class UserController {
                 return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
             }
 
-            userService.sendFriendRequest(optionalUser, userEmail, optionalFriend, friendEmail);
+            userService.sendFriendRequest(optionalUser, optionalFriend);
 
             return new ResponseEntity<>(optionalFriend.get(), HttpStatus.OK);
         }
@@ -122,7 +122,7 @@ public class UserController {
             if (optionalUser.isEmpty()) {
                 return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
             } else {
-                List<String> pendingFriendRequests = userService.getPendingFriendRequests(optionalUser.get());
+                List<User> pendingFriendRequests = userService.getPendingFriendRequests(optionalUser.get());
                 return new ResponseEntity<>(pendingFriendRequests, HttpStatus.OK);
             }
         }
@@ -131,7 +131,7 @@ public class UserController {
         }
     }
 
-    @PatchMapping("pendingFriendRequests/accept")
+    @PatchMapping("/pendingFriendRequests/accept")
     public ResponseEntity<?> acceptFriendRequest(@RequestParam ObjectId userId,
                                                  @RequestParam String friendEmail) {
         try {
@@ -145,7 +145,7 @@ public class UserController {
                 return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
             }
 
-            userService.acceptFriendRequest(optionalUser.get(), friendEmail, optionalFriend.get());
+            userService.acceptFriendRequest(optionalUser.get(), optionalFriend.get());
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
 
         }
@@ -168,7 +168,7 @@ public class UserController {
                 return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
             }
 
-            userService.declineFriendRequest(optionalUser.get(), friendEmail, optionalFriend.get());
+            userService.declineFriendRequest(optionalUser.get(), optionalFriend.get());
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
 
         }
