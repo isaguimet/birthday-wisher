@@ -8,12 +8,12 @@ const initialState = {
 };
 
 // dispatches the lifecycle methods of a promise as actions (pending, fulfilled, rejected)
-// TODO: once we have user ID stored in redux after logging in, take out the hard-coded userId value here
-export const getBoards = createAsyncThunk("board/getBoards", () => {
-        return axios
-            .get(`http://localhost:8080/boards/byUserId/63f12b1424e25937d0545ac1`)
-            .then((response) => response.data)
-    });
+// TODO: once we have user ID stored in redux after logging in, take out the default userId value here
+export const getBoards = createAsyncThunk("board/getBoards", (userId = "63f12b1424e25937d0545ac1") => {
+    return axios
+        .get(`http://localhost:8080/boards/byUserId/${userId}`)
+        .then((response) => response.data)
+});
 
 export const boardSlice = createSlice({
     name: "board",
