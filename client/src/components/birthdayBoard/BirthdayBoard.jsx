@@ -74,6 +74,7 @@ const BirthdayBoard = (props) => {
                     <BirthdayCard
                         key={msgId}
                         id={msgId}
+                        boardId={props.boardId}
                         msgId={msgId}
                         fromUserId={msg.fromUserId}
                         toUserId={msg.toUserId}
