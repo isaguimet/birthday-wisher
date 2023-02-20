@@ -16,7 +16,7 @@ import BirthdayBoard from "../components/birthdayBoard/BirthdayBoard";
 const ProfilePage = (props) => {
 
     const dispatch = useDispatch();
-    const board = useSelector(state => state.board)
+    const board = useSelector(state => state.board);
 
     useEffect(() => {
         dispatch(getBoards())
@@ -48,7 +48,7 @@ const ProfilePage = (props) => {
                 </Profile>
                 {board.loading && <div>Loading...</div>}
                 {!board.loading && board.error ? <div>Error: {board.error}</div> : null}
-                {!board.loading && board.data.length ? (
+                {!board.loading && board.data ? (
                     <div>
                         {board.data.map((board) => (
                             <BirthdayBoard

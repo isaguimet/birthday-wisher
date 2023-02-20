@@ -3,6 +3,8 @@ import ListWishes from "../listWishes/ListWishes";
 import BirthdayCard from "../birthdayCard/BirthdayCard";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import {useState} from "react";
+import {useDispatch} from "react-redux";
+import {setBoardPrivate, setBoardPublic, setBoardClosed, setBoardOpen} from "../../store/board";
 
 /**
  * A component for rendering a User Birthday Board.
@@ -19,14 +21,26 @@ const BirthdayBoard = (props) => {
     const [isOpen, setOpen] = useState(props.open === true);
     const [isPublic, setPublic] = useState(props.public === true);
 
+    const dispatch = useDispatch();
+
     const togglePublic = () => {
-        // TODO: make api call to reflect change in db
-        setPublic(!isPublic);
+        if (isPublic) {
+            dispatch(setBoardPrivate(props.boardId));
+            setPublic(false);
+        } else {
+            dispatch(setBoardPublic(props.boardId));
+            setPublic(true);
+        }
     }
 
     const toggleOpen = () => {
-        // TODO: make api call to reflect change in db
-        setOpen(!isOpen);
+        if (isOpen) {
+            dispatch(setBoardClosed(props.boardId));
+            setOpen(false);
+        } else {
+            dispatch(setBoardOpen(props.boardId));
+            setOpen(true);
+        }
     }
 
     return (

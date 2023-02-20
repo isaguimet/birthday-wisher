@@ -15,6 +15,30 @@ export const getBoards = createAsyncThunk("board/getBoards", (userId = "63f12b14
         .then((response) => response.data)
 });
 
+export const setBoardPrivate = createAsyncThunk("board/setPrivate", (boardId) => {
+    return axios
+        .patch(`http://localhost:8080/boards/setPrivate/${boardId}`)
+        .then((response) => response.data)
+});
+
+export const setBoardPublic = createAsyncThunk("board/setPublic", (boardId) => {
+    return axios
+        .patch(`http://localhost:8080/boards/setPublic/${boardId}`)
+        .then((response) => response.data)
+});
+
+export const setBoardClosed = createAsyncThunk("board/setClosed", (boardId) => {
+    return axios
+        .patch(`http://localhost:8080/boards/setClosed/${boardId}`)
+        .then((response) => response.data)
+});
+
+export const setBoardOpen = createAsyncThunk("board/setOpen", (boardId) => {
+    return axios
+        .patch(`http://localhost:8080/boards/setOpen/${boardId}`)
+        .then((response) => response.data)
+});
+
 export const boardSlice = createSlice({
     name: "board",
     initialState,
@@ -28,6 +52,58 @@ export const boardSlice = createSlice({
             state.error = null;
         })
         builder.addCase(getBoards.rejected, (state, action) => {
+            state.loading = false;
+            state.data = null;
+            state.error = action.error.message;
+        })
+        builder.addCase(setBoardPrivate.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(setBoardPrivate.fulfilled, (state, action) => {
+            state.loading = false;
+            state.data = action.payload;
+            state.error = null;
+        })
+        builder.addCase(setBoardPrivate.rejected, (state, action) => {
+            state.loading = false;
+            state.data = null;
+            state.error = action.error.message;
+        })
+        builder.addCase(setBoardPublic.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(setBoardPublic.fulfilled, (state, action) => {
+            state.loading = false;
+            state.data = action.payload;
+            state.error = null;
+        })
+        builder.addCase(setBoardPublic.rejected, (state, action) => {
+            state.loading = false;
+            state.data = null;
+            state.error = action.error.message;
+        })
+        builder.addCase(setBoardClosed.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(setBoardClosed.fulfilled, (state, action) => {
+            state.loading = false;
+            state.data = action.payload;
+            state.error = null;
+        })
+        builder.addCase(setBoardClosed.rejected, (state, action) => {
+            state.loading = false;
+            state.data = null;
+            state.error = action.error.message;
+        })
+        builder.addCase(setBoardOpen.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(setBoardOpen.fulfilled, (state, action) => {
+            state.loading = false;
+            state.data = action.payload;
+            state.error = null;
+        })
+        builder.addCase(setBoardOpen.rejected, (state, action) => {
             state.loading = false;
             state.data = null;
             state.error = action.error.message;
