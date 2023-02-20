@@ -4,7 +4,7 @@ import BirthdayCard from "../birthdayCard/BirthdayCard";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
-import {setBoardPrivate, setBoardPublic, setBoardClosed, setBoardOpen} from "../../store/board";
+import {setBoardPrivate, setBoardPublic, setBoardClosed, setBoardOpen, deleteBoard} from "../../store/board";
 
 /**
  * A component for rendering a User Birthday Board.
@@ -47,8 +47,6 @@ const BirthdayBoard = (props) => {
         <BoardContainer>
             {props.year}
 
-            <button onClick={() => {}}>Add Wish</button>
-
             {/*TODO: only make these switches visible if this is viewed on the profile page of the current user*/}
             <BootstrapSwitchButton
                 id={"public_toggle"}
@@ -66,6 +64,9 @@ const BirthdayBoard = (props) => {
                 onChange={toggleOpen}
                 width={100}
             />
+
+            <button onClick={() => {dispatch(deleteBoard(props.boardId))}}>Delete Board</button>
+            <button onClick={() => {}}>Add Wish</button>
 
             {/* if no item it doesn't render anything, if no item it should just render blank */}
             <Board>

@@ -39,6 +39,12 @@ export const setBoardOpen = createAsyncThunk("board/setOpen", (boardId) => {
         .then((response) => response.data)
 });
 
+export const deleteBoard = createAsyncThunk("board/deleteBoard", (boardId) => {
+    return axios
+        .delete(`http://localhost:8080/boards/${boardId}`)
+        .then((response) => response.data)
+});
+
 export const boardSlice = createSlice({
     name: "board",
     initialState,
@@ -104,6 +110,19 @@ export const boardSlice = createSlice({
             state.error = null;
         })
         builder.addCase(setBoardOpen.rejected, (state, action) => {
+            state.loading = false;
+            state.data = null;
+            state.error = action.error.message;
+        })
+        builder.addCase(deleteBoard.pending, (state) => {
+            state.loading = true;
+        })
+        builder.addCase(deleteBoard.fulfilled, (state, action) => {
+            state.loading = false;
+            state.data = action.payload;
+            state.error = null;
+        })
+        builder.addCase(deleteBoard.rejected, (state, action) => {
             state.loading = false;
             state.data = null;
             state.error = action.error.message;
