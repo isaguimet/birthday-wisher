@@ -7,7 +7,7 @@ const BirthdayCard = (props) => {
         <Card style={{ width: '18rem' }}>
         <Card.Body>
             <Card.Text>
-            {props.children}
+            {props.msgText}
             </Card.Text>
         </Card.Body>
         </Card>

@@ -42,6 +42,7 @@ const BirthdayBoard = (props) => {
                 onlabel={"Public"}
                 offlabel={"Private"}
                 onChange={togglePublic}
+                width={100}
             />
             <BootstrapSwitchButton
                 id={"open_toggle"}
@@ -49,22 +50,22 @@ const BirthdayBoard = (props) => {
                 onlabel={"Open"}
                 offlabel={"Closed"}
                 onChange={toggleOpen}
+                width={100}
             />
 
             {/* if no item it doesn't render anything, if no item it should just render blank */}
             <Board>
-                <BirthdayCard>
-                    Happy brithday!
-                </BirthdayCard>
-                <BirthdayCard>
-                    Happy brithday Joe!
-                </BirthdayCard>
-                <BirthdayCard>
-                    Happy brithday!
-                </BirthdayCard>
-                <BirthdayCard>
-                    Happy brithday Joe!
-                </BirthdayCard>
+                {Object.entries(props.messages).map(([msgId, msg]) => (
+                    <BirthdayCard
+                        key={msgId}
+                        id={msgId}
+                        msgId={msgId}
+                        fromUserId={msg.fromUserId}
+                        toUserId={msg.toUserId}
+                        lastUpdatedDate={msg.lastUpdatedDate}
+                        msgText={msg.msgText}
+                    />
+                ))}
             </Board>
         </BoardContainer>
     )
