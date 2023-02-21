@@ -1,6 +1,5 @@
 import avatar from "../assets/avatar.png";
 import "./ProfilePage.css";
-import PrimaryButton from "../components/button/PrimaryButton";
 
 const ProfilePage = () => {
 
