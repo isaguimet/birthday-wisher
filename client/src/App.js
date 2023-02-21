@@ -26,7 +26,7 @@ function App() {
                     </Route> */}
 
                     <Route path={"/"} element={<PrivateRoute/>}>
-                        <Route path={"/profile"} element={<ProfilePage/>}/>
+                        <Route path={"/profile"} element={<ProfilePage name="John Doe" birthday="1999-01-01"/>}/>
                     </Route>
 
                     <Route path={"/"} element={<PrivateRoute/>}>

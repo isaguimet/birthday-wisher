@@ -8,6 +8,7 @@ export const StyledDiv = styled.div`
 export const Profile = styled.div`
     display: flex;
     justify-content: center;
+    padding-top: 2rem;
 `;
 
 export const Board = styled.div`

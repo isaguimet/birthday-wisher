@@ -10,7 +10,7 @@ const NavBar = () => {
             
         <StyledNavbar>
             <Container>
-                <StyledLogo>Birthday Wisher</StyledLogo>
+                <StyledLogo href="/">Birthday Wisher</StyledLogo>
                 <Nav>
                     <Navlink href="/home"><StyledImg src={Icons[0]} /></Navlink>
                     <Navlink href="/friends"><StyledImg src={Icons[1]} /></Navlink>
