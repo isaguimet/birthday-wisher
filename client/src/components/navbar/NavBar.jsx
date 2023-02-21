@@ -1,6 +1,6 @@
 import Container from "react-bootstrap/esm/Container";
 import Theme from "../../theme/Theme";
-import { StyledNavbar, StyledLogo, NavItems, Navlink, StyledImg} from "./Navbar.style";
+import { StyledNavbar, StyledLogo, NavItems, Navlink, StyledImg} from "./NavBar.style";
 import Nav from 'react-bootstrap/Nav'
 import Icons from '../../Icons';
 
