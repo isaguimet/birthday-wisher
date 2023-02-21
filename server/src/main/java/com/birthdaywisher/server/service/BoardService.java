@@ -19,6 +19,12 @@ public class BoardService {
         this.boardRepository = boardRepository;
     }
 
+    public boolean shouldCreateNewBoard(Map<String, String> payload) {
+        Optional<Board> userBoardForThisYear = boardRepository.findBoardByUserIdAndYear(
+                new ObjectId(payload.get("user")), String.valueOf(LocalDate.now().getYear()));
+        return userBoardForThisYear.isEmpty();
+    }
+
     public Board createBoard(Map<String, String> payload) {
         Board board = new Board();
         board.setUserId(new ObjectId(payload.get("user")));
@@ -95,6 +101,6 @@ public class BoardService {
     }
 
     public List<Board> getBoardsByUserId(ObjectId userId) {
-        return boardRepository.findByUserId(userId);
+        return boardRepository.findBoardsByUserId(userId);
     }
 }
