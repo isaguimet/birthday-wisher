@@ -193,4 +193,18 @@ public class UserController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
+
+    @PatchMapping("/setProfilePic/{userId}")
+    public ResponseEntity<?> setProfilePic(@RequestParam String profilePic, @PathVariable ObjectId userId) {
+        try {
+            Optional<User> optionalUser = userService.getSingleUser(userId);
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
+            }
+            return new ResponseEntity<>(userService.setProfilePic(optionalUser.get(), profilePic), HttpStatus.OK);
+
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
 }

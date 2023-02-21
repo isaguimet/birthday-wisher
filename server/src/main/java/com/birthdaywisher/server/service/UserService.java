@@ -125,4 +125,9 @@ public class UserService {
         });
         return friendList;
     }
+
+    public User setProfilePic(User user, String profilePic) {
+        user.setProfilePic(profilePic);
+        return userRepository.save(user);
+    }
 }
