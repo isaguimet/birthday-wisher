@@ -33,8 +33,8 @@ const ProfilePage = (props) => {
 
     const getBirthday = () => {
         // var bd = props.birthday + "Z"
-        var bday = new Date(props.birthday);
-        var today = new Date();
+        let bday = new Date(props.birthday);
+        let today = new Date();
 
         let diff = today.getTime() - bday.getTime();
         let age = Math.floor(diff/(1000*3600*24*365))
