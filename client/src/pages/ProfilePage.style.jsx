@@ -3,6 +3,8 @@ import styled from 'styled-components';
 export const StyledDiv = styled.div`
     padding-right: 15rem;
     padding-left: 15rem;
+    // display: flex;
+    // justify-content: center;
 `;
 
 export const Profile = styled.div`
@@ -20,4 +22,14 @@ export const Board = styled.div`
 
 export const BoardContainer = styled.div`
     padding-top: 5rem;
+`;
+
+export const ProfileInfo = styled.div`
+    display: inline;
+`;
+
+export const Age = styled.div`
+    display: inline;
+    background-color: ${props => props.theme.color.peach};  
+    border-radius: 10%;
 `;

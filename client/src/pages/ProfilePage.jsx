@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Theme from "../theme/Theme";
-import {StyledDiv, Profile, Board, BoardContainer} from "./ProfilePage.style"
+import {StyledDiv, Profile, Board, BoardContainer, ProfileInfo, Age, Circle} from "./ProfilePage.style"
 import BirthdayCard from '../components/birthdayCard/BirthdayCard';
 import ProfilePic from '../components/profilePic/ProfilePic';
 import Icons from '../Icons';
@@ -32,7 +32,6 @@ const ProfilePage = (props) => {
     // }
 
     const getBirthday = () => {
-        // var bd = props.birthday + "Z"
         let bday = new Date(props.birthday);
         let today = new Date();
 
@@ -41,7 +40,6 @@ const ProfilePage = (props) => {
         return (
             <>{age}</>
         );
-        
     }
 
     // ----
@@ -59,15 +57,23 @@ const ProfilePage = (props) => {
 
                     <Container>
                         <Row>
-                            <Col sm={2}><ProfilePic src={Icons[4]}/></Col>
-                            <Col>
+                            <Col Style="display:flex; justify-content:center"><ProfilePic src={Icons[4]}/></Col>
+                            <Col> 
                                 <Container>
                                     <Row>
-                                        <h1>{props.name} {getBirthday()}
-                                        </h1>
+                                        <ProfileInfo><h1 Style="display: inline;">{props.name}</h1> <h1 Style="display: inline;"><Age>{getBirthday()}</Age></h1></ProfileInfo>
+
                                     </Row>
                                     <Row>
-                                        <h4>{props.birthday}</h4> 
+                                        <h4><svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-cake" width="27" height="27" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+                                        <path d="M3 20h18v-8a3 3 0 0 0 -3 -3h-12a3 3 0 0 0 -3 3v8z"></path>
+                                        <path d="M3 14.803c.312 .135 .654 .204 1 .197a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1c.35 .007 .692 -.062 1 -.197"></path>
+                                        <path d="M12 4l1.465 1.638a2 2 0 1 1 -3.015 .099l1.55 -1.737z"></path>
+                                        </svg> 
+                                        {props.birthday}
+                                    </h4>
+
                                     </Row>
                                 </Container>
                             </Col>
