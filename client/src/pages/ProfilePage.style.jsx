@@ -3,8 +3,6 @@ import styled from 'styled-components';
 export const StyledDiv = styled.div`
     padding-right: 15rem;
     padding-left: 15rem;
-    // display: flex;
-    // justify-content: center;
 `;
 
 export const Profile = styled.div`
