@@ -63,6 +63,18 @@ public class BoardService {
         boardRepository.deleteById(id);
     }
 
+    public boolean alreadySentMessage(ObjectId boardId, Message msg) {
+        ObjectId requesterId = msg.getFromUserId();
+        Board board = boardRepository.findById(boardId).get();
+        Map<ObjectId, Message> messages = board.getMessages();
+        for (Message message : messages.values()) {
+            if (message.getFromUserId().equals(requesterId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Board createMessage(ObjectId boardId, Message msg) {
         Board board = boardRepository.findById(boardId).get();
         Map<ObjectId, Message> messages = board.getMessages();

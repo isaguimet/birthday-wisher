@@ -90,7 +90,13 @@ public class BoardController {
     @PostMapping("/{boardId}/messages")
     public ResponseEntity<?> createMessage(@PathVariable ObjectId boardId, @RequestBody Message msg) {
         try {
-            return new ResponseEntity<>(boardService.createMessage(boardId, msg), HttpStatus.CREATED);
+            if (boardService.alreadySentMessage(boardId, msg)) {
+                return new ResponseEntity<>(
+                        "User " + msg.getToUserId() + " has already submitted a message to board " + boardId,
+                        HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>(boardService.createMessage(boardId, msg), HttpStatus.CREATED);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
