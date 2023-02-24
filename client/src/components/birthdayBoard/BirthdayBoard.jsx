@@ -1,10 +1,8 @@
 import {Board, BoardContainer} from "../../pages/ProfilePage.style";
-import ListWishes from "../listWishes/ListWishes";
 import BirthdayCard from "../birthdayCard/BirthdayCard";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import {useState} from "react";
-import {useDispatch} from "react-redux";
-import {setBoardPrivate, setBoardPublic, setBoardClosed, setBoardOpen, deleteBoard} from "../../store/board";
+import axios from "axios";
 
 /**
  * A component for rendering a User Birthday Board.
@@ -14,6 +12,9 @@ import {setBoardPrivate, setBoardPublic, setBoardClosed, setBoardOpen, deleteBoa
  * - open {boolean} whether the board is open or closed (for people to submit messages to).
  * - public {boolean} whether the board is public or private (visibility from friends).
  * - messages {object} birthday messages that belong to this board.
+ * - setLoading {function} function to set loading in a parent component.
+ * - setData {function} function to set data in a parent component.
+ * - setError {function} function to set error in a parent component.
  * @returns {JSX.Element}
  * @constructor
  */
@@ -21,27 +22,72 @@ const BirthdayBoard = (props) => {
     const [isOpen, setOpen] = useState(props.open === true);
     const [isPublic, setPublic] = useState(props.public === true);
 
-    const dispatch = useDispatch();
-
     const togglePublic = () => {
+        props.setLoading(true);
         if (isPublic) {
-            dispatch(setBoardPrivate(props.boardId));
-            setPublic(false);
+            axios.patch(`http://localhost:8080/boards/setPrivate/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setPublic(false);
+            }).catch((err) => {
+                props.setLoading(false);
+                props.setData(null);
+                props.setError(err.response.statusText);
+            });
         } else {
-            dispatch(setBoardPublic(props.boardId));
-            setPublic(true);
+            axios.patch(`http://localhost:8080/boards/setPublic/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setPublic(true);
+            }).catch((err) => {
+                props.setLoading(false);
+                props.setData(null);
+                props.setError(err.response.statusText);
+            });
         }
-    }
+    };
 
     const toggleOpen = () => {
+        props.setLoading(true);
         if (isOpen) {
-            dispatch(setBoardClosed(props.boardId));
-            setOpen(false);
+            axios.patch(`http://localhost:8080/boards/setClosed/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setOpen(false);
+            }).catch((err) => {
+                props.setLoading(false);
+                props.setData(null);
+                props.setError(err.response.statusText);
+            });
         } else {
-            dispatch(setBoardOpen(props.boardId));
-            setOpen(true);
+            axios.patch(`http://localhost:8080/boards/setOpen/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setOpen(true);
+            }).catch((err) => {
+                props.setLoading(false);
+                props.setData(null);
+                props.setError(err.response.statusText);
+            });
         }
-    }
+    };
+
+    const deleteBoard = () => {
+        props.setLoading(true);
+        axios.delete(`http://localhost:8080/boards/${props.boardId}`).then((response) => {
+            props.setLoading(false);
+            props.setData(response.data);
+            props.setError(null);
+        }).catch((err) => {
+            props.setLoading(false);
+            props.setData(null);
+            props.setError(err.response.statusText);
+        });
+    };
 
     return (
         <BoardContainer>
@@ -65,8 +111,10 @@ const BirthdayBoard = (props) => {
                 width={100}
             />
 
-            <button onClick={() => {dispatch(deleteBoard(props.boardId))}}>Delete Board</button>
-            <button onClick={() => {}}>Add Wish</button>
+            <button onClick={deleteBoard}>Delete Board</button>
+            <button onClick={() => {
+            }}>Add Wish
+            </button>
 
             {/* if no item it doesn't render anything, if no item it should just render blank */}
             <Board>
@@ -80,11 +128,14 @@ const BirthdayBoard = (props) => {
                         toUserId={msg.toUserId}
                         lastUpdatedDate={msg.lastUpdatedDate}
                         msgText={msg.msgText}
+                        setLoading={props.setLoading}
+                        setData={props.setData}
+                        setError={props.setError}
                     />
                 ))}
             </Board>
         </BoardContainer>
-    )
+    );
 };
 
 export default BirthdayBoard;

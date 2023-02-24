@@ -2,24 +2,37 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Theme from "../theme/Theme";
-import {StyledDiv, Profile, Board, BoardContainer} from "./ProfilePage.style"
-import BirthdayCard from '../components/birthdayCard/BirthdayCard';
+import {StyledDiv, Profile} from "./ProfilePage.style"
 import ProfilePic from '../components/profilePic/ProfilePic';
 import Icons from '../Icons';
-import ListWishes from '../components/listWishes/ListWishes';
 import {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from "react-redux";
-import {getBoards} from "../store/board";
+// import {useSelector} from "react-redux";
 import BirthdayBoard from "../components/birthdayBoard/BirthdayBoard";
+import axios from "axios";
 
 
 const ProfilePage = (props) => {
 
-    const dispatch = useDispatch();
-    const board = useSelector(state => state.board);
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
+
+    // TODO: once user ID is stored in redux, useSelector instead of this hard-coded obj.
+    // const user = useSelector(state => state.user);
+    const user = {id: "63f300a9aa937b2f68a15e23"};
 
     useEffect(() => {
-        dispatch(getBoards())
+        // TODO: once we have user ID stored in redux, load it here as user.id to use in request.
+        setLoading(true);
+        axios.get(`http://localhost:8080/boards/byUserId/${user.id}`).then((response) => {
+            setLoading(false);
+            setData(response.data);
+            setError(null);
+        }).catch((err) => {
+            setLoading(false);
+            setData(null);
+            setError(err.response.statusText);
+        });
     }, []);
 
     return (
@@ -46,11 +59,11 @@ const ProfilePage = (props) => {
                         </Row>
                     </Container>
                 </Profile>
-                {board.loading && <div>Loading...</div>}
-                {!board.loading && board.error ? <div>Error: {board.error}</div> : null}
-                {!board.loading && board.data ? (
+                {loading && <div>Loading...</div>}
+                {!loading && error ? <div>Error: {error}</div> : null}
+                {!loading && data ? (
                     <div>
-                        {board.data.map((board) => (
+                        {data.map((board) => (
                             <BirthdayBoard
                                 key={board.id}
                                 id={board.id}
@@ -59,6 +72,9 @@ const ProfilePage = (props) => {
                                 open={board.open}
                                 public={board.public}
                                 messages={board.messages}
+                                setLoading={setLoading}
+                                setData={setData}
+                                setError={setError}
                             />
                         ))}
                     </div>
