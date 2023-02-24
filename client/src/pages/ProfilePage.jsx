@@ -9,6 +9,8 @@ import {useEffect, useState} from 'react';
 // import {useSelector} from "react-redux";
 import BirthdayBoard from "../components/birthdayBoard/BirthdayBoard";
 import axios from "axios";
+import {useLocation} from "react-router-dom";
+import {useSelector} from "react-redux";
 
 
 const ProfilePage = (props) => {
@@ -17,14 +19,18 @@ const ProfilePage = (props) => {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
 
-    // TODO: once user ID is stored in redux, useSelector instead of this hard-coded obj.
-    // const user = useSelector(state => state.user);
-    const user = {id: "63f300a9aa937b2f68a15e23"};
+    // the ID of the user that is accessing this page
+    const loggedInUser = useSelector((state) => state.user.id);
+
+    // the ID of the user whose profile is shown on this page
+    const path = useLocation().pathname;
+    const profileUser = path.substring(path.lastIndexOf("/") + 1);
+
+    console.log(`user ${loggedInUser} is accessing the profile of user ${profileUser}`);
 
     useEffect(() => {
-        // TODO: once we have user ID stored in redux, load it here as user.id to use in request.
         setLoading(true);
-        axios.get(`http://localhost:8080/boards/byUserId/${user.id}`).then((response) => {
+        axios.get(`http://localhost:8080/boards/byUserId/${loggedInUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
