@@ -108,7 +108,7 @@ public class UserController {
 
             Boolean areFriendsAlready = userService.checkIfAlreadyFriends(optionalUser.get(), optionalFriend.get());
             if (areFriendsAlready) {
-                return new ResponseEntity<>("User email " + userEmail + " and friend email " + friendEmail + "are already friends",
+                return new ResponseEntity<>("User email " + userEmail + " and friend email " + friendEmail + " are already friends",
                         HttpStatus.BAD_REQUEST);
             }
             Boolean isDupFriendRequest = userService.isDuplicatedFriendRequest(optionalUser.get(), optionalFriend.get());

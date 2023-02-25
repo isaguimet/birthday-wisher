@@ -68,17 +68,9 @@ public class UserService {
 
     public Boolean checkIfAlreadyFriends(User fromUser, User toUser) {
         ArrayList<ObjectId> fromUserFriends = fromUser.getFriends();
-        ArrayList<ObjectId> toUserFriends = fromUser.getFriends();
 
         for (ObjectId friend : fromUserFriends) {
             if (friend.equals(toUser.getId())) {
-                return true;
-            }
-        }
-
-        // I think this extra check wouldn't be needed as they would appear in each other's lists
-        for (ObjectId friend : toUserFriends) {
-            if (friend.equals(fromUser.getId())) {
                 return true;
             }
         }
