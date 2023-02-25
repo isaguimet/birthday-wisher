@@ -20,12 +20,18 @@ public class BoardService {
         this.boardRepository = boardRepository;
     }
 
+    public boolean shouldCreateNewBoard(Map<String, String> payload) {
+        Optional<Board> userBoardForThisYear = boardRepository.findBoardByUserIdAndYear(
+                new ObjectId(payload.get("user")), String.valueOf(LocalDate.now().getYear()));
+        return userBoardForThisYear.isEmpty();
+    }
+
     public List<Board> createBoard(Map<String, String> payload) {
         ObjectId oId = new ObjectId(payload.get("user"));
         Board board = new Board();
         board.setUserId(oId);
         boardRepository.save(board);
-        return boardRepository.findByUserId(oId);
+        return boardRepository.findBoardsByUserId(oId);
     }
 
     public Optional<Board> getBoardById(ObjectId id) {
@@ -36,38 +42,50 @@ public class BoardService {
         Board board = boardRepository.findById(id).get();
         board.setPublic(true);
         board = boardRepository.save(board);
-        return boardRepository.findByUserId(board.getUserId());
+        return boardRepository.findBoardsByUserId(board.getUserId());
     }
 
     public List<Board> setBoardPrivate(ObjectId id) {
         Board board = boardRepository.findById(id).get();
         board.setPublic(false);
         board = boardRepository.save(board);
-        return boardRepository.findByUserId(board.getUserId());
+        return boardRepository.findBoardsByUserId(board.getUserId());
     }
 
     public List<Board> setBoardOpen(ObjectId id) {
         Board board = boardRepository.findById(id).get();
         board.setOpen(true);
         board = boardRepository.save(board);
-        return boardRepository.findByUserId(board.getUserId());
+        return boardRepository.findBoardsByUserId(board.getUserId());
     }
 
     public List<Board> setBoardClosed(ObjectId id) {
         Board board = boardRepository.findById(id).get();
         board.setOpen(false);
         board = boardRepository.save(board);
-        return boardRepository.findByUserId(board.getUserId());
+        return boardRepository.findBoardsByUserId(board.getUserId());
     }
 
     public List<Board> deleteBoard(ObjectId id) {
         Optional<Board> board = boardRepository.findById(id);
         boardRepository.deleteById(id);
         if (board.isPresent()) {
-            return boardRepository.findByUserId(board.get().getUserId());
+            return boardRepository.findBoardsByUserId(board.get().getUserId());
         }
 
         return Collections.emptyList();
+    }
+
+    public boolean alreadySentMessage(ObjectId boardId, Message msg) {
+        ObjectId requesterId = msg.getFromUserId();
+        Board board = boardRepository.findById(boardId).get();
+        Map<ObjectId, Message> messages = board.getMessages();
+        for (Message message : messages.values()) {
+            if (message.getFromUserId().equals(requesterId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Board> createMessage(ObjectId boardId, Message msg) {
@@ -76,7 +94,7 @@ public class BoardService {
         messages.put(msg.getId(), msg);
         board.setMessages(messages);
         board = boardRepository.save(board);
-        return boardRepository.findByUserId(board.getUserId());
+        return boardRepository.findBoardsByUserId(board.getUserId());
     }
 
     public Message getMsgById(ObjectId boardId, ObjectId msgId) {
@@ -96,7 +114,7 @@ public class BoardService {
 
         board.setMessages(messages);
         board = boardRepository.save(board);
-        return boardRepository.findByUserId(board.getUserId());
+        return boardRepository.findBoardsByUserId(board.getUserId());
     }
 
     public List<Board> deleteMessage(ObjectId boardId, ObjectId msgId) {
@@ -107,10 +125,10 @@ public class BoardService {
 
         board.setMessages(messages);
         board = boardRepository.save(board);
-        return boardRepository.findByUserId(board.getUserId());
+        return boardRepository.findBoardsByUserId(board.getUserId());
     }
 
     public List<Board> getBoardsByUserId(ObjectId userId) {
-        return boardRepository.findByUserId(userId);
+        return boardRepository.findBoardsByUserId(userId);
     }
 }
