@@ -1,9 +1,9 @@
 import LoginForm from "../components/LoginForm";
+import "../components/LoginStyle.css";
 
 const LoginPage = () => {
     return (
         <div>
-            <p>Welcome to Birthday Wisher!</p>
             <LoginForm/>
         </div>
     );
