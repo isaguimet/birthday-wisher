@@ -12,7 +12,6 @@ export const Profile = styled.div`
 `;
 
 export const Board = styled.div`
-    background-color: rgba(48, 49, 121, 0.25);
     display: flex;
     justify-content: center
     

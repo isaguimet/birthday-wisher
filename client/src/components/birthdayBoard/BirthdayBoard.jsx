@@ -5,6 +5,11 @@ import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import {useState} from "react";
 import {useDispatch} from "react-redux";
 import {setBoardPrivate, setBoardPublic, setBoardClosed, setBoardOpen, deleteBoard} from "../../store/board";
+import Switch from "@mui/material/Switch"
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Button from '@mui/material/Button';
+
 
 /**
  * A component for rendering a User Birthday Board.
@@ -45,10 +50,9 @@ const BirthdayBoard = (props) => {
 
     return (
         <BoardContainer>
-            {props.year}
-
+            <h2>{props.year}</h2>
             {/*TODO: only make these switches visible if this is viewed on the profile page of the current user*/}
-            <BootstrapSwitchButton
+            {/* <BootstrapSwitchButton
                 id={"public_toggle"}
                 checked={isPublic}
                 onlabel={"Public"}
@@ -63,10 +67,16 @@ const BirthdayBoard = (props) => {
                 offlabel={"Closed"}
                 onChange={toggleOpen}
                 width={100}
-            />
+            /> */}
 
-            <button onClick={() => {dispatch(deleteBoard(props.boardId))}}>Delete Board</button>
-            <button onClick={() => {}}>Add Wish</button>
+            <FormGroup Style="display: inline;">
+                <FormControlLabel control={<Switch checked={isPublic} onChange={togglePublic}/>} label="Public" />
+            </FormGroup>
+            <div Style="margin-right: 0.7rem; display:inline;">
+                <Button variant="contained" color="error" size="small" onClick={() => {dispatch(deleteBoard(props.boardId))}}>Delete Board</Button>
+            </div>
+            
+            <Button variant="contained" size="small" onClick={() => {}}>Add Wish</Button>
 
             {/* if no item it doesn't render anything, if no item it should just render blank */}
             <Board>
