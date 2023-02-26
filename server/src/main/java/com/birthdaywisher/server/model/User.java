@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 @Data
@@ -23,6 +24,8 @@ public class User {
     private String email;
     private String password;
     private LocalDate birthdate;
-    private HashMap<ObjectId, Boolean> friends;
+    private ArrayList<ObjectId> friends = new ArrayList<>();
+    // Boolean represents if userId (ObjectId) initiated the friend request
+    private HashMap<ObjectId, Boolean> pendingFriends = new HashMap<>();
     private String profilePic;
 }

@@ -44,85 +44,121 @@ public class UserService {
         return userRepository.findUserByEmail(email);
     }
 
-    public void sendFriendRequest(Optional<User> optionalUser, Optional<User> optionalFriend) {
-        User user = optionalUser.get();
-        User friend = optionalFriend.get();
+    public void sendFriendRequest(User fromUser, User toUser) {
+        HashMap<ObjectId, Boolean> userFromPendingFriends = fromUser.getPendingFriends();
+        HashMap<ObjectId, Boolean> userToPendingFriends = toUser.getPendingFriends();
 
-        savePendingFriendRequests(friend, user);
-        savePendingFriendRequests(user, friend);
+        // the friend request was not initiated by "toUser", so value=false
+        userFromPendingFriends.put(toUser.getId(), false);
+        fromUser.setPendingFriends(userFromPendingFriends);
+        userRepository.save(fromUser);
+
+        // the friend request was initiated by "fromUser", so value=true
+        userToPendingFriends.put(fromUser.getId(), true);
+        toUser.setPendingFriends(userToPendingFriends);
+        userRepository.save(toUser);
     }
 
-    private void savePendingFriendRequests(User user, User friend) {
-        HashMap<ObjectId, Boolean> pendingFriendRequests;
-        if (friend.getFriends() == null) {
-            pendingFriendRequests = new HashMap<>();
-        } else {
-            pendingFriendRequests = friend.getFriends();
+    public Boolean isDuplicatedFriendRequest(User fromUser, User toUser) {
+        // Check if a friend request was already sent
+        HashMap<ObjectId, Boolean> userToPendingFriends = toUser.getPendingFriends();
+
+        return userToPendingFriends.containsKey(fromUser.getId());
+    }
+
+    public Boolean checkIfAlreadyFriends(User fromUser, User toUser) {
+        ArrayList<ObjectId> fromUserFriends = fromUser.getFriends();
+
+        for (ObjectId friend : fromUserFriends) {
+            if (friend.equals(toUser.getId())) {
+                return true;
+            }
         }
-        // Pending friend requests are set to false. Accepted friends requests are set to true
-        pendingFriendRequests.put(user.getId(), false);
-        friend.setFriends(pendingFriendRequests);
-        userRepository.save(friend);
+        return false;
     }
 
     public List<User> getPendingFriendRequests(User user) {
-        HashMap<ObjectId, Boolean> friendHashMap = user.getFriends();
+        HashMap<ObjectId, Boolean> pendingFriends = user.getPendingFriends();
         List<User> pendingFriendRequests = new ArrayList<>();
 
-        if (friendHashMap == null) {
+        if (pendingFriends == null) {
             return Collections.emptyList();
         }
         else {
-            friendHashMap.forEach((key, value) -> {
-                // value=false means that this is a pending friend request
-                if (!value && userRepository.findById(key).isPresent()) {
-                    pendingFriendRequests.add(userRepository.findById(key).get());
+            pendingFriends.forEach((userId, isInitiator) -> {
+                // isInitiator=true means a userId (not the current userId) initiated the friend request
+                // isInitiator=false means the current userId sent the friend request
+                // client side shows which requests they need to accept/decline or waiting for request to be accepted/declined
+                // based on isInitiator value
+                if (userRepository.findById(userId).isPresent()) {
+                    pendingFriendRequests.add(userRepository.findById(userId).get());
                 }
             });
             return pendingFriendRequests;
         }
     }
 
-    public void acceptFriendRequest(User user, User friend) {
-        HashMap<ObjectId, Boolean> userFriendHashMap = user.getFriends();
-        HashMap<ObjectId, Boolean> friendHashMap = friend.getFriends();
+    public Boolean acceptFriendRequest(User user, User friend) {
+        HashMap<ObjectId, Boolean> pendingFriendsOfUser = user.getPendingFriends();
+        HashMap<ObjectId, Boolean> pendingFriendsOfFriend = friend.getPendingFriends();
 
-        if (userFriendHashMap.containsKey(friend.getId())) {
-            userFriendHashMap.put(friend.getId(), true);
+        ArrayList<ObjectId> userFriends = user.getFriends();
+        ArrayList<ObjectId> friendFriends = friend.getFriends();
+
+        // We can only accept friend requests if the user is NOT the one who initiated the request
+        // If a particular friend id maps to false then user is the one who initiated
+        if (!pendingFriendsOfUser.get(friend.getId())) {
+            return false;
+        } else {
+            // Remove each other from each other's pending friends list
+            if (pendingFriendsOfUser.containsKey(friend.getId())) {
+                pendingFriendsOfUser.remove(friend.getId(), true);
+            }
+            if (pendingFriendsOfFriend.containsKey(user.getId())) {
+                pendingFriendsOfFriend.remove(user.getId(), false);
+            }
+            // Add each other as friends
+            userFriends.add(friend.getId());
+            friendFriends.add(user.getId());
+
             userRepository.save(user);
-        }
-
-        if (friendHashMap.containsKey(user.getId())) {
-            friendHashMap.put(user.getId(), true);
             userRepository.save(friend);
+            return true;
         }
     }
 
-    public void declineFriendRequest(User user, User friend) {
-        HashMap<ObjectId, Boolean> userFriendHashMap = user.getFriends();
-        HashMap<ObjectId, Boolean> friendHashMap = friend.getFriends();
+    public Boolean declineFriendRequest(User user, User friend) {
+        HashMap<ObjectId, Boolean> pendingFriendsOfUser = user.getPendingFriends();
+        HashMap<ObjectId, Boolean> pendingFriendsOfFriend = friend.getPendingFriends();
 
-        if (userFriendHashMap.containsKey(friend.getId())) {
-            userFriendHashMap.remove(friend.getId(), false);
-            userRepository.save(user);
-        }
+        // We can only decline friend requests if the user is NOT the one who initiated the request
+        // If a particular friend id maps to false then user is the one who initiated
+        if (!pendingFriendsOfUser.get(friend.getId())) {
+            return false;
+        } else {
+            if (pendingFriendsOfUser.containsKey(friend.getId())) {
+                pendingFriendsOfUser.remove(friend.getId(), true);
+                userRepository.save(user);
+            }
 
-        if (friendHashMap.containsKey(user.getId())) {
-            friendHashMap.remove(user.getId(), false);
-            userRepository.save(friend);
+            if (pendingFriendsOfFriend.containsKey(user.getId())) {
+                pendingFriendsOfFriend.remove(user.getId(), false);
+                userRepository.save(friend);
+            }
+            return true;
         }
     }
 
     public List<User> getFriendListByUser(User user) {
-        HashMap<ObjectId, Boolean> friendHashMap = user.getFriends();
+        ArrayList<ObjectId> friends = user.getFriends();
         List<User> friendList = new ArrayList<>();
-        friendHashMap.forEach((userId, value) -> {
-            // Reminder: value set to true means friend whereas value set to false means pending friend
-            if (value && userRepository.findById(userId).isPresent()) {
+
+        for (ObjectId userId : friends) {
+            if (userRepository.findById(userId).isPresent()) {
                 User friend = userRepository.findById(userId).get();
                 friendList.add(friend);
             }
-        });
+        }
         return friendList;
     }
 

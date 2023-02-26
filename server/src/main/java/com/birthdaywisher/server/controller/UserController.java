@@ -12,6 +12,7 @@ import java.time.MonthDay;
 import java.util.*;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/users")
 public class UserController {
     private UserService userService;
@@ -105,7 +106,17 @@ public class UserController {
                 return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
             }
 
-            userService.sendFriendRequest(optionalUser, optionalFriend);
+            Boolean areFriendsAlready = userService.checkIfAlreadyFriends(optionalUser.get(), optionalFriend.get());
+            if (areFriendsAlready) {
+                return new ResponseEntity<>("User email " + userEmail + " and friend email " + friendEmail + " are already friends",
+                        HttpStatus.BAD_REQUEST);
+            }
+            Boolean isDupFriendRequest = userService.isDuplicatedFriendRequest(optionalUser.get(), optionalFriend.get());
+            if (isDupFriendRequest) {
+                return new ResponseEntity<>("User email " + userEmail + " already sent a friend request to " + friendEmail,
+                        HttpStatus.BAD_REQUEST);
+            }
+            userService.sendFriendRequest(optionalUser.get(), optionalFriend.get());
 
             return new ResponseEntity<>(optionalFriend.get(), HttpStatus.OK);
         }
@@ -144,9 +155,12 @@ public class UserController {
                 return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
             }
 
-            userService.acceptFriendRequest(optionalUser.get(), optionalFriend.get());
+            Boolean isAccepted = userService.acceptFriendRequest(optionalUser.get(), optionalFriend.get());
+            if (!isAccepted) {
+                return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
+                        "This userId cannot accept the request ", HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
-
         }
         catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -167,9 +181,12 @@ public class UserController {
                 return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
             }
 
-            userService.declineFriendRequest(optionalUser.get(), optionalFriend.get());
+            Boolean isDeclined = userService.declineFriendRequest(optionalUser.get(), optionalFriend.get());
+            if (!isDeclined) {
+                return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
+                        "This userId cannot decline the request ", HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
-
         }
         catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

@@ -13,8 +13,9 @@ export const Profile = styled.div`
 export const Board = styled.div`
     background-color: rgba(48, 49, 121, 0.25);
     display: flex;
-    justify-content: center
-    
+    justify-content: center;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 `;
 
 export const BoardContainer = styled.div`

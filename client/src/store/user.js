@@ -3,7 +3,7 @@ import { combineReducers } from 'redux';
 import axios from 'axios';
 
 const initialAuthState = {
-    user: null,
+    id: null,
 }
 
 const initialUserState = {
@@ -17,10 +17,10 @@ export const authSlice = createSlice({
     initialState:initialAuthState,
     reducers: {
         setLogin: (state, action) => {
-            state.user = action.payload.user;
+            state.id = action.payload.id;
         },
         setLogout: (state) => {
-            state.user = null;
+            state.id = null;
         },
     }
 });

@@ -52,9 +52,10 @@ const LoginForm = () => {
     const login = async (values, onSubmitProps) => {
         // TODO: make API call to authenticate user
         onSubmitProps.resetForm();
+        // TODO: use ID from API call response, not this hard-coded ID
         dispatch(
             setLogin({
-                user: values.email
+                id: "63f300a9aa937b2f68a15e23"
             })
         );
         navigate("/home");
