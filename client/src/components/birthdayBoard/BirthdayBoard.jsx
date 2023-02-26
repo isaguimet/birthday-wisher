@@ -4,6 +4,7 @@ import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import {useState} from "react";
 import axios from "axios";
 import {useSelector} from "react-redux";
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 /**
  * A component for rendering a User Birthday Board.
@@ -96,53 +97,64 @@ const BirthdayBoard = (props) => {
     };
 
     return (
-        <BoardContainer>
-            {props.year}
+        <>
+            <BoardContainer>
+                {props.year}
 
-            {loggedInUserIsProfileUser && (
-                <>
-                    <BootstrapSwitchButton
-                        id={"public_toggle"}
-                        checked={isPublic}
-                        onlabel={"Public"}
-                        offlabel={"Private"}
-                        onChange={togglePublic}
-                        width={100}
-                    />
-                    <BootstrapSwitchButton
-                        id={"open_toggle"}
-                        checked={isOpen}
-                        onlabel={"Open"}
-                        offlabel={"Closed"}
-                        onChange={toggleOpen}
-                        width={100}
-                    />
-                    <button onClick={deleteBoard}>Delete Board</button>
-                </>
-            )}
+                {loggedInUserIsProfileUser || (!loggedInUserIsProfileUser && isPublic) ? (
+                    <>
+                        {loggedInUserIsProfileUser && (
+                            <>
+                                <BootstrapSwitchButton
+                                    id={"public_toggle"}
+                                    checked={isPublic}
+                                    onlabel={"Public"}
+                                    offlabel={"Private"}
+                                    onChange={togglePublic}
+                                    width={100}
+                                />
+                                <BootstrapSwitchButton
+                                    id={"open_toggle"}
+                                    checked={isOpen}
+                                    onlabel={"Open"}
+                                    offlabel={"Closed"}
+                                    onChange={toggleOpen}
+                                    width={100}
+                                />
+                                <button onClick={deleteBoard}>Delete Board</button>
+                            </>
+                        )}
 
-            {!loggedInUserIsProfileUser && <button onClick={() => {}}>Add Wish</button>}
+                        {!loggedInUserIsProfileUser && <button onClick={() => {}}>Add Wish</button>}
 
-            {/* if no item it doesn't render anything, if no item it should just render blank */}
-            <Board>
-                {Object.entries(props.messages).map(([msgId, msg]) => (
-                    <BirthdayCard
-                        key={msgId}
-                        id={msgId}
-                        boardId={props.boardId}
-                        msgId={msgId}
-                        fromUserId={msg.fromUserId}
-                        toUserId={msg.toUserId}
-                        lastUpdatedDate={msg.lastUpdatedDate}
-                        msgText={msg.msgText}
-                        setLoading={props.setLoading}
-                        setData={props.setData}
-                        setError={props.setError}
-                        profileUser={props.profileUser}
-                    />
-                ))}
-            </Board>
-        </BoardContainer>
+                        {/* if no item it doesn't render anything, if no item it should just render blank */}
+                        <Board>
+                            {Object.entries(props.messages).map(([msgId, msg]) => (
+                                <BirthdayCard
+                                    key={msgId}
+                                    id={msgId}
+                                    boardId={props.boardId}
+                                    msgId={msgId}
+                                    fromUserId={msg.fromUserId}
+                                    toUserId={msg.toUserId}
+                                    lastUpdatedDate={msg.lastUpdatedDate}
+                                    msgText={msg.msgText}
+                                    setLoading={props.setLoading}
+                                    setData={props.setData}
+                                    setError={props.setError}
+                                    profileUser={props.profileUser}
+                                />
+                            ))}
+                        </Board>
+                    </>
+                ) : (
+                    <Board>
+                        <LockOutlinedIcon/>
+                        <p>This board is private.</p>
+                    </Board>
+                )}
+            </BoardContainer>
+        </>
     );
 };
 
