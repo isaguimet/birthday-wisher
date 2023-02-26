@@ -181,7 +181,14 @@ const BirthdayBoard = (props) => {
                                     <input type={"submit"} value={"Submit"}/>
                                 </form>
                             ) : (
-                                <button onClick={() => setEditing(true)}>Add Wish</button>
+                                <>
+                                    {isOpen ? (
+                                        <button onClick={() => setEditing(true)}>Add Wish</button>
+                                    ) : (
+                                        <p>Submissions are closed for this board.</p>
+                                    )}
+                                </>
+
                             )}
                         </>}
 
@@ -208,7 +215,6 @@ const BirthdayBoard = (props) => {
                 ) : (
                     <Board>
                         <LockOutlinedIcon/>
-                        {/*do smth similar for closed*/}
                         <p>This board is private.</p>
                     </Board>
                 )}
