@@ -29,6 +29,35 @@ const BirthdayBoard = (props) => {
     const [isOpen, setOpen] = useState(props.open === true);
     const [isPublic, setPublic] = useState(props.public === true);
 
+    const [isEditing, setEditing] = useState(false);
+    const [input, setInput] = useState("");
+
+    const handleChange = (event) => {
+        setInput(event.target.value);
+    };
+
+    const handleSubmit = (event) => {
+        const data = {
+            fromUserId: loggedInUser,
+            toUserId: props.profileUser,
+            msgText: input,
+        };
+        props.setLoading(true);
+        axios.post(`http://localhost:8080/boards/${props.boardId}/messages`, data).then((response) => {
+            props.setLoading(false);
+            props.setData(response.data);
+            props.setError(null);
+        }).catch((err) => {
+            props.setLoading(false);
+            //props.setData(null);
+            if (err.response) {
+                props.setError(err.response.data);
+            } else {
+                props.setError(err.message);
+            }
+        });
+    };
+
     const togglePublic = () => {
         props.setLoading(true);
         if (isPublic) {
@@ -39,8 +68,12 @@ const BirthdayBoard = (props) => {
                 setPublic(false);
             }).catch((err) => {
                 props.setLoading(false);
-                props.setData(null);
-                props.setError(err.response.statusText);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
             });
         } else {
             axios.patch(`http://localhost:8080/boards/setPublic/${props.boardId}`).then((response) => {
@@ -50,8 +83,12 @@ const BirthdayBoard = (props) => {
                 setPublic(true);
             }).catch((err) => {
                 props.setLoading(false);
-                props.setData(null);
-                props.setError(err.response.statusText);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
             });
         }
     };
@@ -66,8 +103,12 @@ const BirthdayBoard = (props) => {
                 setOpen(false);
             }).catch((err) => {
                 props.setLoading(false);
-                props.setData(null);
-                props.setError(err.response.statusText);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
             });
         } else {
             axios.patch(`http://localhost:8080/boards/setOpen/${props.boardId}`).then((response) => {
@@ -77,8 +118,12 @@ const BirthdayBoard = (props) => {
                 setOpen(true);
             }).catch((err) => {
                 props.setLoading(false);
-                props.setData(null);
-                props.setError(err.response.statusText);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
             });
         }
     };
@@ -91,8 +136,12 @@ const BirthdayBoard = (props) => {
             props.setError(null);
         }).catch((err) => {
             props.setLoading(false);
-            props.setData(null);
-            props.setError(err.response.statusText);
+            //props.setData(null);
+            if (err.response) {
+                props.setError(err.response.data);
+            } else {
+                props.setError(err.message);
+            }
         });
     };
 
@@ -125,7 +174,16 @@ const BirthdayBoard = (props) => {
                             </>
                         )}
 
-                        {!loggedInUserIsProfileUser && <button onClick={() => {}}>Add Wish</button>}
+                        {!loggedInUserIsProfileUser && <>
+                            {isEditing ? (
+                                <form onSubmit={handleSubmit}>
+                                    <input type={"text"} value={input} onChange={handleChange}/>
+                                    <input type={"submit"} value={"Submit"}/>
+                                </form>
+                            ) : (
+                                <button onClick={() => setEditing(true)}>Add Wish</button>
+                            )}
+                        </>}
 
                         {/* if no item it doesn't render anything, if no item it should just render blank */}
                         <Board>
@@ -150,6 +208,7 @@ const BirthdayBoard = (props) => {
                 ) : (
                     <Board>
                         <LockOutlinedIcon/>
+                        {/*do smth similar for closed*/}
                         <p>This board is private.</p>
                     </Board>
                 )}

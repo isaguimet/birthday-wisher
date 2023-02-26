@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import BirthdayBoard from "../birthdayBoard/BirthdayBoard";
 import axios from "axios";
 import {BoardContainer} from "../../pages/ProfilePage.style";
+import {Alert} from "reactstrap";
 
 /**
  * A component for fetching and rendering information about all boards that belong to a specific user.
@@ -24,20 +25,27 @@ const BoardSection = (props) => {
             setError(null);
         }).catch((err) => {
             setLoading(false);
-            setData(null);
-            console.log(err)
+            //setData(null);
             if (err.response) {
-                setError(err.response.statusText);
+                setError(err.response.data);
             } else {
                 setError(err.message);
             }
         });
     }, []);
 
+    const handleAlertToggle = () => {
+        setError(null);
+    }
+
     return (
         <BoardContainer>
+            {!!error && (
+                <Alert color={"danger"} toggle={handleAlertToggle}>
+                    Error: {error}
+                </Alert>
+            )}
             {loading && <div>Loading board info...</div>}
-            {!loading && error ? <div>Error fetching board info: {error}. Try again later.</div> : null}
             {!loading && data ? (
                 <div>
                     {data.map((board) => (

@@ -44,8 +44,12 @@ const BirthdayCard = (props) => {
             props.setError(null);
         }).catch((err) => {
             props.setLoading(false);
-            props.setData(null);
-            props.setError(err.response.statusText);
+            //props.setData(null);
+            if (err.response) {
+                props.setError(err.response.data);
+            } else {
+                props.setError(err.message);
+            }
         });
     };
 
@@ -57,8 +61,12 @@ const BirthdayCard = (props) => {
             props.setError(null);
         }).catch((err) => {
             props.setLoading(false);
-            props.setData(null);
-            props.setError(err.response.statusText);
+            //props.setData(null);
+            if (err.response) {
+                props.setError(err.response.data);
+            } else {
+                props.setError(err.message);
+            }
         });
     };
 
