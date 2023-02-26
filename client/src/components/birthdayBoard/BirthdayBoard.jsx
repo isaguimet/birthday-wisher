@@ -3,6 +3,7 @@ import BirthdayCard from "../birthdayCard/BirthdayCard";
 import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import {useState} from "react";
 import axios from "axios";
+import {useSelector} from "react-redux";
 
 /**
  * A component for rendering a User Birthday Board.
@@ -15,10 +16,15 @@ import axios from "axios";
  * - setLoading {function} function to set loading in a parent component.
  * - setData {function} function to set data in a parent component.
  * - setError {function} function to set error in a parent component.
+ * - profileUser {string} the unique identifier for the user whose board this component is displaying.
  * @returns {JSX.Element}
  * @constructor
  */
 const BirthdayBoard = (props) => {
+    // the ID of the user that is accessing this page
+    const loggedInUser = useSelector((state) => state.user.id);
+    const loggedInUserIsProfileUser = loggedInUser === props.profileUser;
+
     const [isOpen, setOpen] = useState(props.open === true);
     const [isPublic, setPublic] = useState(props.public === true);
 
