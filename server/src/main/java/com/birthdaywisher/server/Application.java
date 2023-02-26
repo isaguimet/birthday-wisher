@@ -54,7 +54,7 @@ public class Application {
                     }
                 }
 
-                boards.add(new Board(new ObjectId(), true, true, "2021", toUserId, messages2021));
+                boards.add(new Board(new ObjectId(), true, false, "2021", toUserId, messages2021));
                 boards.add(new Board(new ObjectId(), false, true, "2022", toUserId, messages2022));
                 boards.add(new Board(new ObjectId(), true, true, "2023", toUserId, messages2023));
             }
