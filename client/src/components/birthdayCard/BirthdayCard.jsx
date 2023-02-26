@@ -3,6 +3,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {useState} from "react";
 import axios from "axios";
+import {useSelector} from "react-redux";
 
 /**
  * A component for rendering a User Birthday Message.
@@ -16,10 +17,17 @@ import axios from "axios";
  * - setLoading {function} function to set loading in a parent component.
  * - setData {function} function to set data in a parent component.
  * - setError {function} function to set error in a parent component.
+ * - profileUser {string} the unique identifier for the user whose board this component is displaying.
  * @returns {JSX.Element}
  * @constructor
  */
 const BirthdayCard = (props) => {
+
+    // the ID of the user that is accessing this page
+    const loggedInUser = useSelector((state) => state.user.id);
+    const loggedInUserIsProfileUser = loggedInUser === props.profileUser;
+    const loggedInUserIsMsgCreator = loggedInUser === props.fromUserId;
+
     const [isEditing, setEditing] = useState(false);
     const [input, setInput] = useState("");
 
@@ -57,12 +65,14 @@ const BirthdayCard = (props) => {
     return (
         <Card style={{width: '18rem'}}>
             <Card.Body>
-                {!isEditing && (
-                    <>
+                {!isEditing && <>
+                    {loggedInUserIsMsgCreator &&
                         <EditOutlinedIcon onClick={() => setEditing(true)}/>
+                    }
+                    {(loggedInUserIsMsgCreator || loggedInUserIsProfileUser) && (
                         <DeleteOutlineOutlinedIcon onClick={handleDelete}/>
-                    </>
-                )}
+                    )}
+                </>}
                 {isEditing && (
                     <form onSubmit={handleSubmit}>
                         <input type={"text"} value={input} onChange={handleChange}/>

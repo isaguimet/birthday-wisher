@@ -99,28 +99,29 @@ const BirthdayBoard = (props) => {
         <BoardContainer>
             {props.year}
 
-            {/*TODO: only make these switches visible if this is viewed on the profile page of the current user*/}
-            <BootstrapSwitchButton
-                id={"public_toggle"}
-                checked={isPublic}
-                onlabel={"Public"}
-                offlabel={"Private"}
-                onChange={togglePublic}
-                width={100}
-            />
-            <BootstrapSwitchButton
-                id={"open_toggle"}
-                checked={isOpen}
-                onlabel={"Open"}
-                offlabel={"Closed"}
-                onChange={toggleOpen}
-                width={100}
-            />
+            {loggedInUserIsProfileUser && (
+                <>
+                    <BootstrapSwitchButton
+                        id={"public_toggle"}
+                        checked={isPublic}
+                        onlabel={"Public"}
+                        offlabel={"Private"}
+                        onChange={togglePublic}
+                        width={100}
+                    />
+                    <BootstrapSwitchButton
+                        id={"open_toggle"}
+                        checked={isOpen}
+                        onlabel={"Open"}
+                        offlabel={"Closed"}
+                        onChange={toggleOpen}
+                        width={100}
+                    />
+                    <button onClick={deleteBoard}>Delete Board</button>
+                </>
+            )}
 
-            <button onClick={deleteBoard}>Delete Board</button>
-            <button onClick={() => {
-            }}>Add Wish
-            </button>
+            {!loggedInUserIsProfileUser && <button onClick={() => {}}>Add Wish</button>}
 
             {/* if no item it doesn't render anything, if no item it should just render blank */}
             <Board>
@@ -137,6 +138,7 @@ const BirthdayBoard = (props) => {
                         setLoading={props.setLoading}
                         setData={props.setData}
                         setError={props.setError}
+                        profileUser={props.profileUser}
                     />
                 ))}
             </Board>
