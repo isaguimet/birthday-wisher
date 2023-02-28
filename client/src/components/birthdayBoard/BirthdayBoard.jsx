@@ -1,10 +1,13 @@
 import {Board, BoardContainer} from "../../pages/ProfilePage.style";
 import BirthdayCard from "../birthdayCard/BirthdayCard";
-import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import {useState} from "react";
 import axios from "axios";
 import {useSelector} from "react-redux";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
+import Switch from "@mui/material/Switch"
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Button from '@mui/material/Button';
 
 /**
  * A component for rendering a User Birthday Board.
@@ -154,23 +157,19 @@ const BirthdayBoard = (props) => {
                     <>
                         {loggedInUserIsProfileUser && (
                             <>
-                                <BootstrapSwitchButton
-                                    id={"public_toggle"}
-                                    checked={isPublic}
-                                    onlabel={"Public"}
-                                    offlabel={"Private"}
-                                    onChange={togglePublic}
-                                    width={100}
-                                />
-                                <BootstrapSwitchButton
-                                    id={"open_toggle"}
-                                    checked={isOpen}
-                                    onlabel={"Open"}
-                                    offlabel={"Closed"}
-                                    onChange={toggleOpen}
-                                    width={100}
-                                />
-                                <button onClick={deleteBoard}>Delete Board</button>
+                                <FormGroup style={{display: "inline"}}>
+                                    <FormControlLabel control={<Switch checked={isPublic} onChange={togglePublic}/>}
+                                                      label="Public"/>
+                                </FormGroup>
+                                <FormGroup style={{display: "inline"}}>
+                                    <FormControlLabel control={<Switch checked={isOpen} onChange={toggleOpen}/>}
+                                                      label="Open"/>
+                                </FormGroup>
+                                <div style={{marginRight: "0.7rem", display: "inline"}}>
+                                    <Button variant="contained" color="error" size="small" onClick={deleteBoard}>
+                                        Delete Board
+                                    </Button>
+                                </div>
                             </>
                         )}
 
@@ -183,12 +182,12 @@ const BirthdayBoard = (props) => {
                             ) : (
                                 <>
                                     {isOpen ? (
-                                        <button onClick={() => setEditing(true)}>Add Wish</button>
+                                        <Button variant="contained" size="small" onClick={() => setEditing(true)}>Add
+                                            Wish</Button>
                                     ) : (
                                         <p>Submissions are closed for this board.</p>
                                     )}
                                 </>
-
                             )}
                         </>}
 

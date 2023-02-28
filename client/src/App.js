@@ -10,30 +10,26 @@ import Theme from "./theme/Theme";
 function App() {
     return (
         <Theme>
-        <div className="app">
-            <BrowserRouter>
-                <NavBar/>
-                <Routes>
-                    <Route path={"/"} element={<LoginPage/>}/>
+            <div className="app">
+                <BrowserRouter>
+                    <NavBar/>
+                    <Routes>
+                        <Route path={"/"} element={<LoginPage/>}/>
 
-                    <Route path={"/"} element={<PrivateRoute/>}>
-                        <Route path={"/home"} element={<HomePage/>}/>
-                    </Route>
+                        <Route path={"/"} element={<PrivateRoute/>}>
+                            <Route path={"/home"} element={<HomePage/>}/>
+                        </Route>
 
-                    {/* <Route path={"/"} element={<PrivateRoute/>}>
-                        <Route path={"/personal-board"} element={<PersonalBoardPage/>}/>
-                    </Route> */}
+                        <Route path={"/"} element={<PrivateRoute/>}>
+                            <Route path={"/profile/:userId"} element={<ProfilePage/>}/>
+                        </Route>
 
-                    <Route path={"/"} element={<PrivateRoute/>}>
-                        <Route path={"/profile/:userId"} element={<ProfilePage/>}/>
-                    </Route>
-
-                    <Route path={"/"} element={<PrivateRoute/>}>
-                        <Route path={"/wishing-center"} element={<WishingCenterPage/>}/>
-                    </Route>
-                </Routes>
-            </BrowserRouter>
-        </div>
+                        <Route path={"/"} element={<PrivateRoute/>}>
+                            <Route path={"/wishing-center"} element={<WishingCenterPage/>}/>
+                        </Route>
+                    </Routes>
+                </BrowserRouter>
+            </div>
         </Theme>
     );
 }

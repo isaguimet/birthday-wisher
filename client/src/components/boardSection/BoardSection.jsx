@@ -3,6 +3,7 @@ import BirthdayBoard from "../birthdayBoard/BirthdayBoard";
 import axios from "axios";
 import {BoardContainer} from "../../pages/ProfilePage.style";
 import {Alert} from "reactstrap";
+import Container from "react-bootstrap/Container";
 
 /**
  * A component for fetching and rendering information about all boards that belong to a specific user.
@@ -40,31 +41,33 @@ const BoardSection = (props) => {
 
     return (
         <BoardContainer>
-            {!!error && (
-                <Alert color={"danger"} toggle={handleAlertToggle}>
-                    Error: {error}
-                </Alert>
-            )}
-            {loading && <div>Loading board info...</div>}
-            {!loading && data ? (
-                <div>
-                    {data.map((board) => (
-                        <BirthdayBoard
-                            key={board.id}
-                            id={board.id}
-                            boardId={board.id}
-                            year={board.year}
-                            open={board.open}
-                            public={board.public}
-                            messages={board.messages}
-                            setLoading={setLoading}
-                            setData={setData}
-                            setError={setError}
-                            profileUser={props.profileUser}
-                        />
-                    ))}
-                </div>
-            ) : null}
+            <Container>
+                {!!error && (
+                    <Alert color={"danger"} toggle={handleAlertToggle}>
+                        Error fetching board info: {error}
+                    </Alert>
+                )}
+                {loading && <div>Loading board info...</div>}
+                {!loading && data ? (
+                    <div>
+                        {data.map((board) => (
+                            <BirthdayBoard
+                                key={board.id}
+                                id={board.id}
+                                boardId={board.id}
+                                year={board.year}
+                                open={board.open}
+                                public={board.public}
+                                messages={board.messages}
+                                setLoading={setLoading}
+                                setData={setData}
+                                setError={setError}
+                                profileUser={props.profileUser}
+                            />
+                        ))}
+                    </div>
+                ) : null}
+            </Container>
         </BoardContainer>
     );
 };
