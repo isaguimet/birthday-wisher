@@ -1,27 +1,70 @@
 import Theme from "../theme/Theme";
 import FriendCard from "../components/friendCard/FriendCard";
-import {StyledDiv} from "./ProfilePage.style";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import {useState} from "react";
+import axios from "axios";
+import {Alert} from "reactstrap";
 
-const FriendsPage = (props) => {
+const FriendsPage = () => {
+    const [loading, setLoading] = useState(false);
+    const [data, setData] = useState(null);
+    const [error, setError] = useState(null);
+    const [status, setStatus] = useState(0)
+
+    const handleClick = () => {
+        // TODO: get email from search bar component (to be implemented)
+        axios.get(`http://localhost:8080/users/byEmail/zack-martin@hotmail.com`).then((response) => {
+            setLoading(false)
+            setData(response.data)
+            setError(null)
+            setStatus(200)
+        }).catch((err) => {
+            setLoading(false);
+            setStatus(parseInt(err.response.status))
+            if (err.response) {
+                setError(err.response.data);
+            } else {
+                setError(err.message);
+            }
+        });
+    }
+
+    const handleAlertToggle = () => {
+        setError(null);
+    }
 
     return (
         <Theme>
-            <StyledDiv>
+            <Container>
+                <Container className="searchContainer">
+                    <h1>Friends List</h1>
+                    <button onClick={handleClick}>Find Friend</button>
+                </Container>
+                <Container className="searchResultContainer">
+                    {!!error && (
+                        <Alert color={"warning"} toggle={handleAlertToggle}>
+                            Error: {error}
+                        </Alert>
+                    )}
+                    {loading && <div>Finding user given this email ...</div>}
+                    {!loading && data && !(status === 404) ? (
+                        <>{data.firstName} {data.lastName}</>
+                    ) : null}
+                </Container>
                 <Container>
                     <Row>
                         <Col>
-                            <h1>Friends birthdays</h1>
+                            <h2>Friends birthdays</h2>
                             <FriendCard></FriendCard>
                         </Col>
                         <Col>
-                            <h1>Pending Friend Requests</h1>
+                            <h2>Pending Friend Requests</h2>
                         </Col>
                     </Row>
                 </Container>
-            </StyledDiv>
+            </Container>
         </Theme>
     );
 };
