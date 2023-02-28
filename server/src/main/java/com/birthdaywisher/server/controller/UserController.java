@@ -47,6 +47,21 @@ public class UserController {
         }
     }
 
+    @GetMapping("/byEmail/{email}")
+    public ResponseEntity<?> getUserByEmail(@PathVariable String email) {
+        Optional<User> optionalUser = userService.findUserByEmail(email);
+        try {
+            if (optionalUser.isPresent()) {
+                return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>("Email not found: " + email, HttpStatus.NOT_FOUND);
+            }
+        }
+        catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
     @PostMapping("/signUp")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         try {
