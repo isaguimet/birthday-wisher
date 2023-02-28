@@ -1,46 +1,14 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Alert } from "reactstrap";
-import Table from 'react-bootstrap/Table';
+import BirthdayTable from "../components/birthdayTable/BirthdayTable"
 import { StyledDiv } from "./WishingCenterPage.style";
 
-const Row = (props) => {
-    const { firstName, lastName, birthdate } = props
-    var months = ["January", "February", "March", "April", "May", "June",
-        "July", "August", "September", "October", "November", "December"];
-    const month = months[parseInt(birthdate.slice(5, 7)) - 1];
-    const day = birthdate.slice(8);
-
-    return (
-        <tr>
-            <td>{month} {day}</td>
-            <td>{firstName} {lastName}'s Birthday</td>
-        </tr>
-    )
-}
-
-const BirthdayTable = (props) => {
-    const { data } = props
-    return (
-        <div>
-            <Table striped bordered hover>
-                <tbody>
-                    {data.map(row =>
-                        <Row firstName={row.firstName}
-                            lastName={row.lastName}
-                            birthdate={row.birthdate} />
-                    )}
-                </tbody>
-            </Table>
-        </div>
-    )
-}
-
-function filterUpcomingBirthdays(data) {
+// filter out birthdays that have already past
+function getUpcomingBirthdays(data) {
     var today = new Date();
     var day = today.getDate();
     var month = today.getMonth() + 1;
-    data.map(friend => console.log(" " + friend.birthdate.slice(5, 7) + " " + friend.birthdate.slice(8)));
     return data.filter(friend => parseInt(friend.birthdate.slice(5, 7)) > month || (parseInt(friend.birthdate.slice(5, 7)) === month && parseInt(friend.birthdate.slice(8))) >= day);
 }
 
@@ -72,7 +40,7 @@ const WishingCenterPage = () => {
         setLoading(true);
         axios.get(`http://localhost:8080/users/friendList/${userId}`).then((response) => {
             setLoading(false);
-            setData(filterUpcomingBirthdays(response.data.sort(compare)));
+            setData(getUpcomingBirthdays(response.data.sort(compare)));
             // setNextYearBirthdays(response.data.sort(compare));
             console.log("response data: " + JSON.stringify(response.data))
             setError(null);
