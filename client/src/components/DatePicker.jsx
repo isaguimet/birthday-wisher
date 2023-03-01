@@ -9,9 +9,14 @@ const DatePicker = () => {
     };
     
     return (
+    //Minimum year: 0000 01 01
+    //Maximum year: 3000 12 31
     <div>
         <input
         type="date"
+        min="0000-01-01"
+        max="3000-12-31"
+        className="form-control mt-1"
         onChange={handleChange}
         ref={dateInputRef}
         />
