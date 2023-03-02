@@ -31,7 +31,6 @@ function compare(a, b) {
 const WishingCenterPage = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState(null);
-    // const [nextyearBirthdays, setNextYearBirthdays] = useState(null);
     const [error, setError] = useState(null);
 
     const userId = "63f90f25dca51a6d00d65007";
@@ -41,7 +40,6 @@ const WishingCenterPage = () => {
         axios.get(`http://localhost:8080/users/friendList/${userId}`).then((response) => {
             setLoading(false);
             setData(getUpcomingBirthdays(response.data.sort(compare)));
-            // setNextYearBirthdays(response.data.sort(compare));
             console.log("response data: " + JSON.stringify(response.data))
             setError(null);
         }).catch((err) => {
@@ -71,8 +69,6 @@ const WishingCenterPage = () => {
                 <StyledDiv>
                     <h1>Upcoming Birthdays</h1>
                     <BirthdayTable data={data} />
-                    {/* <h1> Next Year Birthdays</h1>
-                    <BirthdayTable data={nextyearBirthdays} /> */}
                 </StyledDiv>
             ) : null}
         </div>
