@@ -6,6 +6,8 @@ import Col from "react-bootstrap/Col";
 import {useState} from "react";
 import axios from "axios";
 import {Alert} from "reactstrap";
+import {BsPersonPlusFill} from "react-icons/bs";
+import SearchBar from "../components/searchBar/SearchBar";
 
 const FriendsPage = () => {
     const [loading, setLoading] = useState(false);
@@ -13,23 +15,23 @@ const FriendsPage = () => {
     const [error, setError] = useState(null);
     const [status, setStatus] = useState(0)
 
-    const handleClick = () => {
-        // TODO: get email from search bar component (to be implemented)
-        axios.get(`http://localhost:8080/users/byEmail/zack-martin@hotmail.com`).then((response) => {
-            setLoading(false)
-            setData(response.data)
-            setError(null)
-            setStatus(200)
-        }).catch((err) => {
-            setLoading(false);
-            setStatus(parseInt(err.response.status))
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
-        });
-    }
+    // const handleClick = (props) => {
+    //     // TODO: get email from search bar component (to be implemented)
+    //     axios.get(`http://localhost:8080/users/byEmail/zack-martin@hotmail.com`).then((response) => {
+    //         setLoading(false)
+    //         setData(response.data)
+    //         setError(null)
+    //         setStatus(200)
+    //     }).catch((err) => {
+    //         setLoading(false);
+    //         setStatus(parseInt(err.response.status))
+    //         if (err.response) {
+    //             setError(err.response.data);
+    //         } else {
+    //             setError(err.message);
+    //         }
+    //     });
+    // }
 
     const handleAlertToggle = () => {
         setError(null);
@@ -40,7 +42,14 @@ const FriendsPage = () => {
             <Container>
                 <Container className="searchContainer">
                     <h1>Friends List</h1>
-                    <button onClick={handleClick}>Find Friend</button>
+                    {/*<SearchBar findFriend={handleClick}></SearchBar>*/}
+                    <SearchBar
+                        setData={setData}
+                        setError={setError}
+                        setStatus={setStatus}
+                        setLoading={setLoading}
+                    ></SearchBar>
+                    {/*<button onClick={handleClick}>Find Friend</button>*/}
                 </Container>
                 <Container className="searchResultContainer">
                     {!!error && (
@@ -50,7 +59,7 @@ const FriendsPage = () => {
                     )}
                     {loading && <div>Finding user given this email ...</div>}
                     {!loading && data && !(status === 404) ? (
-                        <>{data.firstName} {data.lastName}</>
+                        <>{data.firstName} {data.lastName} <BsPersonPlusFill/></>
                     ) : null}
                 </Container>
                 <Container>
