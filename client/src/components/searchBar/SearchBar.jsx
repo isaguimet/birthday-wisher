@@ -8,24 +8,22 @@ const SearchBar = (props) => {
         setInput(event.target.value);
     };
 
-    const handleSubmit = () => {
-        console.log("props: " + input);
-        console.log("helllooo")
-        // TODO: get email from search bar component input
-        // axios.get(`http://localhost:8080/users/byEmail/zack-martin@hotmail.com`).then((response) => {
-        //     props.setLoading(false)
-        //     props.setData(response.data)
-        //     props.setError(null)
-        //     props.setStatus(200)
-        // }).catch((err) => {
-        //     props.setLoading(false);
-        //     props.setStatus(parseInt(err.response.status))
-        //     if (err.response) {
-        //         props.setError(err.response.data);
-        //     } else {
-        //         props.setError(err.message);
-        //     }
-        // });
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        axios.get(`http://localhost:8080/users/byEmail/${input}`).then((response) => {
+            props.setLoading(false)
+            props.setData(response.data)
+            props.setError(null)
+            props.setStatus(200)
+        }).catch((err) => {
+            props.setLoading(false);
+            props.setStatus(parseInt(err.response.status))
+            if (err.response) {
+                props.setError(err.response.data);
+            } else {
+                props.setError(err.message);
+            }
+        });
     }
 
     return (

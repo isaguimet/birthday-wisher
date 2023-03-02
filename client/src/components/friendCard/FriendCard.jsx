@@ -1,6 +1,4 @@
 import Card from 'react-bootstrap/Card';
-import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {Alert} from "reactstrap";
@@ -24,7 +22,6 @@ const FriendCard = (props) => {
         axios.get(`http://localhost:8080/users/friendList/${userId}`).then((response) => {
             setLoading(false);
             setData(response.data);
-            console.log("response data: " + JSON.stringify(response.data))
             setError(null);
         }).catch((err) => {
             setLoading(false);
@@ -33,7 +30,6 @@ const FriendCard = (props) => {
             } else {
                 setError(err.message);
             }
-            console.log(error)
         });
     }, []);
 
@@ -52,13 +48,11 @@ const FriendCard = (props) => {
             {!loading && data ? (
                 <div className="friendList">
                     {data.map((friend) => (
-                        <Card style={{width: '30rem'}}>
+                        <Card key={friend.id} style={{width: '30rem'}}>
                             <Card.Body className="friendCard">
                                 <Card.Text>
-                                    <Row>
-                                        <Col>{friend.firstName} {friend.lastName}</Col>
-                                        <Col>{friend.birthdate.split("-")[1]}/{friend.birthdate.split("-")[2]}</Col>
-                                    </Row>
+                                    {friend.firstName} {friend.lastName} &nbsp;&nbsp;&nbsp;&nbsp;
+                                    {friend.birthdate.split("-")[1]}/{friend.birthdate.split("-")[2]}
                                 </Card.Text>
                             </Card.Body>
                         </Card>
