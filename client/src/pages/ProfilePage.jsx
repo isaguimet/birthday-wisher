@@ -54,7 +54,6 @@ const ProfilePage = (props) => {
         <Theme>
             <StyledDiv>
                 <Profile>
-
                     <Container>
                         <Row>
                             <Col Style="display:flex; justify-content:center"><ProfilePic src={Icons[4]}/></Col>

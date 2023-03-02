@@ -40,6 +40,7 @@ const BirthdayCard = (props) => {
     }
 
     return (
+        <div Style="padding: 0.3rem;">
         <Card style={{ width: '18rem' }}>
         <Card.Body>
             {!isEditing && (
@@ -59,6 +60,7 @@ const BirthdayCard = (props) => {
             </Card.Text>
         </Card.Body>
         </Card>
+        </div>
     );
 
 };
