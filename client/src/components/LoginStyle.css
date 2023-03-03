@@ -6,12 +6,14 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100vw;
-    height: 100vh;
+    padding-top: 13rem;
+    /* width: 100vw; */
+    /* height: 100vh; */
     /* background-color: #fae5df; */
   }
   
   .Form {
+    border-radius: 2%;
     width: 420px;
     padding-top: 30px;
     padding-bottom: 20px;
