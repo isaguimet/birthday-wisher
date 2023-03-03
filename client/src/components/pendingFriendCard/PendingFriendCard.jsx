@@ -47,7 +47,7 @@ const PendingFriendCard = (props) => {
                     {data.map((friendInfo) => (
                         <Card key={friendInfo.id} style={{width: '30rem'}}>
                             <Card.Body>
-                                {Object.values(friendInfo.pendingFriends)[0] === false ? (
+                                {Object.values(friendInfo.pendingFriends)[0] === true ? (
                                         <div style={{display: "flex", justifyContent: "space-between"}}>
                                             {friendInfo.firstName} {friendInfo.lastName}
                                             <FriendRequestCard friendEmail={friendInfo.email}/>

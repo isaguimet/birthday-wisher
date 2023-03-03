@@ -22,10 +22,6 @@ body {
   row-gap: 20px;
 }
 
-.friendCard {
-  background-color: #f5cac2;
-}
-
 .searchContainer {
   display: flex;
   column-gap: 100px;
