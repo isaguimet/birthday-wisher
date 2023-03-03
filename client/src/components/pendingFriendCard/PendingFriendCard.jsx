@@ -15,11 +15,9 @@ const PendingFriendCard = (props) => {
         setError(null);
     }
 
-    const userId = "63e947477d6de33dfab29aac";
-
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/pendingFriendRequests/${userId}`).then((response) => {
+        axios.get(`http://localhost:8080/users/pendingFriendRequests/${props.userId}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
@@ -50,7 +48,7 @@ const PendingFriendCard = (props) => {
                                 {Object.values(friendInfo.pendingFriends)[0] === true ? (
                                         <div style={{display: "flex", justifyContent: "space-between"}}>
                                             {friendInfo.firstName} {friendInfo.lastName}
-                                            <FriendRequestCard friendEmail={friendInfo.email}/>
+                                            <FriendRequestCard userId={props.userId} friendEmail={friendInfo.email}/>
                                         </div>
                                     ) :
                                     <div style={{display: "flex", justifyContent: "space-between"}}>

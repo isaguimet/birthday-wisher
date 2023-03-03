@@ -2,7 +2,7 @@ import {useState} from "react";
 import axios from "axios";
 
 const FriendRequestCard = (props) => {
-    const {friendEmail} = props;
+    const {userId, friendEmail} = props;
 
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState(null);
@@ -14,7 +14,6 @@ const FriendRequestCard = (props) => {
     }
 
     const handleAcceptClick = () => {
-        const userId = "63e947477d6de33dfab29aac";
 
         const queryParams = {
             'userId': userId,
@@ -39,7 +38,6 @@ const FriendRequestCard = (props) => {
     }
 
     const handleDeclineClick = () => {
-        const userId = "63e947477d6de33dfab29aac";
 
         const queryParams = {
             'userId': userId,

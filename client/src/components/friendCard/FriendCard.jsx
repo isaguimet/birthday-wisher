@@ -6,7 +6,7 @@ import {Alert} from "reactstrap";
 /**
  * A component for rendering a User friends list
  * @param props {Object} Expected props for this component:
- * - userId {ObjectId} the unique identifier for a friend of a user (to be implemented!)
+ * - userId {ObjectId} the unique identifier of a user to get their friends
  * @returns {JSX.Element}
  * @constructor
  */
@@ -15,11 +15,9 @@ const FriendCard = (props) => {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
 
-    const userId = "63f90f25dca51a6d00d65007";
-
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/friendList/${userId}`).then((response) => {
+        axios.get(`http://localhost:8080/users/friendList/${props.userId}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);

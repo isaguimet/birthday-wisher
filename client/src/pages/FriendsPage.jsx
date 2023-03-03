@@ -7,8 +7,11 @@ import {Alert} from "reactstrap";
 import {BsPersonPlusFill} from "react-icons/bs";
 import SearchBar from "../components/searchBar/SearchBar";
 import axios from "axios";
+import {useSelector} from "react-redux";
 
 const FriendsPage = () => {
+    const loggedInUser = useSelector((state) => state.user.id);
+    const loggedInUserEmail = useSelector((state) => state.user.email);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
@@ -22,11 +25,10 @@ const FriendsPage = () => {
         setError(null);
     }
 
-    const handleClickToSendRequest = (props) => {
-        // TODO: switch userEmail and friendEmail. Get userEmail of userId
+    const handleClickToSendRequest = () => {
         const queryParams = {
-            'userEmail': data.email,
-            'friendEmail': "abc@hotmail.com"
+            'userEmail': loggedInUserEmail,
+            'friendEmail': data.email
         }
 
         setLoadingForSendingRequest(true);
@@ -68,7 +70,7 @@ const FriendsPage = () => {
                         <>{data.firstName} {data.lastName}
                             <BsPersonPlusFill onClick={handleClickToSendRequest}/>
                             {!!errorForSendingRequest && <div>{errorForSendingRequest}</div>}
-                            {dataForSendingRequest && <div>Send request succcesfully sent!</div>}
+                            {dataForSendingRequest && <div>Send request successfully sent!</div>}
                             {loadingForSendingRequest && <div>Sending a friend request ...</div>}
                         </>
                     ) : null}
@@ -76,10 +78,10 @@ const FriendsPage = () => {
                 <Container style={{display: "flex"}}>
                     <Container>
                         <h2>Friends birthdays</h2>
-                        <FriendCard/>
+                        <FriendCard userId={loggedInUser}/>
                     </Container>
                     <Container>
-                        <PendingFriendCard/>
+                        <PendingFriendCard userId={loggedInUser}/>
                     </Container>
                 </Container>
             </Container>
