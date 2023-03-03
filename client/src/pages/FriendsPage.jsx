@@ -41,16 +41,14 @@ const FriendsPage = () => {
                         <>{data.firstName} {data.lastName} <BsPersonPlusFill/></>
                     ) : null}
                 </Container>
-                <Container>
-                    <Row>
-                        <Col>
-                            <h2>Friends birthdays</h2>
-                            <FriendCard/>
-                        </Col>
-                        <Col>
-                            <h2>Pending Friend Requests</h2>
-                        </Col>
-                    </Row>
+                <Container style={{display: "flex"}}>
+                    <Container>
+                        <h2>Friends birthdays</h2>
+                        <FriendCard/>
+                    </Container>
+                    <Container>
+                        <PendingFriendCard/>
+                    </Container>
                 </Container>
             </Container>
         </Theme>
