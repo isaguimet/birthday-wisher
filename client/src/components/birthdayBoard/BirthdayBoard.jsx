@@ -151,12 +151,13 @@ const BirthdayBoard = (props) => {
     return (
         <>
             <BoardContainer>
-                {props.year}
-
+                <h3>{props.year}</h3>
+                
+        
                 {loggedInUserIsProfileUser || (!loggedInUserIsProfileUser && isPublic) ? (
                     <>
                         {loggedInUserIsProfileUser && (
-                            <>
+                            <div>
                                 <FormGroup style={{display: "inline"}}>
                                     <FormControlLabel control={<Switch checked={isPublic} onChange={togglePublic}/>}
                                                       label="Public"/>
@@ -165,12 +166,11 @@ const BirthdayBoard = (props) => {
                                     <FormControlLabel control={<Switch checked={isOpen} onChange={toggleOpen}/>}
                                                       label="Open"/>
                                 </FormGroup>
-                                <div style={{marginRight: "0.7rem", display: "inline"}}>
-                                    <Button variant="contained" color="error" size="small" onClick={deleteBoard}>
-                                        Delete Board
-                                    </Button>
+                                <div style={{display: "inline"}}>
+                                <Button variant={"contained"} color={"error"} onClick={deleteBoard}>Delete</Button>
                                 </div>
-                            </>
+
+                            </div>
                         )}
 
                         {!loggedInUserIsProfileUser && <>
@@ -178,12 +178,15 @@ const BirthdayBoard = (props) => {
                                 <form onSubmit={handleSubmit}>
                                     <input type={"text"} value={input} onChange={handleChange}/>
                                     <input type={"submit"} value={"Submit"}/>
+                                    
+                                     {/* <div Style="padding-top:0.3rem;">
+                    <Button variant="outlined" size="small" type={"submit"}>Submit</Button>
+                </div> */}
                                 </form>
                             ) : (
                                 <>
                                     {isOpen ? (
-                                        <Button variant="contained" size="small" onClick={() => setEditing(true)}>Add
-                                            Wish</Button>
+                                        <Button variant="contained" size="small" onClick={() => setEditing(true)}>Add Wish</Button>
                                     ) : (
                                         <p>Submissions are closed for this board.</p>
                                     )}

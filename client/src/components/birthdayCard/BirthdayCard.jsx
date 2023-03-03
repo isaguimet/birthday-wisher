@@ -87,7 +87,7 @@ const BirthdayCard = (props) => {
                         <form onSubmit={handleSubmit}>
                             <input type={"text"} value={input} onChange={handleChange}/>
                             <div style={{paddingTop: "0.3rem"}}>
-                              <Button variant={"outlined"} size={"small"} type={"submit"} value={"Submit"}/>
+                              <Button variant={"outlined"} size={"small"} type={"submit"} value={"Submit"}>Submit</Button>
                             </div>
                         </form>
                     )}

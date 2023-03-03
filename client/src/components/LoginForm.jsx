@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {setLogin} from "../store/user";
 import axios from "axios";
+import { Button } from "@mui/material";
 
 export default function (props) {
     const [date, setDate] = useState('');
@@ -99,12 +100,13 @@ export default function (props) {
                             />
                         </div>
                         <div className="d-grid gap-2 mt-3">
-                            <button
-                                id="button_signIn"
-                                type="submit"
+                            <Button
+                                // id="button_signIn"
+                                variant="contained"
+                                type={"submit"}
                             >
                                 Submit
-                            </button>
+                            </Button>
                             <div className="text-center">
               <span className="link" onClick={changeAuthMode}>
                 Create an Account
