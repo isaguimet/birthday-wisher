@@ -20,7 +20,7 @@ const BoardSection = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/boards/byUserId/${props.profileUser}`).then((response) => {
+        axios.get(`http://localhost/boards/byUserId/${props.profileUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);

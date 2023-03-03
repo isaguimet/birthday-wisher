@@ -17,7 +17,7 @@ const PendingFriendCard = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/pendingFriendRequests/${props.userId}`).then((response) => {
+        axios.get(`http://localhost/users/pendingFriendRequests/${props.userId}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);

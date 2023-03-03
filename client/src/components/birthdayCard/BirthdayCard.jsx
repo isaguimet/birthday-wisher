@@ -39,7 +39,7 @@ const BirthdayCard = (props) => {
     const handleSubmit = (event) => {
         const body = {msgText: input};
         props.setLoading(true);
-        axios.patch(`http://localhost:8080/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
+        axios.patch(`http://localhost/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
@@ -56,7 +56,7 @@ const BirthdayCard = (props) => {
 
     const handleDelete = () => {
         props.setLoading(true);
-        axios.delete(`http://localhost:8080/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
+        axios.delete(`http://localhost/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);

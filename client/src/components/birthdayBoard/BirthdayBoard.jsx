@@ -46,7 +46,7 @@ const BirthdayBoard = (props) => {
             msgText: input,
         };
         props.setLoading(true);
-        axios.post(`http://localhost:8080/boards/${props.boardId}/messages`, data).then((response) => {
+        axios.post(`http://localhost/boards/${props.boardId}/messages`, data).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
@@ -64,7 +64,7 @@ const BirthdayBoard = (props) => {
     const togglePublic = () => {
         props.setLoading(true);
         if (isPublic) {
-            axios.patch(`http://localhost:8080/boards/setPrivate/${props.boardId}`).then((response) => {
+            axios.patch(`http://localhost/boards/setPrivate/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -79,7 +79,7 @@ const BirthdayBoard = (props) => {
                 }
             });
         } else {
-            axios.patch(`http://localhost:8080/boards/setPublic/${props.boardId}`).then((response) => {
+            axios.patch(`http://localhost/boards/setPublic/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -99,7 +99,7 @@ const BirthdayBoard = (props) => {
     const toggleOpen = () => {
         props.setLoading(true);
         if (isOpen) {
-            axios.patch(`http://localhost:8080/boards/setClosed/${props.boardId}`).then((response) => {
+            axios.patch(`http://localhost/boards/setClosed/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -114,7 +114,7 @@ const BirthdayBoard = (props) => {
                 }
             });
         } else {
-            axios.patch(`http://localhost:8080/boards/setOpen/${props.boardId}`).then((response) => {
+            axios.patch(`http://localhost/boards/setOpen/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -133,7 +133,7 @@ const BirthdayBoard = (props) => {
 
     const deleteBoard = () => {
         props.setLoading(true);
-        axios.delete(`http://localhost:8080/boards/${props.boardId}`).then((response) => {
+        axios.delete(`http://localhost/boards/${props.boardId}`).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);

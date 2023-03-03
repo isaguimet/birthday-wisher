@@ -21,7 +21,7 @@ const FriendRequestCard = (props) => {
         }
 
         setLoading(true);
-        axios.patch(`http://localhost:8080/users/pendingFriendRequests/accept`, null, {params: queryParams})
+        axios.patch(`http://localhost/users/pendingFriendRequests/accept`, null, {params: queryParams})
             .then((response) => {
             setLoading(false);
             setData(response.data);
@@ -45,7 +45,7 @@ const FriendRequestCard = (props) => {
         }
 
         setLoading(true);
-        axios.patch(`http://localhost:8080/users/pendingFriendRequests/decline`, null, {params: queryParams})
+        axios.patch(`http://localhost/users/pendingFriendRequests/decline`, null, {params: queryParams})
             .then((response) => {
                 setLoading(false);
                 setData(response.data);

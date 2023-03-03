@@ -32,7 +32,7 @@ const FriendsPage = () => {
         }
 
         setLoadingForSendingRequest(true);
-        axios.patch(`http://localhost:8080/users/friendRequest`, null, {params: queryParams})
+        axios.patch(`http://localhost/users/friendRequest`, null, {params: queryParams})
             .then((response) => {
                 setLoadingForSendingRequest(false);
                 setDataForSendingRequest(response.data);

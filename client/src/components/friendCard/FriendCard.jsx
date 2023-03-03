@@ -17,7 +17,7 @@ const FriendCard = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/friendList/${props.userId}`).then((response) => {
+        axios.get(`http://localhost/users/friendList/${props.userId}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);

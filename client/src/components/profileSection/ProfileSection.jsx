@@ -23,7 +23,7 @@ const ProfileSection = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/${props.profileUser}`).then((response) => {
+        axios.get(`http://localhost/users/${props.profileUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);

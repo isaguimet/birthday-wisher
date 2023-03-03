@@ -25,7 +25,7 @@ export default function (props) {
             password: event.target.new_pass.value,
             birthdate: date
         };
-        axios.post(`http://localhost:8080/users/signUp`, data).then((response) => {
+        axios.post(`http://localhost/users/signUp`, data).then((response) => {
             alert("Success! Try logging in with these credentials now.");
         }).catch((err) => {
             let error = "";
@@ -47,7 +47,7 @@ export default function (props) {
             email: event.target.user_email.value,
             password: event.target.user_pass.value
         };
-        axios.post(`http://localhost:8080/users/login`, data).then((response) => {
+        axios.post(`http://localhost/users/login`, data).then((response) => {
             dispatch(
                 setLogin({
                     user: response.data

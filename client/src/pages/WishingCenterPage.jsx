@@ -38,7 +38,7 @@ const WishingCenterPage = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/friendList/${userId}`).then((response) => {
+        axios.get(`http://localhost/users/friendList/${userId}`).then((response) => {
             setLoading(false);
             setData(getUpcomingBirthdays(response.data.sort(compare)));
             console.log("response data: " + JSON.stringify(response.data))
