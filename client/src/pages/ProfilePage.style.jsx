@@ -13,12 +13,13 @@ export const Profile = styled.div`
 
 export const Board = styled.div`
     display: flex;
-    justify-content: left
-    
+    justify-content: left;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 `;
 
 export const BoardContainer = styled.div`
-    padding-top: 5rem;
+    padding: 2rem 0;
 `;
 
 export const ProfileInfo = styled.div`

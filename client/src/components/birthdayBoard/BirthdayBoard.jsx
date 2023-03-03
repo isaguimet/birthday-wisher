@@ -1,15 +1,13 @@
 import {Board, BoardContainer} from "../../pages/ProfilePage.style";
-import ListWishes from "../listWishes/ListWishes";
 import BirthdayCard from "../birthdayCard/BirthdayCard";
-import BootstrapSwitchButton from "bootstrap-switch-button-react";
 import {useState} from "react";
-import {useDispatch} from "react-redux";
-import {setBoardPrivate, setBoardPublic, setBoardClosed, setBoardOpen, deleteBoard} from "../../store/board";
+import axios from "axios";
+import {useSelector} from "react-redux";
+import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Switch from "@mui/material/Switch"
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
-
 
 /**
  * A component for rendering a User Birthday Board.
@@ -19,82 +17,209 @@ import Button from '@mui/material/Button';
  * - open {boolean} whether the board is open or closed (for people to submit messages to).
  * - public {boolean} whether the board is public or private (visibility from friends).
  * - messages {object} birthday messages that belong to this board.
+ * - setLoading {function} function to set loading in a parent component.
+ * - setData {function} function to set data in a parent component.
+ * - setError {function} function to set error in a parent component.
+ * - profileUser {string} the unique identifier for the user whose board this component is displaying.
  * @returns {JSX.Element}
  * @constructor
  */
 const BirthdayBoard = (props) => {
+    // the ID of the user that is accessing this page
+    const loggedInUser = useSelector((state) => state.user.id);
+    const loggedInUserIsProfileUser = loggedInUser === props.profileUser;
+
     const [isOpen, setOpen] = useState(props.open === true);
     const [isPublic, setPublic] = useState(props.public === true);
 
-    const dispatch = useDispatch();
+    const [isEditing, setEditing] = useState(false);
+    const [input, setInput] = useState("");
+
+    const handleChange = (event) => {
+        setInput(event.target.value);
+    };
+
+    const handleSubmit = (event) => {
+        const data = {
+            fromUserId: loggedInUser,
+            toUserId: props.profileUser,
+            msgText: input,
+        };
+        props.setLoading(true);
+        axios.post(`http://localhost:8080/boards/${props.boardId}/messages`, data).then((response) => {
+            props.setLoading(false);
+            props.setData(response.data);
+            props.setError(null);
+        }).catch((err) => {
+            props.setLoading(false);
+            //props.setData(null);
+            if (err.response) {
+                props.setError(err.response.data);
+            } else {
+                props.setError(err.message);
+            }
+        });
+    };
 
     const togglePublic = () => {
+        props.setLoading(true);
         if (isPublic) {
-            dispatch(setBoardPrivate(props.boardId));
-            setPublic(false);
+            axios.patch(`http://localhost:8080/boards/setPrivate/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setPublic(false);
+            }).catch((err) => {
+                props.setLoading(false);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
+            });
         } else {
-            dispatch(setBoardPublic(props.boardId));
-            setPublic(true);
+            axios.patch(`http://localhost:8080/boards/setPublic/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setPublic(true);
+            }).catch((err) => {
+                props.setLoading(false);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
+            });
         }
-    }
+    };
 
     const toggleOpen = () => {
+        props.setLoading(true);
         if (isOpen) {
-            dispatch(setBoardClosed(props.boardId));
-            setOpen(false);
+            axios.patch(`http://localhost:8080/boards/setClosed/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setOpen(false);
+            }).catch((err) => {
+                props.setLoading(false);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
+            });
         } else {
-            dispatch(setBoardOpen(props.boardId));
-            setOpen(true);
+            axios.patch(`http://localhost:8080/boards/setOpen/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setOpen(true);
+            }).catch((err) => {
+                props.setLoading(false);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
+            });
         }
-    }
+    };
+
+    const deleteBoard = () => {
+        props.setLoading(true);
+        axios.delete(`http://localhost:8080/boards/${props.boardId}`).then((response) => {
+            props.setLoading(false);
+            props.setData(response.data);
+            props.setError(null);
+        }).catch((err) => {
+            props.setLoading(false);
+            //props.setData(null);
+            if (err.response) {
+                props.setError(err.response.data);
+            } else {
+                props.setError(err.message);
+            }
+        });
+    };
 
     return (
-        <BoardContainer>
-            <h2>{props.year}</h2>
-            {/*TODO: only make these switches visible if this is viewed on the profile page of the current user*/}
-            {/* <BootstrapSwitchButton
-                id={"public_toggle"}
-                checked={isPublic}
-                onlabel={"Public"}
-                offlabel={"Private"}
-                onChange={togglePublic}
-                width={100}
-            />
-            <BootstrapSwitchButton
-                id={"open_toggle"}
-                checked={isOpen}
-                onlabel={"Open"}
-                offlabel={"Closed"}
-                onChange={toggleOpen}
-                width={100}
-            /> */}
+        <>
+            <BoardContainer>
+                {props.year}
 
-            <FormGroup Style="display: inline;">
-                <FormControlLabel control={<Switch checked={isPublic} onChange={togglePublic}/>} label="Public" />
-            </FormGroup>
-            <div Style="margin-right: 0.7rem; display:inline;">
-                <Button variant="contained" color="error" size="small" onClick={() => {dispatch(deleteBoard(props.boardId))}}>Delete Board</Button>
-            </div>
-            
-            <Button variant="contained" size="small" onClick={() => {}}>Add Wish</Button>
+                {loggedInUserIsProfileUser || (!loggedInUserIsProfileUser && isPublic) ? (
+                    <>
+                        {loggedInUserIsProfileUser && (
+                            <>
+                                <FormGroup style={{display: "inline"}}>
+                                    <FormControlLabel control={<Switch checked={isPublic} onChange={togglePublic}/>}
+                                                      label="Public"/>
+                                </FormGroup>
+                                <FormGroup style={{display: "inline"}}>
+                                    <FormControlLabel control={<Switch checked={isOpen} onChange={toggleOpen}/>}
+                                                      label="Open"/>
+                                </FormGroup>
+                                <div style={{marginRight: "0.7rem", display: "inline"}}>
+                                    <Button variant="contained" color="error" size="small" onClick={deleteBoard}>
+                                        Delete Board
+                                    </Button>
+                                </div>
+                            </>
+                        )}
 
-            {/* if no item it doesn't render anything, if no item it should just render blank */}
-            <Board>
-                {Object.entries(props.messages).map(([msgId, msg]) => (
-                    <BirthdayCard
-                        key={msgId}
-                        id={msgId}
-                        boardId={props.boardId}
-                        msgId={msgId}
-                        fromUserId={msg.fromUserId}
-                        toUserId={msg.toUserId}
-                        lastUpdatedDate={msg.lastUpdatedDate}
-                        msgText={msg.msgText}
-                    />
-                ))}
-            </Board>
-        </BoardContainer>
-    )
+                        {!loggedInUserIsProfileUser && <>
+                            {isEditing ? (
+                                <form onSubmit={handleSubmit}>
+                                    <input type={"text"} value={input} onChange={handleChange}/>
+                                    <input type={"submit"} value={"Submit"}/>
+                                </form>
+                            ) : (
+                                <>
+                                    {isOpen ? (
+                                        <Button variant="contained" size="small" onClick={() => setEditing(true)}>Add
+                                            Wish</Button>
+                                    ) : (
+                                        <p>Submissions are closed for this board.</p>
+                                    )}
+                                </>
+                            )}
+                        </>}
+
+                        {/* if no item it doesn't render anything, if no item it should just render blank */}
+                        <Board>
+                            {Object.entries(props.messages).map(([msgId, msg]) => (
+                                <BirthdayCard
+                                    key={msgId}
+                                    id={msgId}
+                                    boardId={props.boardId}
+                                    msgId={msgId}
+                                    fromUserId={msg.fromUserId}
+                                    toUserId={msg.toUserId}
+                                    lastUpdatedDate={msg.lastUpdatedDate}
+                                    msgText={msg.msgText}
+                                    setLoading={props.setLoading}
+                                    setData={props.setData}
+                                    setError={props.setError}
+                                    profileUser={props.profileUser}
+                                />
+                            ))}
+                        </Board>
+                    </>
+                ) : (
+                    <Board>
+                        <LockOutlinedIcon/>
+                        <p>This board is private.</p>
+                    </Board>
+                )}
+            </BoardContainer>
+        </>
+    );
 };
 
 export default BirthdayBoard;
