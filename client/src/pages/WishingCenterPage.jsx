@@ -3,12 +3,13 @@ import axios from "axios";
 import { Alert } from "reactstrap";
 import BirthdayTable from "../components/birthdayTable/BirthdayTable"
 import { StyledDiv } from "./WishingCenterPage.style";
+import { useSelector } from "react-redux";
 
 // filter out birthdays that have already past
 function getUpcomingBirthdays(data) {
-    var today = new Date();
-    var day = today.getDate();
-    var month = today.getMonth() + 1;
+    const today = new Date();
+    const day = today.getDate();
+    const month = today.getMonth() + 1;
     return data.filter(friend => parseInt(friend.birthdate.slice(5, 7)) > month || (parseInt(friend.birthdate.slice(5, 7)) === month && parseInt(friend.birthdate.slice(8))) >= day);
 }
 
@@ -33,7 +34,7 @@ const WishingCenterPage = () => {
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
 
-    const userId = "63f90f25dca51a6d00d65007";
+    const userId = useSelector((state) => state.user.id);
 
     useEffect(() => {
         setLoading(true);

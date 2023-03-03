@@ -52,7 +52,7 @@ export default function (props) {
                     user: response.data
                 })
             );
-            navigate("/home");
+            navigate("/wishing-center");
         }).catch((err) => {
             let error = "";
             if (err.response) {
