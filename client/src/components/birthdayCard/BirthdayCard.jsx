@@ -52,7 +52,9 @@ const BirthdayCard = (props) => {
             {isEditing && (
                 <form onSubmit={handleSubmit}>
                     <input type={"text"} value={input} onChange={handleChange}/>
-                    <Button variant="outlined" size="small" type={"submit"} value={"Submit"}/>
+		<div Style="padding-top:0.3rem;">
+                    <Button variant="outlined" size="small" type={"submit"}>Submit</Button>
+		</div>
                 </form>
             )}
             <Card.Text>
