@@ -11,51 +11,51 @@ const initialState = {
 // TODO: once we have user ID stored in redux after logging in, take out the default userId value here
 export const getBoards = createAsyncThunk("board/getBoards", (userId = "63f300a9aa937b2f68a15e23") => {
     return axios
-        .get(`http://localhost:8080/boards/byUserId/${userId}`)
+        .get(`http://localhost/boards/byUserId/${userId}`)
         .then((response) => response.data)
 });
 
 export const setBoardPrivate = createAsyncThunk("board/setPrivate", (boardId) => {
     return axios
-        .patch(`http://localhost:8080/boards/setPrivate/${boardId}`)
+        .patch(`http://localhost/boards/setPrivate/${boardId}`)
         .then((response) => response.data)
 });
 
 export const setBoardPublic = createAsyncThunk("board/setPublic", (boardId) => {
     return axios
-        .patch(`http://localhost:8080/boards/setPublic/${boardId}`)
+        .patch(`http://localhost/boards/setPublic/${boardId}`)
         .then((response) => response.data)
 });
 
 export const setBoardClosed = createAsyncThunk("board/setClosed", (boardId) => {
     return axios
-        .patch(`http://localhost:8080/boards/setClosed/${boardId}`)
+        .patch(`http://localhost/boards/setClosed/${boardId}`)
         .then((response) => response.data)
 });
 
 export const setBoardOpen = createAsyncThunk("board/setOpen", (boardId) => {
     return axios
-        .patch(`http://localhost:8080/boards/setOpen/${boardId}`)
+        .patch(`http://localhost/boards/setOpen/${boardId}`)
         .then((response) => response.data)
 });
 
 export const deleteBoard = createAsyncThunk("board/deleteBoard", (boardId) => {
     return axios
-        .delete(`http://localhost:8080/boards/${boardId}`)
+        .delete(`http://localhost/boards/${boardId}`)
         .then((response) => response.data)
 });
 
 export const updateMsg = createAsyncThunk("board/updateMsg", (data) => {
     const {boardId, msgId, body} = data;
     return axios
-        .patch(`http://localhost:8080/boards/${boardId}/messages/${msgId}`, body)
+        .patch(`http://localhost/boards/${boardId}/messages/${msgId}`, body)
         .then((response) => response.data)
 });
 
 export const deleteMsg = createAsyncThunk("board/deleteMsg", (data) => {
     const {boardId, msgId} = data;
     return axios
-        .delete(`http://localhost:8080/boards/${boardId}/messages/${msgId}`)
+        .delete(`http://localhost/boards/${boardId}/messages/${msgId}`)
         .then((response) => response.data)
 });
 
