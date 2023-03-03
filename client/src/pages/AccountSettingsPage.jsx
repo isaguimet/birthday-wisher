@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import {StyledDiv, StyledImg, StyledText, StyledTextDiv} from "./AccountSettingsPage.style";
 import avatar from "../assets/avatar.png";
+import PrimaryButton from "../components/button/PrimaryButton";
 const AccountSettingsPage = () => {
     const firstName = useSelector((state) => state.user.firstName);
     const lastName = useSelector((state) => state.user.lastName);
@@ -16,6 +17,7 @@ const AccountSettingsPage = () => {
                 <p>{email}</p>
                 <StyledText>Birthday</StyledText>
                 <p>{birthday}</p>
+                <PrimaryButton buttonText="Edit"></PrimaryButton>
             </StyledTextDiv>
         </StyledDiv>
     );
