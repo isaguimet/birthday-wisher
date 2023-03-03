@@ -3,10 +3,8 @@ import Theme from "../../theme/Theme";
 import {Navlink, StyledImg, StyledLogo, StyledNavbar} from "./NavBar.style";
 import Nav from 'react-bootstrap/Nav'
 import Icons from '../../Icons';
-import {useSelector} from "react-redux";
 
 const NavBar = () => {
-    const user = useSelector((state) => state.user);
     return (
         <Theme>
             <StyledNavbar>
