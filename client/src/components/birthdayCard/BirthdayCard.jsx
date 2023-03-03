@@ -4,7 +4,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import {useState} from "react";
 import {updateMsg, deleteMsg} from "../../store/board";
 import {useDispatch} from "react-redux";
-
+import Button from '@mui/material/Button';
 /**
  * A component for rendering a User Birthday Message.
  * @param props {Object} Expected props for this component:
@@ -52,7 +52,7 @@ const BirthdayCard = (props) => {
             {isEditing && (
                 <form onSubmit={handleSubmit}>
                     <input type={"text"} value={input} onChange={handleChange}/>
-                    <input type={"submit"} value={"Submit"}/>
+                    <Button variant="outlined" size="small" type={"submit"} value={"Submit"}/>
                 </form>
             )}
             <Card.Text>
