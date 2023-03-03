@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
+import AccountSettingsPage from "./pages/AccountSettingsPage"
 import LoginPage from "./pages/LoginPage";
 import ProfilePage from "./pages/ProfilePage";
 import WishingCenterPage from "./pages/WishingCenterPage";
@@ -33,6 +34,9 @@ function App() {
                             <Route path={"/profile/:userId"} element={<ProfilePage/>}/>
                         </Route>
 
+                        <Route path={"/"} element={<PrivateRoute />}>
+                            <Route path={"/account"} element={<AccountSettingsPage />} />
+                            
                         <Route path={"/"} element={<PrivateRoute/>}>
                             <Route path={"/wishing-center"} element={<WishingCenterPage/>}/>
                         </Route>
