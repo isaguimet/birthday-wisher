@@ -36,7 +36,8 @@ function App() {
 
                         <Route path={"/"} element={<PrivateRoute />}>
                             <Route path={"/account"} element={<AccountSettingsPage />} />
-                            
+                        </Route>
+
                         <Route path={"/"} element={<PrivateRoute/>}>
                             <Route path={"/wishing-center"} element={<WishingCenterPage/>}/>
                         </Route>

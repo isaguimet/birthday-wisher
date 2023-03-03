@@ -95,7 +95,7 @@ const ProfileSection = (props) => {
                                 <h1 style={{display: "inline"}}><Age>{getBirthday()}</Age></h1>
                             </Col>
                             <Col>
-                                <a href="/settings">
+                                <a href="/account">
                                     Settings
                                     <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-settings"
                                          width="30" height="30" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#2c3e50"
