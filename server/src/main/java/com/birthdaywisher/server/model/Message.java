@@ -16,6 +16,6 @@ public class Message {
     private ObjectId id = new ObjectId();
     private ObjectId fromUserId;
     private ObjectId toUserId;
-    private LocalDate lastUpdatedDate;
+    private LocalDate lastUpdatedDate = LocalDate.now();
     private String msgText;
 }

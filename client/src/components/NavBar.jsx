@@ -2,9 +2,9 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import {useDispatch, useSelector} from "react-redux";
-import {setLogout} from "../state";
+import {setLogout} from "../store/user";
 
-const NavBar = () => {
+const navBAR = () => {
 
     const dispatch = useDispatch();
     const isLoggedIn = Boolean(useSelector((state) => state.user));
@@ -36,4 +36,4 @@ const NavBar = () => {
     );
 };
 
-export default NavBar;
+export default navBAR;
