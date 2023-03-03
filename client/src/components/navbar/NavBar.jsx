@@ -1,6 +1,6 @@
 import Container from "react-bootstrap/esm/Container";
 import Theme from "../../theme/Theme";
-import {Navlink, StyledImg, StyledLogo, StyledNavbar} from "./Navbar.style";
+import {Navlink, StyledImg, StyledLogo, StyledNavbar} from "./NavBar.style";
 import Nav from 'react-bootstrap/Nav'
 import Icons from '../../Icons';
 import {useSelector} from "react-redux";
