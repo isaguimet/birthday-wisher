@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import HomePage from "./pages/HomePage";
+import AccountSettingsPage from "./pages/AccountSettingsPage"
 import LoginPage from "./pages/LoginPage";
 import PersonalBoardPage from "./pages/PersonalBoardPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -18,10 +18,6 @@ function App() {
                         <Route path={"/"} element={<LoginPage />} />
 
                         <Route path={"/"} element={<PrivateRoute />}>
-                            <Route path={"/home"} element={<HomePage />} />
-                        </Route>
-
-                        <Route path={"/"} element={<PrivateRoute />}>
                             <Route path={"/personal-board"} element={<PersonalBoardPage />} />
                         </Route>
 
@@ -29,6 +25,9 @@ function App() {
 
                         <Route path={"/wishing-center"} element={<WishingCenterPage />} />
 
+                        <Route path={"/"} element={<PrivateRoute />}>
+                            <Route path={"/account"} element={<AccountSettingsPage />} />
+                        </Route>
                     </Routes>
                 </BrowserRouter>
             </div>
