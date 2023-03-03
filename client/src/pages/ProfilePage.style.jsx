@@ -13,7 +13,7 @@ export const Profile = styled.div`
 
 export const Board = styled.div`
     display: flex;
-    justify-content: center;
+    justify-content: left;
     padding-top: 1rem;
     padding-bottom: 1rem;
 `;

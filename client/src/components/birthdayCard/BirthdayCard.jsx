@@ -4,6 +4,7 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 import {useState} from "react";
 import axios from "axios";
 import {useSelector} from "react-redux";
+import Button from '@mui/material/Button';
 
 /**
  * A component for rendering a User Birthday Message.
@@ -71,27 +72,29 @@ const BirthdayCard = (props) => {
     };
 
     return (
-        <Card style={{width: '18rem'}}>
-            <Card.Body>
-                {!isEditing && <>
-                    {loggedInUserIsMsgCreator &&
-                        <EditOutlinedIcon onClick={() => setEditing(true)}/>
-                    }
-                    {(loggedInUserIsMsgCreator || loggedInUserIsProfileUser) && (
-                        <DeleteOutlineOutlinedIcon onClick={handleDelete}/>
+        <div style={{padding: "0.3rem"}}>
+            <Card style={{width: '18rem'}}>
+                <Card.Body>
+                    {!isEditing && <>
+                        {loggedInUserIsMsgCreator &&
+                            <EditOutlinedIcon onClick={() => setEditing(true)}/>
+                        }
+                        {(loggedInUserIsMsgCreator || loggedInUserIsProfileUser) && (
+                            <DeleteOutlineOutlinedIcon onClick={handleDelete}/>
+                        )}
+                    </>}
+                    {isEditing && (
+                        <form onSubmit={handleSubmit}>
+                            <input type={"text"} value={input} onChange={handleChange}/>
+                            <Button variant={"outlined"} size={"small"} type={"submit"} value={"Submit"}/>
+                        </form>
                     )}
-                </>}
-                {isEditing && (
-                    <form onSubmit={handleSubmit}>
-                        <input type={"text"} value={input} onChange={handleChange}/>
-                        <input type={"submit"} value={"Submit"}/>
-                    </form>
-                )}
-                <Card.Text>
-                    {props.msgText}
-                </Card.Text>
-            </Card.Body>
-        </Card>
+                    <Card.Text>
+                        {props.msgText}
+                    </Card.Text>
+                </Card.Body>
+            </Card>
+        </div>
     );
 };
 
