@@ -18,6 +18,10 @@ function App() {
                         <Route path={"/"} element={<LoginPage />} />
 
                         <Route path={"/"} element={<PrivateRoute />}>
+                            <Route path={"/home"} element={<HomePage />} />
+                        </Route>
+                        
+                        <Route path={"/"} element={<PrivateRoute />}>
                             <Route path={"/personal-board"} element={<PersonalBoardPage />} />
                         </Route>
 
