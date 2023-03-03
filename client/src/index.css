@@ -15,3 +15,14 @@ body {
   margin: 0 1rem;
   padding: 0;
 }
+
+.friendList {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+}
+
+.searchContainer {
+  display: flex;
+  column-gap: 100px;
+}
