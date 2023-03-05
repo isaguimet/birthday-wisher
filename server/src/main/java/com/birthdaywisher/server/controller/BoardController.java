@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/boards")
 public class BoardController {
     private final BoardService boardService;
@@ -21,7 +22,12 @@ public class BoardController {
     @PostMapping
     public ResponseEntity<?> createBoard(@RequestBody Map<String, String> payload) {
         try {
-            return new ResponseEntity<>(boardService.createBoard(payload), HttpStatus.CREATED);
+            if (boardService.shouldCreateNewBoard(payload)) {
+                return new ResponseEntity<>(boardService.createBoard(payload), HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>(
+                        "User " + payload.get("user") + " already has a board for this year.", HttpStatus.BAD_REQUEST);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -73,10 +79,9 @@ public class BoardController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBoard(@PathVariable ObjectId id) {
+    public ResponseEntity<?> deleteBoard(@PathVariable ObjectId id) {
         try {
-            boardService.deleteBoard(id);
-            return new ResponseEntity<>("Board with id " + id + " has been successfully deleted.", HttpStatus.OK);
+            return new ResponseEntity<>(boardService.deleteBoard(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -85,7 +90,13 @@ public class BoardController {
     @PostMapping("/{boardId}/messages")
     public ResponseEntity<?> createMessage(@PathVariable ObjectId boardId, @RequestBody Message msg) {
         try {
-            return new ResponseEntity<>(boardService.createMessage(boardId, msg), HttpStatus.CREATED);
+            if (boardService.alreadySentMessage(boardId, msg)) {
+                return new ResponseEntity<>(
+                        "User " + msg.getToUserId() + " has already submitted a message to board " + boardId,
+                        HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>(boardService.createMessage(boardId, msg), HttpStatus.CREATED);
+            }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
