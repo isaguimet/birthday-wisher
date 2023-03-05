@@ -45,17 +45,25 @@ const PendingFriendCard = (props) => {
                     {data.map((friendInfo) => (
                         <Card key={friendInfo.id} style={{width: '30rem'}}>
                             <Card.Body>
-                                {Object.values(friendInfo.pendingFriends)[0] === true ? (
-                                        <div style={{display: "flex", justifyContent: "space-between"}}>
-                                            {friendInfo.firstName} {friendInfo.lastName}
-                                            <FriendRequestCard userId={props.userId} friendEmail={friendInfo.email}/>
-                                        </div>
-                                    ) :
-                                    <div style={{display: "flex", justifyContent: "space-between"}}>
-                                        {friendInfo.firstName} {friendInfo.lastName} &nbsp;&nbsp;&nbsp;
-                                        <button disabled>Friend request sent</button>
+                                {Object.keys(friendInfo.pendingFriends).map((userId) => (
+                                    <div key={userId}>
+                                        {userId === props.userId ? (
+                                            <div>
+                                                {friendInfo.pendingFriends[userId] ? (
+                                                        <div style={{display: "flex", justifyContent: "space-between"}}>
+                                                            {friendInfo.firstName} {friendInfo.lastName}
+                                                            <button disabled>Friend request sent</button>
+                                                        </div>
+                                                    ) :
+                                                    <div style={{display: "flex", justifyContent: "space-between"}}>
+                                                        {friendInfo.firstName} {friendInfo.lastName}
+                                                        <FriendRequestCard userId={props.userId}
+                                                                           friendEmail={friendInfo.email}/>
+                                                    </div>}
+                                            </div>
+                                        ) : null}
                                     </div>
-                                }
+                                ))}
                             </Card.Body>
                         </Card>
                     ))}
