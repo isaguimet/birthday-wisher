@@ -2,7 +2,9 @@ package com.birthdaywisher.server;
 
 import com.birthdaywisher.server.model.Board;
 import com.birthdaywisher.server.model.Message;
+import com.birthdaywisher.server.model.User;
 import com.birthdaywisher.server.repository.BoardRepository;
+import com.birthdaywisher.server.repository.UserRepository;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.InitializingBean;
@@ -19,47 +21,97 @@ import java.util.*;
 public class Application {
 
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private BoardRepository boardRepository;
+
+    private ObjectId aliceId = new ObjectId("63e947477d6de33dfab29aac");
+    private ObjectId bobId = new ObjectId("63e8878d9598d713e77c3b79");
+    private ObjectId eveId = new ObjectId("63f3ec13353bb43e7c82eb21");
+    private ObjectId malloryId = new ObjectId("63f2f66168b165647bbfb41a");
+
+    private List<User> users = Arrays.asList(
+            new User(
+                    aliceId, "Alice", "Wunderland", "alice@mail.com", "alice",
+                    LocalDate.parse("1995-09-29"), new ArrayList<>(Arrays.asList(bobId, eveId)),
+                    new HashMap<>(){{put(malloryId, true);}}, null
+            ),
+            new User(
+                    bobId, "Bob", "Bulder", "bob@mail.com", "bob",
+                    LocalDate.parse("1995-10-19"), new ArrayList<>(Arrays.asList(aliceId, eveId)),
+                    new HashMap<>(){{put(malloryId, true);}}, null
+            ),
+            new User(
+                    eveId, "Eve", "Adams", "eve@mail.com", "eve",
+                    LocalDate.parse("1997-05-15"), new ArrayList<>(Arrays.asList(aliceId, bobId)),
+                    new HashMap<>(){{put(malloryId, true);}}, null
+            ),
+            new User(
+                    malloryId, "Mallory", "Manson", "mallory@mail.com", "mallory",
+                    LocalDate.parse("2000-04-23"), new ArrayList<>(), new HashMap<>(){{
+                put(aliceId, false);
+                put(bobId, false);
+                put(eveId, false);
+            }}, null
+            )
+    );
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
 
+    public void resetUserRepo() {
+        userRepository.deleteAll();
+    }
+
+    public void populateUserRepo() {
+        userRepository.saveAll(users);
+    }
+
+    public void resetBoardRepo() {
+        boardRepository.deleteAll();
+    }
+
+    public void populateBoardRepo() {
+        List<Board> boards = new ArrayList<>();
+        String bdayMsg = "Happy birthday, %s! - %s %s";
+
+        for (User toUser : users) {
+            ObjectId toUserId = toUser.getId();
+            Map<ObjectId, Message> messages2021 = new HashMap<>();
+            Map<ObjectId, Message> messages2022 = new HashMap<>();
+            Map<ObjectId, Message> messages2023 = new HashMap<>();
+
+            for (User fromUser : users){
+                ObjectId fromUserId = fromUser.getId();
+
+                if (toUserId != fromUserId) {
+                    ObjectId oId = new ObjectId();
+                    Message m = new Message(
+                            oId, fromUserId, toUserId, LocalDate.parse("2023-02-18"),
+                            String.format(bdayMsg, toUser.getFirstName(), fromUser.getFirstName(), fromUser.getLastName()));
+                    messages2021.put(oId, m);
+                    messages2022.put(oId, m);
+                    messages2023.put(oId, m);
+                }
+            }
+
+            boards.add(new Board(new ObjectId(), true, false, "2021", toUserId, messages2021));
+            boards.add(new Board(new ObjectId(), false, true, "2022", toUserId, messages2022));
+            boards.add(new Board(new ObjectId(), true, true, "2023", toUserId, messages2023));
+        }
+
+        boardRepository.saveAll(boards);
+    }
+
     @Bean
     InitializingBean initDatabaseDemo() {
         return () -> {
-            // This is just a placeholder for now. This is a list of IDs taken from documents that currently exist in
-            // users collection of our database.
-            List<ObjectId> userIds = Arrays.asList(new ObjectId("63e947477d6de33dfab29aac"), new ObjectId("63e8878d9598d713e77c3b79"), new ObjectId("63f3ec13353bb43e7c82eb21"), new ObjectId("63f2f66168b165647bbfb41a"));
-            // TODO: once user stuff is merged, do a similar process as below to clear & populate the user collection
-            // then use those user IDs as the userId field when creating the following boards.
+            //resetUserRepo();
+            //populateUserRepo();
 
-            boardRepository.deleteAll();
-
-            List<Board> boards = new ArrayList<>();
-
-            for (ObjectId toUserId : userIds) {
-                Map<ObjectId, Message> messages2021 = new HashMap<>();
-                Map<ObjectId, Message> messages2022 = new HashMap<>();
-                Map<ObjectId, Message> messages2023 = new HashMap<>();
-
-                for (ObjectId fromUserId : userIds){
-                    if (toUserId != fromUserId) {
-                        ObjectId oId = new ObjectId();
-                        Message m = new Message(
-                                oId, fromUserId, toUserId, LocalDate.parse("2023-02-18"), "Happy Birthday!");
-                        messages2021.put(oId, m);
-                        messages2022.put(oId, m);
-                        messages2023.put(oId, m);
-                    }
-                }
-
-                boards.add(new Board(new ObjectId(), true, false, "2021", toUserId, messages2021));
-                boards.add(new Board(new ObjectId(), false, true, "2022", toUserId, messages2022));
-                boards.add(new Board(new ObjectId(), true, true, "2023", toUserId, messages2023));
-            }
-
-            boardRepository.saveAll(boards);
+            resetBoardRepo();
+            populateBoardRepo();
         };
     }
 
