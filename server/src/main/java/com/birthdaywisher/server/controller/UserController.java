@@ -65,15 +65,15 @@ public class UserController {
     @PostMapping("/signUp")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         try {
-            Boolean newUser = userService.addUser(user);
-            if (newUser) {
-                userService.checkLeader(user);
-                return new ResponseEntity<>(user, HttpStatus.CREATED);
-
-            } else {
+            // Check if user already has an account. Emails need to be unique
+            Optional<User> optionalUser = userService.findUserByEmail(user.getEmail());
+            if (optionalUser.isPresent()) {
                 return new ResponseEntity<>("User is already registered under this email: " + user.getEmail(),
                         HttpStatus.BAD_REQUEST);
             }
+            User newUser = userService.addUser(user);
+            userService.checkLeader(newUser);
+            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         }
         catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
