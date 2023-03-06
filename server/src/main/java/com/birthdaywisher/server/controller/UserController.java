@@ -67,7 +67,9 @@ public class UserController {
         try {
             Boolean newUser = userService.addUser(user);
             if (newUser) {
+                userService.checkLeader(user);
                 return new ResponseEntity<>(user, HttpStatus.CREATED);
+
             } else {
                 return new ResponseEntity<>("User is already registered under this email: " + user.getEmail(),
                         HttpStatus.BAD_REQUEST);
