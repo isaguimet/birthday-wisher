@@ -3,9 +3,12 @@ package com.birthdaywisher.server.service;
 import com.birthdaywisher.server.model.User;
 import com.birthdaywisher.server.repository.UserRepository;
 import org.bson.types.ObjectId;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,9 +18,9 @@ import java.util.*;
 
 @Service
 public class UserService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    private ServerProperties serverProperties;
+    private final ServerProperties serverProperties;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -90,8 +93,7 @@ public class UserService {
 
         if (pendingFriends == null) {
             return Collections.emptyList();
-        }
-        else {
+        } else {
             pendingFriends.forEach((userId, isInitiator) -> {
                 // isInitiator=true means a userId (not the current userId) initiated the friend request
                 // isInitiator=false means the current userId sent the friend request
@@ -187,7 +189,21 @@ public class UserService {
                 uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
             }
             // call post endpoint of other replicas
-            ResponseEntity<?> response1 = restTemplate.postForObject(uri1, user, ResponseEntity.class);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            JSONObject obj = new JSONObject();
+            obj.put("id", user.getId().toString());
+            obj.put("firstName", user.getFirstName());
+            obj.put("lastName", user.getLastName());
+            obj.put("email", user.getEmail());
+            obj.put("password", user.getPassword());
+            obj.put("birthdate", user.getBirthdate().toString());
+
+            HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
+
+            String resultAsJsonStr = restTemplate.postForObject(uri1, request, String.class);
+
             response++;
 
             // if response == number of replicas (for now), then we get all acks
