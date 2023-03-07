@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect} from "react";
 import axios from "axios";
 import {Alert} from "reactstrap";
 import Card from "react-bootstrap/Card";
@@ -7,26 +7,22 @@ import FriendRequestCard from "../friendRequestCard/FriendRequestCard";
 
 const PendingFriendCard = (props) => {
 
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
-
     const handleAlertToggle = () => {
-        setError(null);
+        props.setError(null);
     }
 
     useEffect(() => {
-        setLoading(true);
+        props.setLoading(true);
         axios.get(`http://localhost:8080/users/pendingFriendRequests/${props.userId}`).then((response) => {
-            setLoading(false);
-            setData(response.data);
-            setError(null);
+            props.setLoading(false);
+            props.setData(response.data);
+            props.setError(null);
         }).catch((err) => {
-            setLoading(false);
+            props.setLoading(false);
             if (err.response) {
-                setError(err.response.data);
+                props.setError(err.response.data);
             } else {
-                setError(err.message);
+                props.setError(err.message);
             }
         });
     }, []);
@@ -34,15 +30,15 @@ const PendingFriendCard = (props) => {
     return (
         <>
             <h2>Pending Friend Requests</h2>
-            {!!error && (
+            {!!props.error && (
                 <Alert color={"danger"} toggle={handleAlertToggle}>
-                    Error: {error}
+                    Error: {props.error}
                 </Alert>
             )}
-            {loading && <div>Loading pending friend requests...</div>}
-            {!loading && data ? (
+            {props.loading && <div>Loading pending friend requests...</div>}
+            {!(props.loading) && props.data ? (
                 <div>
-                    {data.map((friendInfo) => (
+                    {props.data.map((friendInfo) => (
                         <Card key={friendInfo.id} style={{width: '30rem'}}>
                             <Card.Body>
                                 {Object.keys(friendInfo.pendingFriends).map((userId) => (
