@@ -17,7 +17,8 @@ const BirthdayTable = (props) => {
                     {data.map(row =>
                         <TableRow firstName={row.firstName}
                             lastName={row.lastName}
-                            birthdate={row.birthdate} />
+                            birthdate={row.birthdate}
+                            userId={row.id} />
                     )}
                 </tbody>
             </Table>
