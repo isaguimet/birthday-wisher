@@ -75,7 +75,7 @@ public class UserController {
                         HttpStatus.BAD_REQUEST);
             }
             User newUser = userService.addUser(user);
-            leaderService.forwardReqToBackups(newUser);
+            leaderService.forwardUserReqToBackups(newUser);
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         }
         catch (Exception e) {

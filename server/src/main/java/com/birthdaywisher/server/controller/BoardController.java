@@ -1,5 +1,7 @@
 package com.birthdaywisher.server.controller;
 
+import com.birthdaywisher.server.leader.LeaderService;
+import com.birthdaywisher.server.model.Board;
 import com.birthdaywisher.server.model.Message;
 import com.birthdaywisher.server.service.BoardService;
 import org.bson.types.ObjectId;
@@ -13,20 +15,26 @@ import java.util.Map;
 @CrossOrigin
 @RequestMapping("/boards")
 public class BoardController {
-    private final BoardService boardService;
+    private BoardService boardService;
+    private LeaderService leaderService;
 
-    public BoardController(BoardService boardService) {
+    public BoardController(BoardService boardService, LeaderService leaderService) {
         this.boardService = boardService;
+        this.leaderService = leaderService;
     }
 
     @PostMapping
-    public ResponseEntity<?> createBoard(@RequestBody Map<String, String> payload) {
+    public ResponseEntity<?> createBoard(@RequestBody Board board) {
         try {
-            if (boardService.shouldCreateNewBoard(payload)) {
-                return new ResponseEntity<>(boardService.createBoard(payload), HttpStatus.CREATED);
+            // TODO: change frontend requests to pass field with name "userId" not "user" (not merged to main yet, it's in my other PR for board updates)
+            ObjectId id = board.getUserId();
+            if (boardService.shouldCreateNewBoard(board)) {
+                Board newBoard = boardService.createBoard(board);
+                leaderService.forwardBoardReqToBackups(newBoard);
+                return new ResponseEntity<>(boardService.getBoardsByUserId(id), HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>(
-                        "User " + payload.get("user") + " already has a board for this year.", HttpStatus.BAD_REQUEST);
+                        "User " + id + " already has a board for this year.", HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
