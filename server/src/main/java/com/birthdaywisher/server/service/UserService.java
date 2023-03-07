@@ -3,31 +3,16 @@ package com.birthdaywisher.server.service;
 import com.birthdaywisher.server.model.User;
 import com.birthdaywisher.server.repository.UserRepository;
 import org.bson.types.ObjectId;
-import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.*;
 
 @Service
 public class UserService {
     private final UserRepository userRepository;
 
-    private final ServerProperties serverProperties;
-
-    @Autowired
-    private RestTemplate restTemplate;
-
-    public UserService(UserRepository userRepository, ServerProperties serverProperties) {
+    public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.serverProperties = serverProperties;
     }
 
     public List<User> getAllUsers() {
@@ -174,42 +159,5 @@ public class UserService {
     public User setProfilePic(User user, String profilePic) {
         user.setProfilePic(profilePic);
         return userRepository.save(user);
-    }
-
-    public void checkLeader(User user) {
-        // check if this is a leader somehow for now just getting ports
-        Integer port = serverProperties.getPort();
-        int response = 0;
-
-        // Primary replica
-        if (port == 8080) {
-            URI uri1 = URI.create("http://localhost/users/signUp");
-
-            if (uri1.getPort() == -1) {
-                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
-            }
-            // call post endpoint of other replicas
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-
-            JSONObject obj = new JSONObject();
-            obj.put("id", user.getId().toString());
-            obj.put("firstName", user.getFirstName());
-            obj.put("lastName", user.getLastName());
-            obj.put("email", user.getEmail());
-            obj.put("password", user.getPassword());
-            obj.put("birthdate", user.getBirthdate().toString());
-
-            HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
-
-            String resultAsJsonStr = restTemplate.postForObject(uri1, request, String.class);
-
-            response++;
-
-            // if response == number of replicas (for now), then we get all acks
-            if (response == 1) {
-                System.out.println(" I have received 1 ACKS from the replicas");
-            }
-        }
     }
 }

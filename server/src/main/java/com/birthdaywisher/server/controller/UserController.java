@@ -1,5 +1,6 @@
 package com.birthdaywisher.server.controller;
 
+import com.birthdaywisher.server.leader.LeaderService;
 import com.birthdaywisher.server.model.User;
 import com.birthdaywisher.server.service.UserService;
 import org.bson.types.ObjectId;
@@ -16,10 +17,12 @@ import java.util.*;
 @RequestMapping("/users")
 public class UserController {
     private UserService userService;
+    private LeaderService leaderService;
 
     // Constructor dependency injection
-    public UserController(UserService userService) {
+    public UserController(UserService userService, LeaderService leaderService) {
         this.userService = userService;
+        this.leaderService = leaderService;
     }
 
     @GetMapping("/")
@@ -72,7 +75,7 @@ public class UserController {
                         HttpStatus.BAD_REQUEST);
             }
             User newUser = userService.addUser(user);
-            userService.checkLeader(newUser);
+            leaderService.forwardReqToBackups(newUser);
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         }
         catch (Exception e) {
