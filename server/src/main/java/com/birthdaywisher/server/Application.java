@@ -16,6 +16,9 @@ public class Application {
 
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer customizer() {
+        // ObjectMapper mapper = JsonMapper.builder()
+        //     .findAndAddModules()
+        //     .build();
         return builder -> builder.serializerByType(ObjectId.class, new ToStringSerializer());
     }
 }
