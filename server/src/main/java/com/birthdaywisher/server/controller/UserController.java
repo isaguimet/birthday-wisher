@@ -182,10 +182,11 @@ public class UserController {
                 return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
                         "This userId cannot accept the request ", HttpStatus.BAD_REQUEST);
             }
+            leaderService.forwardUserReqToBackups(userId, friendEmail, "acceptFriendRequest");
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -208,10 +209,11 @@ public class UserController {
                 return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
                         "This userId cannot decline the request ", HttpStatus.BAD_REQUEST);
             }
+            leaderService.forwardUserReqToBackups(userId, friendEmail, "declineFriendRequest");
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -60,6 +60,37 @@ public class LeaderService {
         }
     }
 
+    public void forwardUserReqToBackups(ObjectId userId, String friendEmail, String typeOfRequest) {
+        if (isLeader()) {
+            int response = 0;
+
+            URI uri = URI.create("");
+            if ("acceptFriendRequest".equals(typeOfRequest)) {
+                uri = URI.create("http://localhost/users/pendingFriendRequests/accept");
+            }
+            if ("declineFriendRequest".equals(typeOfRequest)) {
+                uri = URI.create("http://localhost/users/pendingFriendRequests/decline");
+            }
+
+            uri = buildURIForEachReplica(uri);
+            HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
+
+            String url = UriComponentsBuilder.fromUri(uri)
+                    .queryParam("userId", userId)
+                    .queryParam("friendEmail", friendEmail)
+                    .encode()
+                    .toUriString();
+
+            String result = restTemplate.patchForObject(url, request, String.class);
+            response++;
+
+            // if response == number of replicas (for now), then we get all acks
+            if (response == 1) {
+                System.out.println("I have received 1 ACK from the replicas");
+            }
+        }
+    }
+
     private URI buildURIForEachReplica(URI uri) {
         if (uri.getPort() == -1) {
             uri = UriComponentsBuilder.fromUri(uri).port(8081).build().toUri();
