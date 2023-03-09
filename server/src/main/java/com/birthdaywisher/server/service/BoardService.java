@@ -84,13 +84,12 @@ public class BoardService {
         return false;
     }
 
-    public List<Board> createMessage(ObjectId boardId, Message msg) {
+    public Board createMessage(ObjectId boardId, Message msg) {
         Board board = boardRepository.findById(boardId).get();
         Map<ObjectId, Message> messages = board.getMessages();
         messages.put(msg.getId(), msg);
         board.setMessages(messages);
-        board = boardRepository.save(board);
-        return boardRepository.findBoardsByUserId(board.getUserId());
+        return boardRepository.save(board);
     }
 
     public Message getMsgById(ObjectId boardId, ObjectId msgId) {

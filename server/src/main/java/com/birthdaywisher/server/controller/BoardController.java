@@ -102,7 +102,15 @@ public class BoardController {
                         "User " + msg.getToUserId() + " has already submitted a message to board " + boardId,
                         HttpStatus.BAD_REQUEST);
             } else {
-                return new ResponseEntity<>(boardService.createMessage(boardId, msg), HttpStatus.CREATED);
+                Board updatedBoard = boardService.createMessage(boardId, msg);
+                for (Map.Entry<ObjectId, Message> msgEntry : updatedBoard.getMessages().entrySet()) {
+                    // a board contains at most one msg with a given fromUserId
+                    if (msgEntry.getValue().getFromUserId().equals(msg.getFromUserId())) {
+                        leaderService.forwardCreateMessage(boardId, msgEntry.getValue());
+                        break;
+                    }
+                }
+                return new ResponseEntity<>(boardService.getBoardsByUserId(updatedBoard.getUserId()), HttpStatus.CREATED);
             }
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
