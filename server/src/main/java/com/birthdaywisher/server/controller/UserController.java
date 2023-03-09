@@ -75,11 +75,11 @@ public class UserController {
                         HttpStatus.BAD_REQUEST);
             }
             User newUser = userService.addUser(user);
-            leaderService.forwardUserReqToBackups(newUser);
+            leaderService.forwardUserReqToBackups(newUser, "signUp");
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -97,7 +97,7 @@ public class UserController {
             }
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -105,10 +105,11 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable ObjectId id) {
         try {
             userService.deleteUser(id);
+            leaderService.forwardUserReqToBackups(id, "delete");
             return new ResponseEntity<>("User has been deleted by id: " + id, HttpStatus.OK);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -138,10 +139,11 @@ public class UserController {
             }
             userService.sendFriendRequest(optionalUser.get(), optionalFriend.get());
 
+            leaderService.forwardUserReqToBackups(userEmail, friendEmail, "friendRequest");
             return new ResponseEntity<>(optionalFriend.get(), HttpStatus.OK);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
