@@ -134,6 +134,7 @@ public class BoardController {
     public ResponseEntity<?> updateMessage(
             @PathVariable ObjectId boardId, @PathVariable ObjectId msgId, @RequestBody Map<String, String> payload) {
         try {
+            leaderService.forwardUpdateMessage(boardId, msgId, payload);
             return new ResponseEntity<>(boardService.updateMessage(boardId, msgId, payload), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

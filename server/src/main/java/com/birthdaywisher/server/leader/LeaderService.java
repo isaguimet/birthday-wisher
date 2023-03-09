@@ -13,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Map;
 
 @Service
 public class LeaderService {
@@ -209,6 +210,29 @@ public class LeaderService {
             }
 
             HttpEntity<String> request = new HttpEntity<>(null, null);
+
+            String resultAsJsonStr = restTemplate.patchForObject(uri1, request, String.class);
+
+            response++;
+
+            // if response == number of replicas (for now), then we get all acks
+            if (response == 1) {
+                System.out.println(" I have received 1 ACKS from the replicas");
+            }
+        }
+    }
+
+    public void forwardUpdateMessage(ObjectId boardId, ObjectId msgId, Map<String, String> payload) {
+        if (isLeader()) {
+            int response = 0;
+
+            URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages/" + msgId);
+
+            if (uri1.getPort() == -1) {
+                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
+            }
+
+            HttpEntity<?> request = new HttpEntity<>(payload, null);
 
             String resultAsJsonStr = restTemplate.patchForObject(uri1, request, String.class);
 
