@@ -26,11 +26,10 @@ public class BoardController {
     @PostMapping
     public ResponseEntity<?> createBoard(@RequestBody Board board) {
         try {
-            // TODO: change frontend requests to pass field with name "userId" not "user" (not merged to main yet, it's in my other PR for board updates)
             ObjectId id = board.getUserId();
             if (boardService.shouldCreateNewBoard(board)) {
                 Board newBoard = boardService.createBoard(board);
-                leaderService.forwardBoardReqToBackups(newBoard);
+                leaderService.forwardCreateBoard(newBoard);
                 return new ResponseEntity<>(boardService.getBoardsByUserId(id), HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>(

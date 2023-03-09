@@ -64,7 +64,7 @@ public class LeaderService {
         }
     }
 
-    public void forwardBoardReqToBackups(Board board) {
+    public void forwardCreateBoard(Board board) {
         if (isLeader()) {
             int response = 0;
 
