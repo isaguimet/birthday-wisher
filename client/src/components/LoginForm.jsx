@@ -101,7 +101,7 @@ export default function (props) {
                         </div>
                         <div className="d-grid gap-2 mt-3">
                             <Button
-                                // id="button_signIn"
+                                class="login-button"
                                 variant="contained"
                                 type={"submit"}
                             >
@@ -173,7 +173,7 @@ export default function (props) {
                     </div>
                     <div className="d-grid gap-2 mt-3">
                         <button
-                            id="button_signup"
+                            class="login-button"
                             type="submit"
                         >
                             Submit
