@@ -52,7 +52,7 @@ public class BoardController {
     @PatchMapping("/setPublic/{id}")
     public ResponseEntity<?> setBoardPublic(@PathVariable ObjectId id) {
         try {
-            leaderService.forwardSetBoardPublic(id);
+            leaderService.forwardBoardPatch("http://localhost/boards/setPublic/" + id);
             return new ResponseEntity<>(boardService.setBoardPublic(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -62,7 +62,7 @@ public class BoardController {
     @PatchMapping("/setPrivate/{id}")
     public ResponseEntity<?> setBoardPrivate(@PathVariable ObjectId id) {
         try {
-            leaderService.forwardSetBoardPrivate(id);
+            leaderService.forwardBoardPatch("http://localhost/boards/setPrivate/" + id);
             return new ResponseEntity<>(boardService.setBoardPrivate(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -72,7 +72,7 @@ public class BoardController {
     @PatchMapping("/setOpen/{id}")
     public ResponseEntity<?> setBoardOpen(@PathVariable ObjectId id) {
         try {
-            leaderService.forwardSetBoardOpen(id);
+            leaderService.forwardBoardPatch("http://localhost/boards/setOpen/" + id);
             return new ResponseEntity<>(boardService.setBoardOpen(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -82,7 +82,7 @@ public class BoardController {
     @PatchMapping("/setClosed/{id}")
     public ResponseEntity<?> setBoardClosed(@PathVariable ObjectId id) {
         try {
-            leaderService.forwardSetBoardClosed(id);
+            leaderService.forwardBoardPatch("http://localhost/boards/setClosed/" + id);
             return new ResponseEntity<>(boardService.setBoardClosed(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -92,7 +92,7 @@ public class BoardController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBoard(@PathVariable ObjectId id) {
         try {
-            leaderService.forwardDeleteBoard(id);
+            leaderService.forwardDeleteReq("http://localhost/boards/" + id);
             return new ResponseEntity<>(boardService.deleteBoard(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -145,7 +145,7 @@ public class BoardController {
     @DeleteMapping("/{boardId}/messages/{msgId}")
     public ResponseEntity<?> deleteMessage(@PathVariable ObjectId boardId, @PathVariable ObjectId msgId) {
         try {
-            leaderService.forwardDeleteMessage(boardId, msgId);
+            leaderService.forwardDeleteReq("http://localhost/boards/" + boardId + "/messages/" + msgId);
             return new ResponseEntity<>(boardService.deleteMessage(boardId, msgId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
