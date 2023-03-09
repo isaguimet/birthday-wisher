@@ -7,9 +7,7 @@ import org.bson.types.ObjectId;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -121,6 +119,98 @@ public class LeaderService {
             HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
             String resultAsJsonStr = restTemplate.postForObject(uri1, request, String.class);
+
+            response++;
+
+            // if response == number of replicas (for now), then we get all acks
+            if (response == 1) {
+                System.out.println(" I have received 1 ACKS from the replicas");
+            }
+        }
+    }
+
+    public void forwardSetBoardPublic(ObjectId id) {
+        if (isLeader()) {
+            int response = 0;
+
+            URI uri1 = URI.create("http://localhost/boards/setPublic/" + id);
+
+            if (uri1.getPort() == -1) {
+                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
+            }
+
+            HttpEntity<String> request = new HttpEntity<>(null, null);
+
+            String resultAsJsonStr = restTemplate.patchForObject(uri1, request, String.class);
+
+            response++;
+
+            // if response == number of replicas (for now), then we get all acks
+            if (response == 1) {
+                System.out.println(" I have received 1 ACKS from the replicas");
+            }
+        }
+    }
+
+    public void forwardSetBoardPrivate(ObjectId id) {
+        if (isLeader()) {
+            int response = 0;
+
+            URI uri1 = URI.create("http://localhost/boards/setPrivate/" + id);
+
+            if (uri1.getPort() == -1) {
+                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
+            }
+
+            HttpEntity<String> request = new HttpEntity<>(null, null);
+
+            String resultAsJsonStr = restTemplate.patchForObject(uri1, request, String.class);
+
+            response++;
+
+            // if response == number of replicas (for now), then we get all acks
+            if (response == 1) {
+                System.out.println(" I have received 1 ACKS from the replicas");
+            }
+        }
+    }
+
+    public void forwardSetBoardOpen(ObjectId id) {
+        if (isLeader()) {
+            int response = 0;
+
+            URI uri1 = URI.create("http://localhost/boards/setOpen/" + id);
+
+            if (uri1.getPort() == -1) {
+                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
+            }
+
+            HttpEntity<String> request = new HttpEntity<>(null, null);
+
+            String resultAsJsonStr = restTemplate.patchForObject(uri1, request, String.class);
+
+            response++;
+
+            // if response == number of replicas (for now), then we get all acks
+            if (response == 1) {
+                System.out.println(" I have received 1 ACKS from the replicas");
+            }
+        }
+    }
+
+    public void forwardSetBoardClosed(ObjectId id) {
+        if (isLeader()) {
+            int response = 0;
+
+            URI uri1 = URI.create("http://localhost/boards/setClosed/" + id);
+
+            if (uri1.getPort() == -1) {
+                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
+            }
+
+            HttpEntity<String> request = new HttpEntity<>(null, null);
+
+            String resultAsJsonStr = restTemplate.patchForObject(uri1, request, String.class);
 
             response++;
 
