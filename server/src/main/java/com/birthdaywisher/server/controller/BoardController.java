@@ -92,6 +92,7 @@ public class BoardController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBoard(@PathVariable ObjectId id) {
         try {
+            leaderService.forwardDeleteBoard(id);
             return new ResponseEntity<>(boardService.deleteBoard(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -144,6 +145,7 @@ public class BoardController {
     @DeleteMapping("/{boardId}/messages/{msgId}")
     public ResponseEntity<?> deleteMessage(@PathVariable ObjectId boardId, @PathVariable ObjectId msgId) {
         try {
+            leaderService.forwardDeleteMessage(boardId, msgId);
             return new ResponseEntity<>(boardService.deleteMessage(boardId, msgId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

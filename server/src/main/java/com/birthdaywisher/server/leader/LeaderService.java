@@ -222,6 +222,27 @@ public class LeaderService {
         }
     }
 
+    public void forwardDeleteBoard(ObjectId id) {
+        if (isLeader()) {
+            int response = 0;
+
+            URI uri1 = URI.create("http://localhost/boards/" + id);
+
+            if (uri1.getPort() == -1) {
+                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
+            }
+
+            restTemplate.delete(uri1);
+
+            response++;
+
+            // if response == number of replicas (for now), then we get all acks
+            if (response == 1) {
+                System.out.println(" I have received 1 ACKS from the replicas");
+            }
+        }
+    }
+
     public void forwardUpdateMessage(ObjectId boardId, ObjectId msgId, Map<String, String> payload) {
         if (isLeader()) {
             int response = 0;
@@ -235,6 +256,27 @@ public class LeaderService {
             HttpEntity<?> request = new HttpEntity<>(payload, null);
 
             String resultAsJsonStr = restTemplate.patchForObject(uri1, request, String.class);
+
+            response++;
+
+            // if response == number of replicas (for now), then we get all acks
+            if (response == 1) {
+                System.out.println(" I have received 1 ACKS from the replicas");
+            }
+        }
+    }
+
+    public void forwardDeleteMessage(ObjectId boardId, ObjectId msgId) {
+        if (isLeader()) {
+            int response = 0;
+
+            URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages/" + msgId);
+
+            if (uri1.getPort() == -1) {
+                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
+            }
+
+            restTemplate.delete(uri1);
 
             response++;
 
