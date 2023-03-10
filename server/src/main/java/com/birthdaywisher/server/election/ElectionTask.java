@@ -18,22 +18,22 @@ public class ElectionTask extends Thread{
     public void run() {
         System.out.println("Starting ElectionTask Thread: " + threadName);
         try {
-            server.getServerSocket().setSoTimeout(180000);
+            server.getServerSocket().setSoTimeout(5000);
             while (true) {
                 try {
                     String msg = server.receiveMessage();
-                    System.out.println("Receved Message: " + msg);
-                    if (server.getPredId() == server.getLeaderId()) {   //server's predecessor is the leader
-                        if (msg.equals("2")) {  //heartbeat message
+//                    System.out.println("Received Message: " + msg);
+                    if (!msg.equals("")) {
+                        if (server.getPredId() == server.getLeaderId()) {   //server's predecessor is the leader
+                            if (msg.equals("2")) {  //heartbeat message
 
+                            } else {
+                                server.election(msg);
+                            }
                         } else {
                             server.election(msg);
                         }
-                    } else {
-                        server.election(msg);
                     }
-
-
                 } catch (SocketTimeoutException ste) {
                     //no message received after some time
                     if (server.getPredId() == server.getLeaderId()) {
@@ -41,11 +41,11 @@ public class ElectionTask extends Thread{
                         server.initiateElection();
                     }
                 } catch (IOException e)  {
-                    System.out.println("Error: " + e);
+                    System.out.println("IOError: " + e);
                 }
             }
         } catch (SocketException e) {
-            System.out.println("Error: " + e);
+            System.out.println("SocketExceptionError: " + e);
         }
 
         System.out.println("Exiting ElectionTask Thread: " + threadName);
