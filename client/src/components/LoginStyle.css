@@ -6,10 +6,10 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 13rem;
-    /* width: 100vw; */
-    /* height: 100vh; */
-    /* background-color: #fae5df; */
+    padding-top: 3rem;
+    width: 100vw;
+    height: 100vh;
+    background-color: #fae5df;
   }
   
   .Form {
@@ -44,9 +44,9 @@ body {
     cursor: pointer;
   }
 
-  /* input {
+  .login-input {
     background-color: #f5cac2;
-  } */
+  }
   
   label {
     font-size: 14px;
@@ -54,9 +54,9 @@ body {
     color: #141850;
   }
 
-  /* button {
+  .login-button {
     background-color: #141850;
     color: #fae5df;
     width: 25%;
-  } */
+  }
 

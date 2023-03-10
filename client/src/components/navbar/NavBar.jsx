@@ -12,12 +12,14 @@ const NavBar = () => {
             <StyledNavbar>
                 <Container>
                     <StyledLogo href="/">Birthday Wisher</StyledLogo>
-                    <Nav>
-                        <Navlink href="/wishing-center"><StyledImg src={Icons[0]}/></Navlink>
-                        <Navlink href="/friends"><StyledImg src={Icons[1]}/></Navlink>
-                        <Navlink href="/notification"><StyledImg src={Icons[2]}/></Navlink>
-                        <Navlink href={`/profile/${user.id}`}><StyledImg src={Icons[3]}/></Navlink>
-                    </Nav>
+                    {user && (
+                        <Nav>
+                            <Navlink href="/wishing-center"><StyledImg src={Icons[0]}/></Navlink>
+                            <Navlink href="/friends"><StyledImg src={Icons[1]}/></Navlink>
+                            <Navlink href="/notification"><StyledImg src={Icons[2]}/></Navlink>
+                            <Navlink href={`/profile/${user.id}`}><StyledImg src={Icons[3]}/></Navlink>
+                        </Nav>
+                    )}
                 </Container>
             </StyledNavbar>
         </Theme>
