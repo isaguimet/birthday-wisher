@@ -9,12 +9,17 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 @Service
 public class LeaderService {
@@ -83,8 +88,17 @@ public class LeaderService {
                     .encode()
                     .toUriString();
 
-            String result = restTemplate.patchForObject(url, request, String.class);
-            response++;
+            List<Future<String>> futures = new ArrayList<>();
+            futures.add(asyncPatchForObject(url, request));
+
+            for (Future<String> future : futures) {
+                try {
+                    future.get();
+                    response++;
+                } catch (Exception e) {
+                    // handle the exception??
+                }
+            }
 
             // if response == number of replicas (for now), then we get all acks
             if (response == 1) {
@@ -118,9 +132,17 @@ public class LeaderService {
 
         HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
-        String resultAsJsonStr = restTemplate.postForObject(uri, request, String.class);
+        List<Future<String>> futures = new ArrayList<>();
+        futures.add(asyncPostForObject(uri, request));
 
-        response++;
+        for (Future<String> future : futures) {
+            try {
+                future.get();
+                response++;
+            } catch (Exception e) {
+                // handle the exception??
+            }
+        }
 
         // if response == number of replicas (for now), then we get all acks
         if (response == 1) {
@@ -132,8 +154,17 @@ public class LeaderService {
         URI uri = URI.create("http://localhost/users/");
         uri = buildURIForEachReplica(uri);
 
-        restTemplate.delete(uri + String.valueOf(userId));
-        response++;
+        List<Future<String>> futures = new ArrayList<>();
+        futures.add(asyncDelete(uri + String.valueOf(userId)));
+
+        for (Future<String> future : futures) {
+            try {
+                future.get();
+                response++;
+            } catch (Exception e) {
+                // handle the exception??
+            }
+        }
 
         // if response == number of replicas (for now), then we get all acks
         if (response == 1) {
@@ -153,8 +184,17 @@ public class LeaderService {
                 .encode()
                 .toUriString();
 
-        String result = restTemplate.patchForObject(url, request, String.class);
-        response++;
+        List<Future<String>> futures = new ArrayList<>();
+        futures.add(asyncPatchForObject(url, request));
+
+        for (Future<String> future : futures) {
+            try {
+                future.get();
+                response++;
+            } catch (Exception e) {
+                // handle the exception??
+            }
+        }
 
         // if response == number of replicas (for now), then we get all acks
         if (response == 1) {
@@ -184,9 +224,17 @@ public class LeaderService {
 
             HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
-            String resultAsJsonStr = restTemplate.postForObject(uri1, request, String.class);
+            List<Future<String>> futures = new ArrayList<>();
+            futures.add(asyncPostForObject(uri1, request));
 
-            response++;
+            for (Future<String> future : futures) {
+                try {
+                    future.get();
+                    response++;
+                } catch (Exception e) {
+                    // handle the exception??
+                }
+            }
 
             // if response == number of replicas (for now), then we get all acks
             if (response == 1) {
@@ -217,9 +265,17 @@ public class LeaderService {
 
             HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
-            String resultAsJsonStr = restTemplate.postForObject(uri1, request, String.class);
+            List<Future<String>> futures = new ArrayList<>();
+            futures.add(asyncPostForObject(uri1, request));
 
-            response++;
+            for (Future<String> future : futures) {
+                try {
+                    future.get();
+                    response++;
+                } catch (Exception e) {
+                    // handle the exception??
+                }
+            }
 
             // if response == number of replicas (for now), then we get all acks
             if (response == 1) {
@@ -240,9 +296,17 @@ public class LeaderService {
 
             HttpEntity<String> request = new HttpEntity<>(null, null);
 
-            String resultAsJsonStr = restTemplate.patchForObject(uri1, request, String.class);
+            List<Future<String>> futures = new ArrayList<>();
+            futures.add(asyncPatchForObject(uri1, request));
 
-            response++;
+            for (Future<String> future : futures) {
+                try {
+                    future.get();
+                    response++;
+                } catch (Exception e) {
+                    // handle the exception??
+                }
+            }
 
             // if response == number of replicas (for now), then we get all acks
             if (response == 1) {
@@ -263,9 +327,17 @@ public class LeaderService {
 
             HttpEntity<?> request = new HttpEntity<>(payload, null);
 
-            String resultAsJsonStr = restTemplate.patchForObject(uri1, request, String.class);
+            List<Future<String>> futures = new ArrayList<>();
+            futures.add(asyncPatchForObject(uri1, request));
 
-            response++;
+            for (Future<String> future : futures) {
+                try {
+                    future.get();
+                    response++;
+                } catch (Exception e) {
+                    // handle the exception??
+                }
+            }
 
             // if response == number of replicas (for now), then we get all acks
             if (response == 1) {
@@ -284,14 +356,49 @@ public class LeaderService {
                 uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
             }
 
-            restTemplate.delete(uri1);
+            List<Future<String>> futures = new ArrayList<>();
+            futures.add(asyncDelete(uri1));
 
-            response++;
+            for (Future<String> future : futures) {
+                try {
+                    future.get();
+                    response++;
+                } catch (Exception e) {
+                    // handle the exception??
+                }
+            }
 
             // if response == number of replicas (for now), then we get all acks
             if (response == 1) {
                 System.out.println(" I have received 1 ACKS from the replicas");
             }
         }
+    }
+
+    @Async
+    public Future<String> asyncPatchForObject(URI uri, Object request) {
+        return new AsyncResult<String>(restTemplate.patchForObject(uri, request, String.class));
+    }
+
+    @Async
+    public Future<String> asyncPatchForObject(String url, Object request) {
+        return new AsyncResult<String>(restTemplate.patchForObject(url, request, String.class));
+    }
+
+    @Async
+    public Future<String> asyncPostForObject(URI uri, Object request) {
+        return new AsyncResult<String>(restTemplate.postForObject(uri, request, String.class));
+    }
+
+    @Async
+    public Future<String> asyncDelete(URI uri) {
+        restTemplate.delete(uri);
+        return new AsyncResult<>("Done!");
+    }
+
+    @Async
+    public Future<String> asyncDelete(String url) {
+        restTemplate.delete(url);
+        return new AsyncResult<>("Done!");
     }
 }
