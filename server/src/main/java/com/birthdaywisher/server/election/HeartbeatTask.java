@@ -15,13 +15,14 @@ public class HeartbeatTask extends Thread{
     public void run() {
         System.out.println("Starting HeartbeatTask Thread");
         while (true) {
-            if (server.getServerId() == server.getLeaderId()) {
+            if (server.getServerId() != server.getLeaderId()) {
                 try {
                     System.out.println("Sending Heartbeat Msg to Successor Port: " + String.valueOf(server.getSuccPort()));
                     server.sendMessage("2");
                     Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    System.out.println(e);
+                } catch (Exception e) {
+                    System.out.println("heartbeat error:" + e);
+                    server.initiateElection();
                 }
             } else {
                 break;

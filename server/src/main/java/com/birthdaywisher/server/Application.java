@@ -67,6 +67,26 @@ public class Application {
             // -------------------------------- BEGIN SERVER 1 SETUP
             // --------------------------------
             // server1 port: 5000
+            Server server = new Server(1, 3, 3, "server1");
+            server.setSuccPort(7000);
+
+            ServerSocket serverSocket = new ServerSocket(5000);
+            Socket ss = serverSocket.accept();
+            server.setSocket(ss);
+            System.out.println("Server 1 listening on port 5000 ... ");
+
+            //// TimeUnit.SECONDS.sleep(180);
+            Socket s = new Socket(address, server.getSuccPort()); // todo: figure out order
+            server.setSuccSocket(s);
+            System.out.println("Connected to server 2");
+
+            // -------------------------------- END SERVER 1 SETUP
+            // --------------------------------
+
+            // initialize server information and setup successor and predecessor
+            // -------------------------------- BEGIN SERVER 1 SETUP
+            // --------------------------------
+            // server1 port: 5000
             // Server server = new Server(1, 3, 3, "server1");
             // server.setSuccPort(7000);
             //
@@ -81,51 +101,31 @@ public class Application {
             // server.setSuccSocket(s);
             // System.out.println("Connected to server 2");
 
-            // -------------------------------- END SERVER 1 SETUP
-            // --------------------------------
-
-            // -------------------------------- BEGIN SERVER 2 SETUP
-            // --------------------------------
-            // server2 port: 6000
-            //// Server server = new Server(2, 3, 1, "server2");
-            //// server.setSuccPort(7000);
-            // System.out.println("Connected to server 3");
-            //
-            // //server 2
-            // Server server = new Server(2, 3, 1, "server2");
-            // server.setServerPort(6000);
-            // server.setSuccPort(7000);
-            // server.setSuccId(3);
-            //
-            //// ServerSocket serverSocket = new ServerSocket(6000);
-            //// Socket ss = serverSocket.accept();
-            // server.setSocket(ss);
-            // System.out.println("Server 2 listening on port 6000 ... ");
-            // -------------------------------- END SERVER 2 SETUP
-            //// --------------------------------
-
             // -------------------------------- BEGIN SERVER 3 SETUP
             // --------------------------------
             // //server3 port: 7000
-            Server server = new Server(3, 3, 2, "server3");
-            server.setSuccPort(5000);
-            System.out.println("Connected to server 1");
-
-            Socket s = new Socket(address, server.getSuccPort()); // todo: figure out order
-            server.setSuccSocket(s);
-
-            ServerSocket serverSocket = new ServerSocket(7000);
-            Socket ss = serverSocket.accept();
-            server.setSocket(ss);
-            System.out.println("Server 3 listening on port 7000 ... ");
+            // Server server = new Server(3, 3, 2, "server3");
+            // server.setSuccPort(5000);
+            // System.out.println("Connected to server 1");
+            //
+            // Socket s = new Socket(address, server.getSuccPort()); //todo: figure out
+            // order
+            // server.setSuccSocket(s);
+            //
+            // ServerSocket serverSocket = new ServerSocket(7000);
+            // Socket ss = serverSocket.accept();
+            // server.setSocket(ss);
+            // System.out.println("Server 3 listening on port 7000 ... ");
             // -------------------------------- END SERVER 3 SETUP
             // --------------------------------
 
             // Leader functions
-            if (server.getServerId() == server.getLeaderId()) {
+            if (server.getServerId() != server.getLeaderId()) {
 
-                // Thread heartbeatTaskThread = new HeartbeatTask(server);
-                // heartbeatTaskThread.start();
+                Thread heartbeatTaskThread = new HeartbeatTask(server);
+                heartbeatTaskThread.start();
+
+                // Send heart beat message to successor (server 3 to 1)
 
                 // Send heart beat message to successor (server 3 to 1)
 
@@ -135,8 +135,8 @@ public class Application {
                 // opening? socket connetion
                 // (new task start election)?
 
-                Thread electionTask = new ElectionTask(server, server.getServerName());
-                electionTask.start();
+                // Thread electionTask = new ElectionTask(server, server.getServerName());
+                // electionTask.start();
 
             }
 
@@ -168,7 +168,7 @@ public class Application {
             // System.out.println(e);
             // }
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println("Application error" + e);
         }
         SpringApplication.run(Application.class, args);
 

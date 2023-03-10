@@ -34,14 +34,13 @@ public class ElectionTask extends Thread{
                             server.election(msg);
                         }
                     }
-                } catch (SocketTimeoutException ste) {
+                } catch (Exception e) {
+                    System.out.println("Error: " + e);
                     //no message received after some time
                     if (server.getPredId() == server.getLeaderId()) {
                         System.out.println("No heartbeat message received, intiating election...");
                         server.initiateElection();
                     }
-                } catch (IOException e)  {
-                    System.out.println("IOError: " + e);
                 }
             }
         } catch (SocketException e) {
