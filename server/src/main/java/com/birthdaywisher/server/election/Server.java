@@ -151,9 +151,20 @@ public class Server {
     public String receiveMessage() throws IOException{
         Socket ss = getServerSocket();
         DataInputStream dis = new DataInputStream(ss.getInputStream());
-        String  msg = (String) dis.readUTF();
+        String  msg = "";
 
-        System.out.println("Received Message: " + msg);
+        while(true) {
+            if(dis.available() > 0) {
+                msg = dis.readUTF();
+                System.out.println("Read: " + msg);
+                break;
+            }
+        }
+
+        if(!msg.equals("")) {
+            System.out.println("Received msg: " + msg);
+        }
+
         return msg;
     }
 
