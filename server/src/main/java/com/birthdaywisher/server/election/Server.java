@@ -1,29 +1,39 @@
 package com.birthdaywisher.server.election;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 public class Server {
     
     private int serverId;
+    private String serverName;
     private int predId;
+    private int succId;
+    private Socket socket;
     private Socket succSocket;
     private int succPort;
+    private int serverPort;
     private int leaderId;
     private boolean isRunning;
 
-    public Server(int id) {
-        this.serverId = id;
-        this.isRunning = false;
-    }
-
-    public Server(int id, int leaderId) {
+    public Server(int id, int leaderId, int predId, String serverName) {
         this.serverId = id;
         this.leaderId = leaderId;
+        this.predId = predId;
         this.isRunning = false;
+        this.serverName = serverName;
     }
 
      //Getters
+    public int getServerPort() { return this.serverPort; }
+    public int getSuccId() { return this.succId; }
+    public String getServerName() { return this.serverName; }
+    public Socket getServerSocket() {
+        return this.socket;
+    }
+    
     public int getServerId() {
         return this.serverId;
     }
@@ -49,6 +59,13 @@ public class Server {
     }
 
     //Setters
+    public void setServerPort(int port) { this.serverPort = port; }
+    public void setSuccId(int succId) { this.succId = succId; }
+    public void setServerName(String name) { this.serverName = name; }
+    public void setSocket(Socket socket) {
+        this.socket = socket;
+    }
+
     public void setSuccSocket(Socket socket) {
         this.succSocket = socket;
     }
@@ -69,10 +86,6 @@ public class Server {
         this.isRunning = status;
     }
 
-    public void setLeader(int id) {
-        this.leaderId = id;
-    }
-
     public void initiateElection() {
         setIsRunning(true);
         
@@ -90,6 +103,7 @@ public class Server {
         char msgId = msg.charAt(1);
 
         if ((int) msgType == 0) {
+            System.out.println("Election Message Received: " + msg);
             //If message id is greater than server id, pass message onto successor
             if ((int) msgId > getServerId()) {
 
@@ -108,8 +122,8 @@ public class Server {
             }
         //Recieve leader message, update leader id and stop running 
         } else {
-            
-            setLeader(msgId);
+            System.out.println("Leader Message Received: " + msg);
+            setLeaderId(msgId);
             setIsRunning(false);
  
             //quit the election and not send anything
@@ -126,10 +140,21 @@ public class Server {
             dout.writeUTF(msg);
             dout.flush();
             dout.close();
+
+            System.out.println("Sent Message: " + msg);
         } catch (Exception e) {
             System.out.println(e);
         }
 
+    }
+
+    public String receiveMessage() throws IOException{
+        Socket ss = getServerSocket();
+        DataInputStream dis = new DataInputStream(ss.getInputStream());
+        String  msg = (String) dis.readUTF();
+
+        System.out.println("Received Message: " + msg);
+        return msg;
     }
 
 }
