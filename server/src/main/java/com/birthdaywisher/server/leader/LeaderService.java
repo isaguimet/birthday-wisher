@@ -10,15 +10,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 
 @Service
@@ -28,10 +26,13 @@ public class LeaderService {
 
     private final ServerProperties serverProperties;
 
+    private final List<Integer> serverPorts = Arrays.asList(8080, 8081, 8082);
+
     public LeaderService(ServerProperties serverProperties, RestTemplate restTemplate) {
         this.serverProperties = serverProperties;
         this.restTemplate = restTemplate;
     }
+
     public boolean isLeader() {
         // check if this is a leader somehow for now just getting ports
         return serverProperties.getPort() == 8080;
@@ -79,17 +80,19 @@ public class LeaderService {
                 uri = URI.create("http://localhost/users/pendingFriendRequests/decline");
             }
 
-            uri = buildURIForEachReplica(uri);
+            List<URI> replicaURIs = buildURIForEachReplica(uri);
             HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
 
-            String url = UriComponentsBuilder.fromUri(uri)
-                    .queryParam("userId", userId)
-                    .queryParam("friendEmail", friendEmail)
-                    .encode()
-                    .toUriString();
-
             List<Future<String>> futures = new ArrayList<>();
-            futures.add(asyncPatchForObject(url, request));
+            for (URI replicaURI : replicaURIs) {
+                String url = UriComponentsBuilder.fromUri(replicaURI)
+                        .queryParam("userId", userId)
+                        .queryParam("friendEmail", friendEmail)
+                        .encode()
+                        .toUriString();
+
+                futures.add(asyncPatchForObject(url, request));
+            }
 
             for (Future<String> future : futures) {
                 try {
@@ -107,16 +110,20 @@ public class LeaderService {
         }
     }
 
-    private URI buildURIForEachReplica(URI uri) {
-        if (uri.getPort() == -1) {
-            uri = UriComponentsBuilder.fromUri(uri).port(8081).build().toUri();
+    private List<URI> buildURIForEachReplica(URI uri) {
+        List<URI> replicaURIs = new ArrayList<>();
+        for (Integer port : serverPorts) {
+            if (!Objects.equals(port, serverProperties.getPort())) {
+                uri = UriComponentsBuilder.fromUri(uri).port(port).build().toUri();
+                replicaURIs.add(uri);
+            }
         }
-        return uri;
+        return replicaURIs;
     }
 
     private void addUserPOSTRequest(User user, int response) {
         URI uri = URI.create("http://localhost/users/signUp");
-        uri = buildURIForEachReplica(uri);
+        List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         // call post endpoint of other replicas
         HttpHeaders headers = new HttpHeaders();
@@ -133,7 +140,9 @@ public class LeaderService {
         HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
         List<Future<String>> futures = new ArrayList<>();
-        futures.add(asyncPostForObject(uri, request));
+        for (URI replicaURI : replicaURIs) {
+            futures.add(asyncPostForObject(replicaURI, request));
+        }
 
         for (Future<String> future : futures) {
             try {
@@ -152,10 +161,12 @@ public class LeaderService {
 
     private void deleteUserRequest(ObjectId userId, int response) {
         URI uri = URI.create("http://localhost/users/");
-        uri = buildURIForEachReplica(uri);
+        List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         List<Future<String>> futures = new ArrayList<>();
-        futures.add(asyncDelete(uri + String.valueOf(userId)));
+        for (URI replicaURI : replicaURIs) {
+            futures.add(asyncDelete(replicaURI + String.valueOf(userId)));
+        }
 
         for (Future<String> future : futures) {
             try {
@@ -174,18 +185,20 @@ public class LeaderService {
 
     private void sendFriendRequest(String userEmail, String friendEmail, int response) {
         URI uri = URI.create("http://localhost/users/friendRequest");
-        uri = buildURIForEachReplica(uri);
+        List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
 
-        String url = UriComponentsBuilder.fromUri(uri)
-                .queryParam("userEmail", userEmail)
-                .queryParam("friendEmail", friendEmail)
-                .encode()
-                .toUriString();
-
         List<Future<String>> futures = new ArrayList<>();
-        futures.add(asyncPatchForObject(url, request));
+        for (URI replicaURI : replicaURIs) {
+            String url = UriComponentsBuilder.fromUri(replicaURI)
+                    .queryParam("userEmail", userEmail)
+                    .queryParam("friendEmail", friendEmail)
+                    .encode()
+                    .toUriString();
+
+            futures.add(asyncPatchForObject(url, request));
+        }
 
         for (Future<String> future : futures) {
             try {
@@ -207,10 +220,8 @@ public class LeaderService {
             int response = 0;
 
             URI uri1 = URI.create("http://localhost/boards");
+            List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
-            if (uri1.getPort() == -1) {
-                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
-            }
             // call post endpoint of other replicas
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -225,7 +236,9 @@ public class LeaderService {
             HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
             List<Future<String>> futures = new ArrayList<>();
-            futures.add(asyncPostForObject(uri1, request));
+            for (URI replicaURI : replicaURIs) {
+                futures.add(asyncPostForObject(replicaURI, request));
+            }
 
             for (Future<String> future : futures) {
                 try {
@@ -249,9 +262,8 @@ public class LeaderService {
 
             URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages");
 
-            if (uri1.getPort() == -1) {
-                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
-            }
+            List<URI> replicaURIs = buildURIForEachReplica(uri1);
+
             // call post endpoint of other replicas
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -266,7 +278,9 @@ public class LeaderService {
             HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
             List<Future<String>> futures = new ArrayList<>();
-            futures.add(asyncPostForObject(uri1, request));
+            for (URI replicaURI : replicaURIs) {
+                futures.add(asyncPostForObject(replicaURI, request));
+            }
 
             for (Future<String> future : futures) {
                 try {
@@ -289,15 +303,14 @@ public class LeaderService {
             int response = 0;
 
             URI uri1 = URI.create(url);
-
-            if (uri1.getPort() == -1) {
-                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
-            }
+            List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
             HttpEntity<String> request = new HttpEntity<>(null, null);
 
             List<Future<String>> futures = new ArrayList<>();
-            futures.add(asyncPatchForObject(uri1, request));
+            for (URI replicaURI : replicaURIs) {
+                futures.add(asyncPatchForObject(replicaURI, request));
+            }
 
             for (Future<String> future : futures) {
                 try {
@@ -320,15 +333,14 @@ public class LeaderService {
             int response = 0;
 
             URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages/" + msgId);
-
-            if (uri1.getPort() == -1) {
-                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
-            }
+            List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
             HttpEntity<?> request = new HttpEntity<>(payload, null);
 
             List<Future<String>> futures = new ArrayList<>();
-            futures.add(asyncPatchForObject(uri1, request));
+            for (URI replicaURI : replicaURIs) {
+                futures.add(asyncPatchForObject(replicaURI, request));
+            }
 
             for (Future<String> future : futures) {
                 try {
@@ -351,13 +363,12 @@ public class LeaderService {
             int response = 0;
 
             URI uri1 = URI.create(url);
-
-            if (uri1.getPort() == -1) {
-                uri1 = UriComponentsBuilder.fromUri(uri1).port(8081).build().toUri();
-            }
+            List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
             List<Future<String>> futures = new ArrayList<>();
-            futures.add(asyncDelete(uri1));
+            for (URI replicaURI : replicaURIs) {
+                futures.add(asyncDelete(replicaURI));
+            }
 
             for (Future<String> future : futures) {
                 try {
@@ -377,28 +388,28 @@ public class LeaderService {
 
     @Async
     public Future<String> asyncPatchForObject(URI uri, Object request) {
-        return new AsyncResult<String>(restTemplate.patchForObject(uri, request, String.class));
+        return CompletableFuture.completedFuture(restTemplate.patchForObject(uri, request, String.class));
     }
 
     @Async
     public Future<String> asyncPatchForObject(String url, Object request) {
-        return new AsyncResult<String>(restTemplate.patchForObject(url, request, String.class));
+        return CompletableFuture.completedFuture(restTemplate.patchForObject(url, request, String.class));
     }
 
     @Async
     public Future<String> asyncPostForObject(URI uri, Object request) {
-        return new AsyncResult<String>(restTemplate.postForObject(uri, request, String.class));
+        return CompletableFuture.completedFuture(restTemplate.postForObject(uri, request, String.class));
     }
 
     @Async
     public Future<String> asyncDelete(URI uri) {
         restTemplate.delete(uri);
-        return new AsyncResult<>("Done!");
+        return CompletableFuture.completedFuture("Done!");
     }
 
     @Async
     public Future<String> asyncDelete(String url) {
         restTemplate.delete(url);
-        return new AsyncResult<>("Done!");
+        return CompletableFuture.completedFuture("Done!");
     }
 }
