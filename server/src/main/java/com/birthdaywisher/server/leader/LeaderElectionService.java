@@ -7,6 +7,7 @@ import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -55,14 +56,15 @@ public class LeaderElectionService {
             System.out.println("waiting to accept connection on " + server.getServerPort());
             ServerSocket serverSocket = new ServerSocket(server.getServerPort());
 
-            TimeUnit.SECONDS.sleep(20);
+            TimeUnit.SECONDS.sleep(10);
 
             Socket s = new Socket(address, server.getSuccPort());
             server.setSuccSocket(s);
             System.out.println("Connected to server " + server.getSuccId());
 
-            Future<Socket> ss = acceptConnections(serverSocket);
-            server.setSocket(ss.get());
+            Socket ss = acceptConnections(serverSocket).get();
+            server.setSocket(ss);
+            server.setInputStream(new DataInputStream(ss.getInputStream()));
             System.out.println("Server " + server.getServerId() +  " listening on port " + server.getServerPort() +  " ... ");
 
             if (server.getServerId()== server.getLeaderId()) {

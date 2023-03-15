@@ -17,6 +17,7 @@ public class Server {
     private int serverPort;
     private int leaderId;
     private boolean isRunning;
+    private DataInputStream inputStream;
 
     public Server(int id, int leaderId, int predId, String serverName) {
         this.serverId = id;
@@ -86,6 +87,14 @@ public class Server {
         this.isRunning = status;
     }
 
+    public DataInputStream getInputStream() {
+        return inputStream;
+    }
+
+    public void setInputStream(DataInputStream inputStream) {
+        this.inputStream = inputStream;
+    }
+
     public void initiateElection() {
         setIsRunning(true);
         
@@ -139,7 +148,7 @@ public class Server {
             DataOutputStream dout = new DataOutputStream(s.getOutputStream());
             dout.writeUTF(msg);
             dout.flush();
-            dout.close();
+//            dout.close();
 
             System.out.println("Sent Message: " + msg);
         } catch (Exception e) {
@@ -149,22 +158,17 @@ public class Server {
     }
 
     public String receiveMessage() throws IOException{
-        Socket ss = getServerSocket();
-        DataInputStream dis = new DataInputStream(ss.getInputStream());
         String  msg = "";
 
         while(true) {
-            if(dis.available() > 0) {
-                msg = dis.readUTF();
-                System.out.println("Read: " + msg);
-                break;
+            if(inputStream.available() > 0) {
+                msg = inputStream.readUTF();
+                if(!msg.equals("")) {
+                    System.out.println("Received msg: " + msg);
+                    break;
+                }
             }
         }
-
-        if(!msg.equals("")) {
-            System.out.println("Received msg: " + msg);
-        }
-
         return msg;
     }
 
