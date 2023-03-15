@@ -53,8 +53,8 @@ public class LeaderElectionService {
         try {
             InetAddress address = InetAddress.getByName("127.0.0.1");
 
-            System.out.println("waiting to accept connection on " + server.getServerPort());
             ServerSocket serverSocket = new ServerSocket(server.getServerPort());
+            System.out.println(String.format("Server %d listening on port %d ...", server.getServerId(), server.getServerPort()));
 
             TimeUnit.SECONDS.sleep(10);
 
@@ -65,7 +65,6 @@ public class LeaderElectionService {
             Socket ss = acceptConnections(serverSocket).get();
             server.setSocket(ss);
             server.setInputStream(new DataInputStream(ss.getInputStream()));
-            System.out.println("Server " + server.getServerId() +  " listening on port " + server.getServerPort() +  " ... ");
 
             if (server.getServerId()== server.getLeaderId()) {
 
