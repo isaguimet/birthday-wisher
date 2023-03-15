@@ -18,6 +18,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class LeaderService {
@@ -26,7 +28,11 @@ public class LeaderService {
 
     private final ServerProperties serverProperties;
 
-    private final List<Integer> serverPorts = Arrays.asList(8080, 8081, 8082);
+    // server group
+    private final List<Integer> serverGroup = new ArrayList<>(Arrays.asList(8080, 8081, 8082));
+
+    private final Pattern pattern = Pattern.compile("I/O error on (POST|GET|PATCH|DELETE) request for \"http://localhost:(\\d{4,})/users/signUp\": " +
+            "Connect to http://localhost:(\\d{4,}) \\[localhost/127.0.0.1, localhost/0:0:0:0:0:0:0:1\\] failed: Connection refused");
 
     public LeaderService(ServerProperties serverProperties, RestTemplate restTemplate) {
         this.serverProperties = serverProperties;
@@ -112,7 +118,7 @@ public class LeaderService {
 
     private List<URI> buildURIForEachReplica(URI uri) {
         List<URI> replicaURIs = new ArrayList<>();
-        for (Integer port : serverPorts) {
+        for (Integer port : serverGroup) {
             if (!Objects.equals(port, serverProperties.getPort())) {
                 uri = UriComponentsBuilder.fromUri(uri).port(port).build().toUri();
                 replicaURIs.add(uri);
@@ -140,13 +146,31 @@ public class LeaderService {
         HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
         List<Future<String>> futures = new ArrayList<>();
-        for (URI replicaURI : replicaURIs) {
-            futures.add(asyncPostForObject(replicaURI, request));
+        try {
+            for (URI replicaURI : replicaURIs) {
+                futures.add(asyncPostForObject(replicaURI, request));
+            }
         }
+        catch (Exception e) {
+            Matcher matcher = pattern.matcher(e.getMessage());
+            if (matcher.find()) {
+                Integer portToRemove = Integer.valueOf(matcher.group(2));
+                try {
+                    serverGroup.remove(portToRemove);
+                } catch (Exception e1) {
+                    System.out.println("Error from removing port: " + e1.getMessage());
+                }
+                System.out.println("server group: " + serverGroup);
+            } else {
+                System.out.println("did not match");
+            }
+        }
+
 
         for (Future<String> future : futures) {
             try {
-                future.get();
+                String result = future.get();
+                System.out.println("future result: " + result);
                 response++;
             } catch (Exception e) {
                 // handle the exception??
