@@ -8,12 +8,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -43,11 +40,6 @@ public class LeaderElectionService {
     }
 
     @Async
-    public Future<Socket> acceptConnections(ServerSocket serverSocket) throws IOException {
-        return CompletableFuture.completedFuture(serverSocket.accept());
-    }
-
-    @Async
     public void init() {
         System.out.println("Server " + server.getServerName());
         try {
@@ -62,7 +54,7 @@ public class LeaderElectionService {
             server.setSuccSocket(s);
             System.out.println("Connected to server " + server.getSuccId());
 
-            Socket ss = acceptConnections(serverSocket).get();
+            Socket ss = serverSocket.accept();
             server.setSocket(ss);
             server.setInputStream(new DataInputStream(ss.getInputStream()));
 
