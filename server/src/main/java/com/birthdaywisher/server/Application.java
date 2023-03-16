@@ -31,7 +31,7 @@ public class Application {
 
     public static void main(String[] args) {
         try {
-            InetAddress address = InetAddress.getByName("127.0.0.1");
+            // InetAddress address = InetAddress.getByName("127.0.0.1");
 
             // //server 1
             // Server server = new Server(1, 3, 3, "server1");
@@ -67,18 +67,19 @@ public class Application {
             // -------------------------------- BEGIN SERVER 1 SETUP
             // --------------------------------
             // server1 port: 5000
-            Server server = new Server(1, 3, 3, "server1");
-            server.setSuccPort(7000);
+            // Server server = new Server(1, 3, 3, "server1");
+            // server.setSuccPort(7000);
 
-            ServerSocket serverSocket = new ServerSocket(5000);
-            Socket ss = serverSocket.accept();
-            server.setSocket(ss);
-            System.out.println("Server 1 listening on port 5000 ... ");
+            // ServerSocket serverSocket = new ServerSocket(5000);
+            // Socket ss = serverSocket.accept();
+            // server.setSocket(ss);
+            // System.out.println("Server 1 listening on port 5000 ... ");
 
-            //// TimeUnit.SECONDS.sleep(180);
-            Socket s = new Socket(address, server.getSuccPort()); // todo: figure out order
-            server.setSuccSocket(s);
-            System.out.println("Connected to server 2");
+            // //// TimeUnit.SECONDS.sleep(180);
+            // Socket s = new Socket(address, server.getSuccPort()); // todo: figure out
+            // order
+            // server.setSuccSocket(s);
+            // System.out.println("Connected to server 2");
 
             // -------------------------------- END SERVER 1 SETUP
             // --------------------------------
@@ -120,25 +121,25 @@ public class Application {
             // --------------------------------
 
             // Leader functions
-            if (server.getServerId() != server.getLeaderId()) {
+            // if (server.getServerId() != server.getLeaderId()) {
 
-                Thread heartbeatTaskThread = new HeartbeatTask(server);
-                heartbeatTaskThread.start();
+            // Thread heartbeatTaskThread = new HeartbeatTask(server);
+            // heartbeatTaskThread.start();
 
-                // Send heart beat message to successor (server 3 to 1)
+            // // Send heart beat message to successor (server 3 to 1)
 
-                // Send heart beat message to successor (server 3 to 1)
+            // // Send heart beat message to successor (server 3 to 1)
 
-                // If server 1, listen for heartbeat
-            } else {
-                // if no heart beat recieved (by 1) and timeout, server 1 start election by
-                // opening? socket connetion
-                // (new task start election)?
+            // // If server 1, listen for heartbeat
+            // } else {
+            // // if no heart beat recieved (by 1) and timeout, server 1 start election by
+            // // opening? socket connetion
+            // // (new task start election)?
 
-                // Thread electionTask = new ElectionTask(server, server.getServerName());
-                // electionTask.start();
+            // // Thread electionTask = new ElectionTask(server, server.getServerName());
+            // // electionTask.start();
 
-            }
+            // }
 
             // sendMessageToSuccessor(Server server, String msg);
 

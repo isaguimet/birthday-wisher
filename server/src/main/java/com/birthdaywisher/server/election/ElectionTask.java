@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
-public class ElectionTask extends Thread{
-//    private Thread t;
+public class ElectionTask extends Thread {
+    // private Thread t;
     private String threadName;
     private Server server;
 
@@ -18,14 +18,16 @@ public class ElectionTask extends Thread{
     public void run() {
         System.out.println("Starting ElectionTask Thread: " + threadName);
         try {
-            server.getServerSocket().setSoTimeout(5000);
+            // server.getServerSocket().setSoTimeout(5000);
+            server.getSuccSocket().setKeepAlive(true);
+            System.out.println("is successor socket alive " + server.getSuccSocket().getKeepAlive());
             while (true) {
                 try {
                     String msg = server.receiveMessage();
-//                    System.out.println("Received Message: " + msg);
+                    // System.out.println("Received Message: " + msg);
                     if (!msg.equals("")) {
-                        if (server.getPredId() == server.getLeaderId()) {   //server's predecessor is the leader
-                            if (msg.equals("2")) {  //heartbeat message
+                        if (server.getPredId() == server.getLeaderId()) { // server's predecessor is the leader
+                            if (msg.equals("2")) { // heartbeat message
 
                             } else {
                                 server.election(msg);
@@ -36,7 +38,7 @@ public class ElectionTask extends Thread{
                     }
                 } catch (Exception e) {
                     System.out.println("Error: " + e);
-                    //no message received after some time
+                    // no message received after some time
                     if (server.getPredId() == server.getLeaderId()) {
                         System.out.println("No heartbeat message received, intiating election...");
                         server.initiateElection();
@@ -51,14 +53,13 @@ public class ElectionTask extends Thread{
 
     }
 
-//    public void start() {
-//
-//
-//        if (t == null) {
-//            t = new Thread(this, threadName);
-//            t.start();
-//        }
-//    }
-
+    // public void start() {
+    //
+    //
+    // if (t == null) {
+    // t = new Thread(this, threadName);
+    // t.start();
+    // }
+    // }
 
 }

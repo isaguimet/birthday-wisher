@@ -34,8 +34,8 @@ public class LeaderElectionService {
         } else {
             this.server = new Server(1, 3, 3, "server1");
             server.setServerPort(5000);
-            server.setSuccPort(6000);
-            server.setSuccId(2);
+            server.setSuccPort(7000);
+            server.setSuccId(3);
         }
     }
 
@@ -46,36 +46,38 @@ public class LeaderElectionService {
             InetAddress address = InetAddress.getByName("127.0.0.1");
 
             ServerSocket serverSocket = new ServerSocket(server.getServerPort());
-            System.out.println(String.format("Server %d listening on port %d ...", server.getServerId(), server.getServerPort()));
+            System.out.println(
+                    String.format("Server %d listening on port %d ...", server.getServerId(), server.getServerPort()));
 
             TimeUnit.SECONDS.sleep(10);
 
             Socket s = new Socket(address, server.getSuccPort());
             server.setSuccSocket(s);
             System.out.println("Connected to server " + server.getSuccId());
+            s.setKeepAlive(true);  
 
             Socket ss = serverSocket.accept();
             server.setSocket(ss);
             server.setInputStream(new DataInputStream(ss.getInputStream()));
 
-            if (server.getServerId()== server.getLeaderId()) {
+            if (server.getServerId() == server.getLeaderId()) {
 
-                    Thread heartbeatTaskThread = new HeartbeatTask(server);
-                    heartbeatTaskThread.start();
+                Thread heartbeatTaskThread = new HeartbeatTask(server);
+                heartbeatTaskThread.start();
 
-                    //Send heart beat message to successor (server 3 to 1)
+                // Send heart beat message to successor (server 3 to 1)
 
+                // If server 1, listen for heartbeat
+            } else {
+                // if no heart beat recieved (by 1) and timeout, server 1 start election by
+                // opening? socket connetion
+                // (new task start election)?
 
-                    //If server 1, listen for heartbeat
-                } else {
-                    //if no heart beat recieved (by 1) and timeout, server 1 start election by opening? socket connetion
-                    //(new task start election)?
+                Thread electionTask = new ElectionTask(server, server.getServerName());
+                electionTask.start();
 
-                    Thread electionTask = new ElectionTask(server, server.getServerName());
-                    electionTask.start();
-
-                    electionTask.join();
-                }
+                electionTask.join();
+            }
 
         } catch (Exception e) {
             System.out.println("Failed to initialize leader: " + e.getMessage());
