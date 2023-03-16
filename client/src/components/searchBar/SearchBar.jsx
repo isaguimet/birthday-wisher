@@ -10,6 +10,7 @@ const SearchBar = (props) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
+        props.setLoading(true);
         axiosInstance.get(`users/byEmail/${input}`).then((response) => {
             props.setLoading(false)
             props.setData(response.data)

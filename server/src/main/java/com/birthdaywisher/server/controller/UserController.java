@@ -133,7 +133,7 @@ public class UserController {
             }
             userService.sendFriendRequest(optionalUser.get(), optionalFriend.get());
 
-            return new ResponseEntity<>(optionalFriend.get(), HttpStatus.OK);
+            return new ResponseEntity<>(userService.getPendingFriendRequests(optionalUser.get()), HttpStatus.OK);
         }
         catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -175,7 +175,13 @@ public class UserController {
                 return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
                         "This userId cannot accept the request ", HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+
+            List<User> updatedPendingFriends = userService.getPendingFriendRequests(optionalUser.get());
+
+            List<User> updatedFriendList = userService.getFriendListByUser(optionalUser.get());
+            updatedFriendList.sort(Comparator.comparing(friend -> MonthDay.from(friend.getBirthdate())));
+
+            return new ResponseEntity<>(Arrays.asList(updatedPendingFriends, updatedFriendList), HttpStatus.OK);
         }
         catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
@@ -201,7 +207,7 @@ public class UserController {
                 return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
                         "This userId cannot decline the request ", HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+            return new ResponseEntity<>(userService.getPendingFriendRequests(optionalUser.get()), HttpStatus.OK);
         }
         catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());

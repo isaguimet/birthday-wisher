@@ -1,51 +1,48 @@
-import Card from 'react-bootstrap/Card';
-import {useEffect, useState} from "react";
+import Container from "react-bootstrap/Container";
 import {Alert} from "reactstrap";
+import {useEffect} from "react";
 import axiosInstance from "../../utils/API";
+import Card from "react-bootstrap/Card";
 
 /**
  * A component for rendering a User friends list
- * @param props {Object} Expected props for this component:
- * - userId {ObjectId} the unique identifier of a user to get their friends
  * @returns {JSX.Element}
  * @constructor
  */
-const FriendCard = (props) => {
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
+const FriendBirthdayList = (props) => {
 
     useEffect(() => {
-        setLoading(true);
-        axiosInstance.get(`users/friendList/${props.userId}`).then((response) => {
-            setLoading(false);
-            setData(response.data);
-            setError(null);
+        props.setLoading(true);
+        axiosInstance.get(`users/friendList/${props.loggedInUser}`).then((response) => {
+            props.setLoading(false);
+            props.setData(response.data);
+            props.setError(null);
         }).catch((err) => {
-            setLoading(false);
+            props.setLoading(false);
             if (err.response) {
-                setError(err.response.data);
+                props.setError(err.response.data);
             } else {
-                setError(err.message);
+                props.setError(err.message);
             }
         });
     }, []);
 
     const handleAlertToggle = () => {
-        setError(null);
-    }
+        props.setError(null);
+    };
 
     return (
-        <div>
-            {!!error && (
+        <Container>
+            <h2>Friends birthdays</h2>
+            {!!props.error && (
                 <Alert color={"danger"} toggle={handleAlertToggle}>
-                    Error: {error}
+                    Error: {props.error}
                 </Alert>
             )}
-            {loading && <div>Loading friends...</div>}
-            {!loading && data ? (
+            {props.loading && <div>Loading your friends...</div>}
+            {!props.loading && props.data ? (
                 <div className="friendList">
-                    {data.map((friend) => (
+                    {props.data.map((friend) => (
                         <Card key={friend.id} style={{width: '30rem'}}>
                             <Card.Body className="friendCard">
                                 <Card.Text>
@@ -57,8 +54,8 @@ const FriendCard = (props) => {
                     ))}
                 </div>
             ) : null}
-        </div>
+        </Container>
     );
-}
+};
 
-export default FriendCard;
+export default FriendBirthdayList;
