@@ -6,8 +6,8 @@ import {useState} from "react";
 import {Alert} from "reactstrap";
 import {BsPersonPlusFill} from "react-icons/bs";
 import SearchBar from "../components/searchBar/SearchBar";
-import axios from "axios";
 import {useSelector} from "react-redux";
+import axiosInstance from "../utils/API";
 
 const FriendsPage = () => {
     const loggedInUser = useSelector((state) => state.user.id);
@@ -36,7 +36,7 @@ const FriendsPage = () => {
         }
 
         setLoadingForSendingRequest(true);
-        axios.patch(`http://localhost:8080/users/friendRequest`, null, {params: queryParams})
+        axiosInstance.patch(`users/friendRequest`, null, {params: queryParams})
             .then((response) => {
                 setLoadingForSendingRequest(false);
                 // Adds a pending friend onto the old data list

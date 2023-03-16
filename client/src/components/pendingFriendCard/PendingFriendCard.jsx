@@ -1,9 +1,9 @@
 import {useEffect} from "react";
-import axios from "axios";
 import {Alert} from "reactstrap";
 import Card from "react-bootstrap/Card";
 import button from "bootstrap/js/src/button";
 import FriendRequestCard from "../friendRequestCard/FriendRequestCard";
+import axiosInstance from "../../utils/API";
 
 const PendingFriendCard = (props) => {
 
@@ -13,7 +13,7 @@ const PendingFriendCard = (props) => {
 
     useEffect(() => {
         props.setLoading(true);
-        axios.get(`http://localhost:8080/users/pendingFriendRequests/${props.userId}`).then((response) => {
+        axiosInstance.get(`users/pendingFriendRequests/${props.userId}`).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);

@@ -1,5 +1,5 @@
 import {useState} from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/API";
 
 const FriendRequestCard = (props) => {
     const {userId, friendEmail} = props;
@@ -21,7 +21,7 @@ const FriendRequestCard = (props) => {
         }
 
         setLoading(true);
-        axios.patch(`http://localhost:8080/users/pendingFriendRequests/accept`, null, {params: queryParams})
+        axiosInstance.patch(`users/pendingFriendRequests/accept`, null, {params: queryParams})
             .then((response) => {
             setLoading(false);
             setData(response.data);
@@ -45,7 +45,7 @@ const FriendRequestCard = (props) => {
         }
 
         setLoading(true);
-        axios.patch(`http://localhost:8080/users/pendingFriendRequests/decline`, null, {params: queryParams})
+        axiosInstance.patch(`users/pendingFriendRequests/decline`, null, {params: queryParams})
             .then((response) => {
                 setLoading(false);
                 setData(response.data);

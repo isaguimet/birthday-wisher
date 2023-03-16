@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import { Alert } from "reactstrap";
+import {useEffect, useState} from "react";
+import {Alert} from "reactstrap";
 import BirthdayTable from "../components/birthdayTable/BirthdayTable"
-import { StyledDiv } from "./WishingCenterPage.style";
-import { useSelector } from "react-redux";
+import {StyledDiv} from "./WishingCenterPage.style";
+import {useSelector} from "react-redux";
+import axiosInstance from "../utils/API";
 
 // filter out birthdays that have already past
 function getUpcomingBirthdays(data) {
@@ -38,7 +38,7 @@ const WishingCenterPage = () => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/friendList/${userId}`).then((response) => {
+        axiosInstance.get(`users/friendList/${userId}`).then((response) => {
             setLoading(false);
             setData(getUpcomingBirthdays(response.data.sort(compare)));
             console.log("response data: " + JSON.stringify(response.data))

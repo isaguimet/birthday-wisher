@@ -2,9 +2,9 @@ import Card from 'react-bootstrap/Card';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {useState} from "react";
-import axios from "axios";
 import {useSelector} from "react-redux";
 import Button from '@mui/material/Button';
+import axiosInstance from "../../utils/API";
 
 /**
  * A component for rendering a User Birthday Message.
@@ -39,7 +39,7 @@ const BirthdayCard = (props) => {
     const handleSubmit = (event) => {
         const body = {msgText: input};
         props.setLoading(true);
-        axios.patch(`http://localhost:8080/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
+        axiosInstance.patch(`boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
@@ -56,7 +56,7 @@ const BirthdayCard = (props) => {
 
     const handleDelete = () => {
         props.setLoading(true);
-        axios.delete(`http://localhost:8080/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
+        axiosInstance.delete(`boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);

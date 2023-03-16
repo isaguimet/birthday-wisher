@@ -1,5 +1,5 @@
 import {useState} from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/API";
 
 const SearchBar = (props) => {
     const [input, setInput] = useState("");
@@ -10,7 +10,7 @@ const SearchBar = (props) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.get(`http://localhost:8080/users/byEmail/${input}`).then((response) => {
+        axiosInstance.get(`users/byEmail/${input}`).then((response) => {
             props.setLoading(false)
             props.setData(response.data)
             props.setError(null)

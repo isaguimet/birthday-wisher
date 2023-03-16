@@ -1,11 +1,11 @@
 import {useEffect, useState} from 'react';
 import BirthdayBoard from "../birthdayBoard/BirthdayBoard";
-import axios from "axios";
 import {BoardContainer} from "../../pages/ProfilePage.style";
 import {Alert} from "reactstrap";
 import Container from "react-bootstrap/Container";
 import Button from "@mui/material/Button";
 import {useSelector} from "react-redux";
+import axiosInstance from "../../utils/API";
 
 /**
  * A component for fetching and rendering information about all boards that belong to a specific user.
@@ -25,7 +25,7 @@ const BoardSection = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/boards/byUserId/${props.profileUser}`).then((response) => {
+        axiosInstance.get(`boards/byUserId/${props.profileUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
@@ -49,7 +49,7 @@ const BoardSection = (props) => {
             user: props.profileUser,
         };
         setLoading(true);
-        axios.post("http://localhost:8080/boards", data).then((response) => {
+        axiosInstance.post("boards", data).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);

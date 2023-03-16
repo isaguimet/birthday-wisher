@@ -5,8 +5,8 @@ import ProfilePic from "../profilePic/ProfilePic";
 import Icons from "../../Icons";
 import {Age, Profile, ProfileInfo} from "../../pages/ProfilePage.style";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {Alert} from "reactstrap";
+import axiosInstance from "../../utils/API";
 
 /**
  * A component for fetching and rendering personal information about a specific user.
@@ -23,7 +23,7 @@ const ProfileSection = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/${props.profileUser}`).then((response) => {
+        axiosInstance.get(`users/${props.profileUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);

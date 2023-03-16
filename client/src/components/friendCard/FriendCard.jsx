@@ -1,7 +1,7 @@
 import Card from 'react-bootstrap/Card';
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {Alert} from "reactstrap";
+import axiosInstance from "../../utils/API";
 
 /**
  * A component for rendering a User friends list
@@ -17,7 +17,7 @@ const FriendCard = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/friendList/${props.userId}`).then((response) => {
+        axiosInstance.get(`users/friendList/${props.userId}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
