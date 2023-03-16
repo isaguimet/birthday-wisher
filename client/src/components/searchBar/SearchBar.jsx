@@ -15,10 +15,8 @@ const SearchBar = (props) => {
             props.setLoading(false)
             props.setData(response.data)
             props.setError(null)
-            props.setStatus(200)
         }).catch((err) => {
             props.setLoading(false);
-            props.setStatus(parseInt(err.response.status))
             if (err.response) {
                 props.setError(err.response.data);
             } else {

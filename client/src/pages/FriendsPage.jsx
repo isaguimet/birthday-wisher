@@ -15,7 +15,6 @@ const FriendsPage = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
-    const [status, setStatus] = useState(0)
 
     const [loadingForSendingRequest, setLoadingForSendingRequest] = useState(false);
     const [dataForSendingRequest, setDataForSendingRequest] = useState(null);
@@ -64,7 +63,6 @@ const FriendsPage = () => {
                     <SearchBar
                         setData={setData}
                         setError={setError}
-                        setStatus={setStatus}
                         setLoading={setLoading}
                     />
                 </Container>
@@ -75,7 +73,7 @@ const FriendsPage = () => {
                         </Alert>
                     )}
                     {loading && <div>Finding user given this email ...</div>}
-                    {!loading && data && !(status === 404) ? (
+                    {!loading && data && !error ? (
                         <>{data.firstName} {data.lastName}
                             <BsPersonPlusFill onClick={handleClickToSendRequest}/>
                             {!!errorForSendingRequest && <div>{errorForSendingRequest}</div>}
