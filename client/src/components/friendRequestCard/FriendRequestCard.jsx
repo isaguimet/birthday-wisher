@@ -1,17 +1,9 @@
-import {useState} from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/API";
+import Card from "react-bootstrap/Card";
+import button from "bootstrap/js/src/button";
 
 const FriendRequestCard = (props) => {
-    const {userId, friendEmail} = props;
-
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
-
-    // TODO: handle error & loading state...
-    const handleAlertToggle = () => {
-        setError(null);
-    }
+    const {userId, friendEmail, friendInfo} = props;
 
     const handleAcceptClick = () => {
 
@@ -20,20 +12,40 @@ const FriendRequestCard = (props) => {
             'friendEmail': friendEmail
         }
 
-        setLoading(true);
-        axios.patch(`http://localhost:8080/users/pendingFriendRequests/accept`, null, {params: queryParams})
+        // accept the friend request (returns updated list of pending friends)
+        props.setLoadingForPendingFriends(true);
+        axiosInstance.patch(`http://localhost:8080/users/pendingFriendRequests/accept`, null, {params: queryParams})
             .then((response) => {
-            setLoading(false);
-            setData(response.data);
-            setError(null);
-        }).catch((err) => {
-            setLoading(false);
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
-            alert(error)
+                const [updatedPending, updatedFriends] = response.data;
+                props.setLoadingForPendingFriends(false);
+                props.setDataForPendingFriends(updatedPending);
+                props.setDataForFriends(updatedFriends);
+                props.setErrorForPendingFriends(null);
+            }).catch((err) => {
+                axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/accept`, null, {params: queryParams})
+                .then((response) => {
+                    const [updatedPending, updatedFriends] = response.data;
+                    props.setLoadingForPendingFriends(false);
+                    props.setDataForPendingFriends(updatedPending);
+                    props.setDataForFriends(updatedFriends);
+                    props.setErrorForPendingFriends(null);
+                }).catch((err) => {
+                    axiosInstance.patch(`http://localhost:8082/users/pendingFriendRequests/accept`, null, {params: queryParams})
+                    .then((response) => {
+                        const [updatedPending, updatedFriends] = response.data;
+                        props.setLoadingForPendingFriends(false);
+                        props.setDataForPendingFriends(updatedPending);
+                        props.setDataForFriends(updatedFriends);
+                        props.setErrorForPendingFriends(null);
+                    }).catch((err) => {
+                    props.setLoadingForPendingFriends(false);
+                    if (err.response) {
+                        props.setErrorForPendingFriends(err.response.data);
+                    } else {
+                        props.setErrorForPendingFriends(err.message);
+                    }
+                });
+            });
         });
     }
 
@@ -44,28 +56,62 @@ const FriendRequestCard = (props) => {
             'friendEmail': friendEmail
         }
 
-        setLoading(true);
-        axios.patch(`http://localhost:8080/users/pendingFriendRequests/decline`, null, {params: queryParams})
+        props.setLoadingForPendingFriends(true);
+        axiosInstance.patch(`http://localhost:8080/users/pendingFriendRequests/decline`, null, {params: queryParams})
             .then((response) => {
-                setLoading(false);
-                setData(response.data);
-                setError(null);
+                props.setLoadingForPendingFriends(false);
+                props.setDataForPendingFriends(response.data);
+                props.setErrorForPendingFriends(null);
             }).catch((err) => {
-            setLoading(false);
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
-            alert(error)
+                axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/decline`, null, {params: queryParams})
+                .then((response) => {
+                    props.setLoadingForPendingFriends(false);
+                    props.setDataForPendingFriends(response.data);
+                    props.setErrorForPendingFriends(null);
+                }).catch((err) => {
+                    axiosInstance.patch(`http://localhost:8082/users/pendingFriendRequests/decline`, null, {params: queryParams})
+                    .then((response) => {
+                        props.setLoadingForPendingFriends(false);
+                        props.setDataForPendingFriends(response.data);
+                        props.setErrorForPendingFriends(null);
+                    }).catch((err) => {
+                    props.setLoadingForPendingFriends(false);
+                    if (err.response) {
+                        props.setErrorForPendingFriends(err.response.data);
+                    } else {
+                        props.setErrorForPendingFriends(err.message);
+                    }
+                });
+            });
         });
     }
 
     return (
-        <div>
-            <button onClick={handleAcceptClick}>Accept</button>
-            <button onClick={handleDeclineClick}>Decline</button>
-        </div>
+        <Card key={friendInfo.id} style={{width: '30rem'}}>
+            <Card.Body>
+                {Object.keys(friendInfo.pendingFriends).map((userId) => (
+                    <div key={userId}>
+                        {userId === props.userId ? (
+                            <div>
+                                {friendInfo.pendingFriends[userId] ? (
+                                        <div style={{display: "flex", justifyContent: "space-between"}}>
+                                            {friendInfo.firstName} {friendInfo.lastName}
+                                            <button disabled>Friend request sent</button>
+                                        </div>
+                                    ) :
+                                    (<div style={{display: "flex", justifyContent: "space-between"}}>
+                                        {friendInfo.firstName} {friendInfo.lastName}
+                                        <div>
+                                            <button onClick={handleAcceptClick}>Accept</button>
+                                            <button onClick={handleDeclineClick}>Decline</button>
+                                        </div>
+                                    </div>)}
+                            </div>
+                        ) : null}
+                    </div>
+                ))}
+            </Card.Body>
+        </Card>
     );
 };
 

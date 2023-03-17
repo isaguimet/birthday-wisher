@@ -1,5 +1,6 @@
 package com.birthdaywisher.server.controller;
 
+import com.birthdaywisher.server.leader.LeaderService;
 import com.birthdaywisher.server.model.User;
 import com.birthdaywisher.server.service.UserService;
 import org.bson.types.ObjectId;
@@ -16,10 +17,12 @@ import java.util.*;
 @RequestMapping("/users")
 public class UserController {
     private UserService userService;
+    private LeaderService leaderService;
 
     // Constructor dependency injection
-    public UserController(UserService userService) {
+    public UserController(UserService userService, LeaderService leaderService) {
         this.userService = userService;
+        this.leaderService = leaderService;
     }
 
     @GetMapping("/")
@@ -65,16 +68,35 @@ public class UserController {
     @PostMapping("/signUp")
     public ResponseEntity<?> addUser(@RequestBody User user) {
         try {
-            Boolean newUser = userService.addUser(user);
-            if (newUser) {
-                return new ResponseEntity<>(user, HttpStatus.CREATED);
-            } else {
+            // Check if user already has an account. Emails need to be unique
+            Optional<User> optionalUser = userService.findUserByEmail(user.getEmail());
+            if (optionalUser.isPresent()) {
                 return new ResponseEntity<>("User is already registered under this email: " + user.getEmail(),
                         HttpStatus.BAD_REQUEST);
             }
+            User newUser = userService.addUser(user);
+            leaderService.forwardUserReqToBackups(newUser, "signUp");
+            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/forwarded/signUp")
+    public ResponseEntity<?> forwardAddUser(@RequestBody User user) {
+        try {
+            // Check if user already has an account. Emails need to be unique
+            Optional<User> optionalUser = userService.findUserByEmail(user.getEmail());
+            if (optionalUser.isPresent()) {
+                return new ResponseEntity<>("User is already registered under this email: " + user.getEmail(),
+                        HttpStatus.BAD_REQUEST);
+            }
+            User newUser = userService.addUser(user);
+            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -92,7 +114,7 @@ public class UserController {
             }
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -100,10 +122,22 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable ObjectId id) {
         try {
             userService.deleteUser(id);
+            leaderService.forwardUserReqToBackups(id, "delete");
             return new ResponseEntity<>("User has been deleted by id: " + id, HttpStatus.OK);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/forwarded/{id}")
+    public ResponseEntity<String> forwardDeleteUser(@PathVariable ObjectId id) {
+        try {
+            userService.deleteUser(id);
+            return new ResponseEntity<>("User has been deleted by id: " + id, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -133,10 +167,42 @@ public class UserController {
             }
             userService.sendFriendRequest(optionalUser.get(), optionalFriend.get());
 
-            return new ResponseEntity<>(optionalFriend.get(), HttpStatus.OK);
+            leaderService.forwardUserReqToBackups(userEmail, friendEmail, "friendRequest");
+            return new ResponseEntity<>(userService.getPendingFriendRequests(optionalUser.get()), HttpStatus.OK);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/forwarded/friendRequest")
+    public ResponseEntity<?> forwardSendFriendRequest(@RequestParam String userEmail,
+                                                      @RequestParam String friendEmail) {
+        try {
+            Optional<User> optionalUser = userService.findUserByEmail(userEmail);
+            Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
+
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User email does not exist: " + userEmail, HttpStatus.NOT_FOUND);
+            }
+            if (optionalFriend.isEmpty()) {
+                return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
+            }
+
+            Boolean areFriendsAlready = userService.checkIfAlreadyFriends(optionalUser.get(), optionalFriend.get());
+            if (areFriendsAlready) {
+                return new ResponseEntity<>("User email " + userEmail + " and friend email " + friendEmail + " are already friends",
+                        HttpStatus.BAD_REQUEST);
+            }
+            Boolean isDupFriendRequest = userService.isDuplicatedFriendRequest(optionalUser.get(), optionalFriend.get());
+            if (isDupFriendRequest) {
+                return new ResponseEntity<>("User email " + userEmail + " already sent a friend request to " + friendEmail,
+                        HttpStatus.BAD_REQUEST);
+            }
+            userService.sendFriendRequest(optionalUser.get(), optionalFriend.get());
+            return new ResponseEntity<>(optionalFriend.get(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -175,10 +241,44 @@ public class UserController {
                 return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
                         "This userId cannot accept the request ", HttpStatus.BAD_REQUEST);
             }
+
+            leaderService.forwardUserReqToBackups(userId, friendEmail, "acceptFriendRequest");
+
+            List<User> updatedPendingFriends = userService.getPendingFriendRequests(optionalUser.get());
+
+            List<User> updatedFriendList = userService.getFriendListByUser(optionalUser.get());
+            updatedFriendList.sort(Comparator.comparing(friend -> MonthDay.from(friend.getBirthdate())));
+
+            return new ResponseEntity<>(Arrays.asList(updatedPendingFriends, updatedFriendList), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/forwarded/pendingFriendRequests/accept")
+    public ResponseEntity<?> forwardAcceptFriendRequest(@RequestParam ObjectId userId,
+                                                        @RequestParam String friendEmail) {
+        try {
+            Optional<User> optionalUser = userService.getSingleUser(userId);
+            Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
+
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
+            }
+            if (optionalFriend.isEmpty()) {
+                return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
+            }
+
+            Boolean isAccepted = userService.acceptFriendRequest(optionalUser.get(), optionalFriend.get());
+            if (!isAccepted) {
+                return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
+                        "This userId cannot accept the request ", HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -201,10 +301,37 @@ public class UserController {
                 return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
                         "This userId cannot decline the request ", HttpStatus.BAD_REQUEST);
             }
+            leaderService.forwardUserReqToBackups(userId, friendEmail, "declineFriendRequest");
+            return new ResponseEntity<>(userService.getPendingFriendRequests(optionalUser.get()), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/forwarded/pendingFriendRequests/decline")
+    public ResponseEntity<?> forwardDeclineFriendRequest(@RequestParam ObjectId userId,
+                                                         @RequestParam String friendEmail) {
+        try {
+            Optional<User> optionalUser = userService.getSingleUser(userId);
+            Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
+
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
+            }
+            if (optionalFriend.isEmpty()) {
+                return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
+            }
+
+            Boolean isDeclined = userService.declineFriendRequest(optionalUser.get(), optionalFriend.get());
+            if (!isDeclined) {
+                return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
+                        "This userId cannot decline the request ", HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

@@ -1,11 +1,11 @@
 import {useEffect, useState} from 'react';
 import BirthdayBoard from "../birthdayBoard/BirthdayBoard";
-import axios from "axios";
 import {BoardContainer} from "../../pages/ProfilePage.style";
 import {Alert} from "reactstrap";
 import Container from "react-bootstrap/Container";
 import Button from "@mui/material/Button";
 import {useSelector} from "react-redux";
+import axiosInstance from "../../utils/API";
 
 /**
  * A component for fetching and rendering information about all boards that belong to a specific user.
@@ -25,18 +25,30 @@ const BoardSection = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/boards/byUserId/${props.profileUser}`).then((response) => {
+        axiosInstance.get(`http://localhost:8080/boards/byUserId/${props.profileUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
         }).catch((err) => {
-            setLoading(false);
-            //setData(null);
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
+            axiosInstance.get(`http://localhost:8081/boards/byUserId/${props.profileUser}`).then((response) => {
+                setLoading(false);
+                setData(response.data);
+                setError(null);
+            }).catch((err) => {
+                axiosInstance.get(`http://localhost:8082/boards/byUserId/${props.profileUser}`).then((response) => {
+                    setLoading(false);
+                    setData(response.data);
+                    setError(null);
+                }).catch((err) => {
+                    setLoading(false);
+                    //setData(null);
+                    if (err.response) {
+                        setError(err.response.data);
+                    } else {
+                        setError(err.message);
+                    }
+                });
+            });
         });
     }, []);
 
@@ -46,20 +58,32 @@ const BoardSection = (props) => {
 
     const createBoard = () => {
         const data = {
-            user: props.profileUser,
+            userId: props.profileUser,
         };
         setLoading(true);
-        axios.post("http://localhost:8080/boards", data).then((response) => {
+        axiosInstance.post("http://localhost:8080/boards", data).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
         }).catch((err) => {
-            setLoading(false);
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
+            axiosInstance.post("http://localhost:8081/boards", data).then((response) => {
+                setLoading(false);
+                setData(response.data);
+                setError(null);
+            }).catch((err) => {
+                axiosInstance.post("http://localhost:8082/boards", data).then((response) => {
+                    setLoading(false);
+                    setData(response.data);
+                    setError(null);
+                }).catch((err) => {
+                    setLoading(false);
+                    if (err.response) {
+                        setError(err.response.data);
+                    } else {
+                        setError(err.message);
+                    }
+                });
+            });
         });
     };
 

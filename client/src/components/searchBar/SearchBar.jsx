@@ -1,5 +1,5 @@
 import {useState} from "react";
-import axios from "axios";
+import axiosInstance from "../../utils/API";
 
 const SearchBar = (props) => {
     const [input, setInput] = useState("");
@@ -10,19 +10,30 @@ const SearchBar = (props) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.get(`http://localhost:8080/users/byEmail/${input}`).then((response) => {
+        props.setLoading(true);
+        axiosInstance.get(`http://localhost:8080/users/byEmail/${input}`).then((response) => {
             props.setLoading(false)
             props.setData(response.data)
             props.setError(null)
-            props.setStatus(200)
         }).catch((err) => {
-            props.setLoading(false);
-            props.setStatus(parseInt(err.response.status))
-            if (err.response) {
-                props.setError(err.response.data);
-            } else {
-                props.setError(err.message);
-            }
+            axiosInstance.get(`http://localhost:8081/users/byEmail/${input}`).then((response) => {
+                props.setLoading(false)
+                props.setData(response.data)
+                props.setError(null)
+            }).catch((err) => {
+                axiosInstance.get(`http://localhost:8082/users/byEmail/${input}`).then((response) => {
+                    props.setLoading(false)
+                    props.setData(response.data)
+                    props.setError(null)
+                }).catch((err) => {
+                    props.setLoading(false);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
+                });
+            });
         });
     }
 
