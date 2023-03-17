@@ -3,6 +3,7 @@ package com.birthdaywisher.server.election;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class Server {
@@ -18,16 +19,18 @@ public class Server {
     private int leaderId;
     private boolean isRunning;
     private DataInputStream inputStream;
-
+    private boolean electionStarted;
     public Server(int id, int leaderId, int predId, String serverName) {
         this.serverId = id;
         this.leaderId = leaderId;
         this.predId = predId;
         this.isRunning = false;
         this.serverName = serverName;
+        this.electionStarted = false;
     }
 
     // Getters
+    public boolean getElectionStarted() { return this.electionStarted; };
     public int getServerPort() {
         return this.serverPort;
     }
@@ -69,6 +72,7 @@ public class Server {
     }
 
     // Setters
+    public void setElectionStarted(boolean status) { this.electionStarted = status;}
     public void setServerPort(int port) {
         this.serverPort = port;
     }
@@ -115,10 +119,11 @@ public class Server {
 
     public void initiateElection() {
         setIsRunning(true);
+        setElectionStarted(true);
 
         System.out.println("Election initiated by server: " + getServerId());
-
-        election("0" + getServerId());
+        sendMessage("0" + getServerId());
+//        election("0" + getServerId());
     }
 
     // call an election and select a new leader
@@ -126,34 +131,60 @@ public class Server {
     // 0 is election message
     // 1 is leader message
     public void election(String msg) {
-        char msgType = msg.charAt(0);
-        char msgId = msg.charAt(1);
+        System.out.println("election message: " + msg);
+        int isLeaderMessage = Character.getNumericValue(msg.charAt(0));
+        int serverId = Character.getNumericValue(msg.charAt(1));
 
-        if ((int) msgType == 0) {
-            System.out.println("Election Message Received: " + msg);
+        if (isLeaderMessage == 0) {
+//            System.out.println("Election Message Received: " + msg);
             // If message id is greater than server id, pass message onto successor
-            if ((int) msgId > getServerId()) {
+            if (serverId > getServerId()) {
 
                 sendMessage(msg);
 
                 // If message id is less than server id, send new message with server id to
                 // succesor and set running to true
-            } else if ((int) msgId < getServerId() && !getIsRunning()) {
-
+            } else if (serverId < getServerId() && !getIsRunning()) {
+                System.out.println("current server id better than election id");
                 setIsRunning(true);
+
+
+                if (getServerId() == 2) {
+                    setSuccPort(5000);
+                    try {
+                        InetAddress address = InetAddress.getByName("127.0.0.1");
+                        Socket s = new Socket(address, getSuccPort());
+                        setSuccSocket(s);
+                        System.out.println("Connected to server 1");
+                    } catch (Exception e) {
+                        System.out.println(e);
+                    }
+
+                }
                 sendMessage("0" + String.valueOf(getServerId()));
 
                 // If message id matches server id, new message declaring leader is sent to all
                 // servers
-            } else if (msgId == getServerId()) {
+            } else if (serverId == getServerId()) {
 
-                sendMessage("1" + String.valueOf(msgId));
+                sendMessage("1" + String.valueOf(serverId));
+                setLeaderId(serverId);
+                setElectionStarted(false);
+                setIsRunning(false);
             }
             // Recieve leader message, update leader id and stop running
         } else {
             System.out.println("Leader Message Received: " + msg);
-            setLeaderId(msgId);
+            setLeaderId(serverId);
             setIsRunning(false);
+            setElectionStarted(false);
+
+            System.out.println("Leader ID" + getLeaderId());
+            System.out.println("Server ID" + getServerId());
+            if (getLeaderId() == getServerId()) {
+                Thread heartbeatTaskThread = new HeartbeatTask(this);
+                heartbeatTaskThread.start();
+            }
 
             // quit the election and not send anything
             // call something to set proxy to send to this server now

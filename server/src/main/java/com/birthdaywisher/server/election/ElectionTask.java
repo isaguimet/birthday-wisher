@@ -9,6 +9,8 @@ public class ElectionTask extends Thread {
     private String threadName;
     private Server server;
 
+    private final long heartbeatTimeoutInterval = 5050;
+
     public ElectionTask(Server server, String threadName) {
         this.server = server;
         this.threadName = threadName;
@@ -17,32 +19,39 @@ public class ElectionTask extends Thread {
     @Override
     public void run() {
         System.out.println("Starting ElectionTask Thread: " + threadName);
+        long lastRead = System.currentTimeMillis();
         try {
             // server.getServerSocket().setSoTimeout(5000);
             server.getSuccSocket().setKeepAlive(true);
-            System.out.println("is successor socket alive " + server.getSuccSocket().getKeepAlive());
             while (true) {
                 try {
+//                    System.out.println("is successor socket alive " + server.getSuccSocket().getKeepAlive());
                     String msg = server.receiveMessage();
                     // System.out.println("Received Message: " + msg);
                     if (!msg.equals("")) {
-                        if (server.getPredId() == server.getLeaderId()) { // server's predecessor is the leader
-                            if (msg.equals("2")) { // heartbeat message
-
-                            } else {
-                                server.election(msg);
-                            }
+                        if (msg.equals("2")) {
+                            lastRead = System.currentTimeMillis();
                         } else {
+                            System.out.println("send election message");
                             server.election(msg);
+                        }
+//                        if (server.getPredId() == server.getLeaderId()) { // server's predecessor is the leader
+//                            if (!msg.equals("2")) { // heartbeat message
+//                                server.election(msg);
+//                            }
+//                        } else {
+//                            server.election(msg);
+//                        }
+                    }
+                    if (server.getPredId() == server.getLeaderId() && !server.getElectionStarted()) {
+//                        System.out.println("time since last heartbeat: " + (System.currentTimeMillis() - lastRead));
+                        if ((System.currentTimeMillis() - lastRead) > heartbeatTimeoutInterval) {
+                            System.out.println("Out of heartbeat interval");
+                            server.initiateElection();
                         }
                     }
                 } catch (Exception e) {
-                    System.out.println("Error: " + e);
-                    // no message received after some time
-                    if (server.getPredId() == server.getLeaderId()) {
-                        System.out.println("No heartbeat message received, intiating election...");
-                        server.initiateElection();
-                    }
+                    System.out.println("ElectionTask Error: " + e);
                 }
             }
         } catch (SocketException e) {

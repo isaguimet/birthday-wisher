@@ -1,0 +1,47 @@
+Starting a Gradle Daemon, 8 busy and 1 stopped Daemons could not be reused, use --status for details
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :resolveMainClassName UP-TO-DATE
+
+> Task :bootRun
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.0.2)
+
+2023-03-16T20:23:05.998-06:00  INFO 8844 --- [           main] com.birthdaywisher.server.Application    : Starting Application using Java 19.0.2 with PID 8844 (D:\Documents\20 University\10 Classes\Year 5\CPSC 559\birthday-wisher\server\build\classes\java\main started by jessi in D:\Documents\20 University\10 Classes\Year 5\CPSC 559\birthday-wisher\server)
+2023-03-16T20:23:06.003-06:00  INFO 8844 --- [           main] com.birthdaywisher.server.Application    : The following 1 profile is active: "inst3"
+2023-03-16T20:23:06.756-06:00  INFO 8844 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2023-03-16T20:23:06.817-06:00  INFO 8844 --- [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 55 ms. Found 2 MongoDB repository interfaces.
+2023-03-16T20:23:07.367-06:00  INFO 8844 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 8082 (http)
+2023-03-16T20:23:07.380-06:00  INFO 8844 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2023-03-16T20:23:07.380-06:00  INFO 8844 --- [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.5]
+2023-03-16T20:23:07.483-06:00  INFO 8844 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2023-03-16T20:23:07.485-06:00  INFO 8844 --- [           main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1422 ms
+Leader Election Service instantiated
+2023-03-16T20:23:07.746-06:00  INFO 8844 --- [           main] org.mongodb.driver.client                : MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|spring-boot", "version": "4.8.2"}, "os": {"type": "Windows", "name": "Windows 10", "architecture": "amd64", "version": "10.0"}, "platform": "Java/Oracle Corporation/19.0.2+7-44"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='db-user', source='admin', password=<hidden>, mechanismProperties=<hidden>}, streamFactoryFactory=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.Jep395RecordCodecProvider@2d55e826]}, clusterSettings={hosts=[127.0.0.1:27017], srvHost=cluster0.ojsx0tm.mongodb.net, srvServiceName=mongodb, mode=MULTIPLE, requiredClusterType=REPLICA_SET, requiredReplicaSetName='atlas-m6wi7g-shard-0', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='30000 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, sendBufferSize=0}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, sendBufferSize=0}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=true, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=JAVA_LEGACY, serverApi=null, autoEncryptionSettings=null, contextProvider=null}
+2023-03-16T20:23:07.746-06:00  INFO 8844 --- [0tm.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017 to client view of cluster
+2023-03-16T20:23:07.777-06:00  INFO 8844 --- [0tm.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-5qpmzs9-shard-00-00.ojsx0tm.mongodb.net:27017 to client view of cluster
+2023-03-16T20:23:07.778-06:00  INFO 8844 --- [0tm.mongodb.net] org.mongodb.driver.cluster               : Adding discovered server ac-5qpmzs9-shard-00-01.ojsx0tm.mongodb.net:27017 to client view of cluster
+Server server1
+Server 1 listening on port 5000 ...
+2023-03-16T20:23:08.556-06:00  INFO 8844 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-5qpmzs9-shard-00-01.ojsx0tm.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=13, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=500543800, setName='atlas-m6wi7g-shard-0', canonicalAddress=ac-5qpmzs9-shard-00-01.ojsx0tm.mongodb.net:27017, hosts=[ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017, ac-5qpmzs9-shard-00-00.ojsx0tm.mongodb.net:27017, ac-5qpmzs9-shard-00-01.ojsx0tm.mongodb.net:27017], passives=[], arbiters=[], primary='ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017', tagSet=TagSet{[Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=7, topologyVersion=TopologyVersion{processId=640acc27676455f969273be7, counter=3}, lastWriteDate=Thu Mar 16 20:23:08 MDT 2023, lastUpdateTimeNanos=3338461720200}
+2023-03-16T20:23:08.556-06:00  INFO 8844 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017, type=REPLICA_SET_PRIMARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=13, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=500517600, setName='atlas-m6wi7g-shard-0', canonicalAddress=ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017, hosts=[ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017, ac-5qpmzs9-shard-00-00.ojsx0tm.mongodb.net:27017, ac-5qpmzs9-shard-00-01.ojsx0tm.mongodb.net:27017], passives=[], arbiters=[], primary='ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017', tagSet=TagSet{[Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=7fffffff0000000000000073, setVersion=7, topologyVersion=TopologyVersion{processId=640acb237802de6ed87026fe, counter=6}, lastWriteDate=Thu Mar 16 20:23:08 MDT 2023, lastUpdateTimeNanos=3338461720100}
+2023-03-16T20:23:08.556-06:00  INFO 8844 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=ac-5qpmzs9-shard-00-00.ojsx0tm.mongodb.net:27017, type=REPLICA_SET_SECONDARY, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=13, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=500505600, setName='atlas-m6wi7g-shard-0', canonicalAddress=ac-5qpmzs9-shard-00-00.ojsx0tm.mongodb.net:27017, hosts=[ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017, ac-5qpmzs9-shard-00-00.ojsx0tm.mongodb.net:27017, ac-5qpmzs9-shard-00-01.ojsx0tm.mongodb.net:27017], passives=[], arbiters=[], primary='ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017', tagSet=TagSet{[Tag{name='nodeType', value='ELECTABLE'}, Tag{name='provider', value='AWS'}, Tag{name='region', value='US_EAST_1'}, Tag{name='workloadType', value='OPERATIONAL'}]}, electionId=null, setVersion=7, topologyVersion=TopologyVersion{processId=640aca2e94da6dcedbad3852, counter=4}, lastWriteDate=Thu Mar 16 20:23:08 MDT 2023, lastUpdateTimeNanos=3338461720200}
+2023-03-16T20:23:08.561-06:00  INFO 8844 --- [ngodb.net:27017] org.mongodb.driver.cluster               : Discovered replica set primary ac-5qpmzs9-shard-00-02.ojsx0tm.mongodb.net:27017 with max election id 7fffffff0000000000000073 and max set version 7
+2023-03-16T20:23:08.597-06:00  INFO 8844 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 8082 (http) with context path ''
+2023-03-16T20:23:08.603-06:00  INFO 8844 --- [           main] com.birthdaywisher.server.Application    : Started Application in 3.118 seconds (process running for 3.529)
+Connected to server 2
+Starting ElectionTask Thread: server1
+Read: 2
+Received Message: 2
+Read: 2
+Received Message: 2
+Out of heartbeat interval
+Election initiated by server: 1
+Sent Message: 01

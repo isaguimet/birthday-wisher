@@ -34,8 +34,8 @@ public class LeaderElectionService {
         } else {
             this.server = new Server(1, 3, 3, "server1");
             server.setServerPort(5000);
-            server.setSuccPort(7000);
-            server.setSuccId(3);
+            server.setSuccPort(6000);
+            server.setSuccId(2);
         }
     }
 
@@ -49,7 +49,7 @@ public class LeaderElectionService {
             System.out.println(
                     String.format("Server %d listening on port %d ...", server.getServerId(), server.getServerPort()));
 
-            TimeUnit.SECONDS.sleep(10);
+            TimeUnit.SECONDS.sleep(15);
 
             Socket s = new Socket(address, server.getSuccPort());
             server.setSuccSocket(s);
