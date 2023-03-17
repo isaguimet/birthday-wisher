@@ -4,8 +4,8 @@ import "./LoginStyle.css";
 import {useNavigate} from "react-router-dom";
 import {useDispatch} from "react-redux";
 import {setLogin} from "../store/user";
-import axios from "axios";
-import { Button } from "@mui/material";
+import {Button} from "@mui/material";
+import axiosInstance from "../utils/API";
 
 export default function (props) {
     const [date, setDate] = useState('');
@@ -25,16 +25,24 @@ export default function (props) {
             password: event.target.new_pass.value,
             birthdate: date
         };
-        axios.post(`http://localhost:8080/users/signUp`, data).then((response) => {
+        axiosInstance.post(`http://localhost:8080/users/signUp`, data).then((response) => {
             alert("Success! Try logging in with these credentials now.");
         }).catch((err) => {
-            let error = "";
-            if (err.response) {
-                error = err.response.data;
-            } else {
-                error = err.message;
-            }
-            alert("Sign Up Error: " + error);
+            axiosInstance.post(`http://localhost:8081/users/signUp`, data).then((response) => {
+                alert("Success! Try logging in with these credentials now.");
+            }).catch((err) => {
+                axiosInstance.post(`http://localhost:8082/users/signUp`, data).then((response) => {
+                    alert("Success! Try logging in with these credentials now.");
+                }).catch((err) => {
+                    let error = "";
+                    if (err.response) {
+                        error = err.response.data;
+                    } else {
+                        error = err.message;
+                    }
+                    alert("Sign Up Error: " + error);
+                });
+            });
         });
     };
 
@@ -47,7 +55,7 @@ export default function (props) {
             email: event.target.user_email.value,
             password: event.target.user_pass.value
         };
-        axios.post(`http://localhost:8080/users/login`, data).then((response) => {
+        axiosInstance.post(`http://localhost:8080/users/login`, data).then((response) => {
             dispatch(
                 setLogin({
                     user: response.data
@@ -55,13 +63,31 @@ export default function (props) {
             );
             navigate("/wishing-center");
         }).catch((err) => {
-            let error = "";
-            if (err.response) {
-                error = err.response.data;
-            } else {
-                error = err.message;
-            }
-            alert("Sign In Error: " + error);
+            axiosInstance.post(`http://localhost:8081/users/login`, data).then((response) => {
+                dispatch(
+                    setLogin({
+                        user: response.data
+                    })
+                );
+                navigate("/wishing-center");
+            }).catch((err) => {
+                axiosInstance.post(`http://localhost:8082/users/login`, data).then((response) => {
+                    dispatch(
+                        setLogin({
+                            user: response.data
+                        })
+                    );
+                    navigate("/wishing-center");
+                }).catch((err) => {
+                    let error = "";
+                    if (err.response) {
+                        error = err.response.data;
+                    } else {
+                        error = err.message;
+                    }
+                    alert("Sign In Error: " + error);
+                });
+            });
         });
     };
 
