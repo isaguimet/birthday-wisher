@@ -25,10 +25,10 @@ public class Application {
     @Autowired
     private BoardRepository boardRepository;
 
-    private ObjectId aliceId = new ObjectId();
-    private ObjectId bobId = new ObjectId();
-    private ObjectId eveId = new ObjectId();
-    private ObjectId malloryId = new ObjectId();
+    private ObjectId aliceId = new ObjectId("641497f20a359a777e5fd800");
+    private ObjectId bobId = new ObjectId("641497f20a359a777e5fd801");
+    private ObjectId eveId = new ObjectId("641497f20a359a777e5fd802");
+    private ObjectId malloryId = new ObjectId("641497f20a359a777e5fd803");
 
     private List<User> users = Arrays.asList(
             new User(
