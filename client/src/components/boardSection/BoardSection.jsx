@@ -46,7 +46,7 @@ const BoardSection = (props) => {
 
     const createBoard = () => {
         const data = {
-            user: props.profileUser,
+            userId: props.profileUser,
         };
         setLoading(true);
         axios.post("http://localhost:8080/boards", data).then((response) => {

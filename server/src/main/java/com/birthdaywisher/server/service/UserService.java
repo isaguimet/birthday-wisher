@@ -9,7 +9,7 @@ import java.util.*;
 
 @Service
 public class UserService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -23,13 +23,8 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public Boolean addUser(User user) {
-        // Check if user already has an account. Emails need to be unique
-        Optional<User> optionalUser = userRepository.findUserByEmail(user.getEmail());
-        if (optionalUser.isEmpty()) {
-            userRepository.save(user);
-        }
-        return optionalUser.isEmpty();
+    public User addUser(User user) {
+        return userRepository.save(user);
     }
 
     public Optional<User> authorizeUser(String email, String password) {
@@ -83,8 +78,7 @@ public class UserService {
 
         if (pendingFriends == null) {
             return Collections.emptyList();
-        }
-        else {
+        } else {
             pendingFriends.forEach((userId, isInitiator) -> {
                 // isInitiator=true means a userId (not the current userId) initiated the friend request
                 // isInitiator=false means the current userId sent the friend request
