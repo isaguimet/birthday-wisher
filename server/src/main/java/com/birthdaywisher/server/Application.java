@@ -107,10 +107,10 @@ public class Application {
     @Bean
     InitializingBean initDatabaseDemo() {
         return () -> {
-            //resetUserRepo();
+            resetUserRepo();
             populateUserRepo();
 
-            //resetBoardRepo();
+            resetBoardRepo();
             populateBoardRepo();
         };
     }
