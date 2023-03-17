@@ -207,7 +207,7 @@ public class LeaderService {
     public void forwardCreateBoard(Board board) {
         int response = 0;
 
-        URI uri1 = URI.create("http://localhost/boards");
+        URI uri1 = URI.create("http://localhost/boards/forwarded");
         List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
         // call post endpoint of other replicas
@@ -246,7 +246,7 @@ public class LeaderService {
     public void forwardCreateMessage(ObjectId boardId, Message msg) {
         int response = 0;
 
-        URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages");
+        URI uri1 = URI.create("http://localhost/boards/forwarded/" + boardId + "/messages");
 
         List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
@@ -314,7 +314,7 @@ public class LeaderService {
     public void forwardUpdateMessage(ObjectId boardId, ObjectId msgId, Map<String, String> payload) {
         int response = 0;
 
-        URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages/" + msgId);
+        URI uri1 = URI.create("http://localhost/boards/forwarded/" + boardId + "/messages/" + msgId);
         List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
         HttpEntity<?> request = new HttpEntity<>(payload, null);
