@@ -83,6 +83,23 @@ public class UserController {
         }
     }
 
+    @PostMapping("/forwarded/signUp")
+    public ResponseEntity<?> forwardAddUser(@RequestBody User user) {
+        try {
+            // Check if user already has an account. Emails need to be unique
+            Optional<User> optionalUser = userService.findUserByEmail(user.getEmail());
+            if (optionalUser.isPresent()) {
+                return new ResponseEntity<>("User is already registered under this email: " + user.getEmail(),
+                        HttpStatus.BAD_REQUEST);
+            }
+            User newUser = userService.addUser(user);
+            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> authorizeUser(@RequestBody Map<String, String> requestBody) {
         try {
@@ -106,6 +123,17 @@ public class UserController {
         try {
             userService.deleteUser(id);
             leaderService.forwardUserReqToBackups(id, "delete");
+            return new ResponseEntity<>("User has been deleted by id: " + id, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/forwarded/{id}")
+    public ResponseEntity<String> forwardDeleteUser(@PathVariable ObjectId id) {
+        try {
+            userService.deleteUser(id);
             return new ResponseEntity<>("User has been deleted by id: " + id, HttpStatus.OK);
         }
         catch (Exception e) {
@@ -183,6 +211,32 @@ public class UserController {
                         "This userId cannot accept the request ", HttpStatus.BAD_REQUEST);
             }
             leaderService.forwardUserReqToBackups(userId, friendEmail, "acceptFriendRequest");
+            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/forwarded/pendingFriendRequests/accept")
+    public ResponseEntity<?> forwardAcceptFriendRequest(@RequestParam ObjectId userId,
+                                                 @RequestParam String friendEmail) {
+        try {
+            Optional<User> optionalUser = userService.getSingleUser(userId);
+            Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
+
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
+            }
+            if (optionalFriend.isEmpty()) {
+                return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
+            }
+
+            Boolean isAccepted = userService.acceptFriendRequest(optionalUser.get(), optionalFriend.get());
+            if (!isAccepted) {
+                return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
+                        "This userId cannot accept the request ", HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
         }
         catch (Exception e) {

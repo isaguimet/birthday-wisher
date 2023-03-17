@@ -18,8 +18,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class LeaderService {
@@ -31,113 +29,79 @@ public class LeaderService {
     // server group
     private final List<Integer> serverGroup = new ArrayList<>(Arrays.asList(8080, 8081, 8082));
 
-    private final Pattern pattern = Pattern.compile("I/O error on (POST|PATCH|DELETE) request for \"http://localhost:(\\d{4,})(/)\\b(users|boards)\\b(/[a-zA-Z0-9?=&]+)*\": " +
-            "Connect to http://localhost:(\\d{4,}) \\[localhost/127.0.0.1, localhost/0:0:0:0:0:0:0:1\\] failed: Connection refused");
-
     public LeaderService(ServerProperties serverProperties, RestTemplate restTemplate) {
         this.serverProperties = serverProperties;
         this.restTemplate = restTemplate;
     }
 
-    public boolean isLeader() {
-        // check if this is a leader somehow for now just getting ports
-        return serverProperties.getPort() == 8080;
-    }
-
-    private void handleIfBackupCrashed(String errMsg) {
-        Matcher matcher = pattern.matcher(errMsg);
-        if (matcher.find()) {
-            Integer portToRemove = Integer.valueOf(matcher.group(2));
-            try {
-                serverGroup.remove(portToRemove);
-                System.out.println("Updated server group: " + serverGroup);
-            } catch (Exception e) {
-                System.out.println("Error removing port from server group: " + e.getMessage());
-            }
-        }
-    }
-
     public void forwardUserReqToBackups(User user, String typeOfRequest) {
-        if (isLeader()) {
-            int response = 0;
+        int response = 0;
 
-            if ("signUp".equals(typeOfRequest)) {
-                addUserPOSTRequest(user, response);
-            }
+        if ("signUp".equals(typeOfRequest)) {
+            addUserPOSTRequest(user, response);
         }
     }
 
     public void forwardUserReqToBackups(ObjectId id, String typeOfRequest) {
-        if (isLeader()) {
-            int response = 0;
+        int response = 0;
 
-            if ("delete".equals(typeOfRequest)) {
-                deleteUserRequest(id, response);
-            }
+        if ("delete".equals(typeOfRequest)) {
+            deleteUserRequest(id, response);
         }
     }
 
     public void forwardUserReqToBackups(String userEmail, String friendEmail, String typeOfRequest) {
-        if (isLeader()) {
-            int response = 0;
+        int response = 0;
 
-            if ("friendRequest".equals(typeOfRequest)) {
-                sendFriendRequest(userEmail, friendEmail, response);
-            }
+        if ("friendRequest".equals(typeOfRequest)) {
+            sendFriendRequest(userEmail, friendEmail, response);
         }
     }
 
     public void forwardUserReqToBackups(ObjectId userId, String friendEmail, String typeOfRequest) {
-        if (isLeader()) {
-            int response = 0;
+        int response = 0;
 
-            URI uri = URI.create("");
-            if ("acceptFriendRequest".equals(typeOfRequest)) {
-                uri = URI.create("http://localhost/users/pendingFriendRequests/accept");
-            }
-            if ("declineFriendRequest".equals(typeOfRequest)) {
-                uri = URI.create("http://localhost/users/pendingFriendRequests/decline");
-            }
+        URI uri = URI.create("");
+        if ("acceptFriendRequest".equals(typeOfRequest)) {
+            uri = URI.create("http://localhost/users/forwarded/pendingFriendRequests/accept");
+        }
+        if ("declineFriendRequest".equals(typeOfRequest)) {
+            uri = URI.create("http://localhost/users/pendingFriendRequests/decline");
+        }
 
-            List<URI> replicaURIs = buildURIForEachReplica(uri);
-            HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
+        List<URI> replicaURIs = buildURIForEachReplica(uri);
+        HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
 
-            List<Future<String>> futures = new ArrayList<>();
+        List<Future<String>> futures = new ArrayList<>();
+        for (URI replicaURI : replicaURIs) {
+            String url = UriComponentsBuilder.fromUri(replicaURI)
+                    .queryParam("userId", userId)
+                    .queryParam("friendEmail", friendEmail)
+                    .encode()
+                    .toUriString();
+
+            futures.add(asyncPatchForObject(url, request));
+        }
+
+        for (Future<String> future : futures) {
             try {
-                for (URI replicaURI : replicaURIs) {
-                    String url = UriComponentsBuilder.fromUri(replicaURI)
-                            .queryParam("userId", userId)
-                            .queryParam("friendEmail", friendEmail)
-                            .encode()
-                            .toUriString();
+                future.get();
+                response++;
+            } catch (Exception e) {
+                // handle the exception??
+            }
+        }
 
-                    futures.add(asyncPatchForObject(url, request));
-                }
-            }
-            catch (Exception e) {
-                handleIfBackupCrashed(e.getMessage());
-            }
-
-            for (Future<String> future : futures) {
-                try {
-                    future.get();
-                    response++;
-                } catch (Exception e) {
-                    // handle the exception??
-                }
-            }
-
-            // if response == number of replicas (for now), then we get all acks
-            if (response == 1) {
-                System.out.println("I have received 1 ACK from the replicas");
-            }
+        // if response == number of replicas (for now), then we get all acks
+        if (response == 1) {
+            System.out.println("I have received 1 ACK from the replicas");
         }
     }
 
     private List<URI> buildURIForEachReplica(URI uri) {
         List<URI> replicaURIs = new ArrayList<>();
         for (Integer port : serverGroup) {
-            if (!Objects.equals(port, serverProperties.getPort())) {
+            if (port.intValue() > serverProperties.getPort().intValue()) {
                 uri = UriComponentsBuilder.fromUri(uri).port(port).build().toUri();
                 replicaURIs.add(uri);
             }
@@ -146,7 +110,7 @@ public class LeaderService {
     }
 
     private void addUserPOSTRequest(User user, int response) {
-        URI uri = URI.create("http://localhost/users/signUp");
+        URI uri = URI.create("http://localhost/users/forwarded/signUp");
         List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         // call post endpoint of other replicas
@@ -164,13 +128,8 @@ public class LeaderService {
         HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
         List<Future<String>> futures = new ArrayList<>();
-        try {
-            for (URI replicaURI : replicaURIs) {
-                futures.add(asyncPostForObject(replicaURI, request));
-            }
-        }
-        catch (Exception e) {
-            handleIfBackupCrashed(e.getMessage());
+        for (URI replicaURI : replicaURIs) {
+            futures.add(asyncPostForObject(replicaURI, request));
         }
 
         for (Future<String> future : futures) {
@@ -190,17 +149,12 @@ public class LeaderService {
     }
 
     private void deleteUserRequest(ObjectId userId, int response) {
-        URI uri = URI.create("http://localhost/users/");
+        URI uri = URI.create("http://localhost/users/forwarded/");
         List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         List<Future<String>> futures = new ArrayList<>();
-        try {
-            for (URI replicaURI : replicaURIs) {
-                futures.add(asyncDelete(replicaURI + String.valueOf(userId)));
-            }
-        }
-        catch (Exception e) {
-            handleIfBackupCrashed(e.getMessage());
+        for (URI replicaURI : replicaURIs) {
+            futures.add(asyncDelete(replicaURI + String.valueOf(userId)));
         }
 
         for (Future<String> future : futures) {
@@ -225,19 +179,14 @@ public class LeaderService {
         HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
 
         List<Future<String>> futures = new ArrayList<>();
-        try {
-            for (URI replicaURI : replicaURIs) {
-                String url = UriComponentsBuilder.fromUri(replicaURI)
-                        .queryParam("userEmail", userEmail)
-                        .queryParam("friendEmail", friendEmail)
-                        .encode()
-                        .toUriString();
+        for (URI replicaURI : replicaURIs) {
+            String url = UriComponentsBuilder.fromUri(replicaURI)
+                    .queryParam("userEmail", userEmail)
+                    .queryParam("friendEmail", friendEmail)
+                    .encode()
+                    .toUriString();
 
-                futures.add(asyncPatchForObject(url, request));
-            }
-        }
-        catch (Exception e) {
-            handleIfBackupCrashed(e.getMessage());
+            futures.add(asyncPatchForObject(url, request));
         }
 
         for (Future<String> future : futures) {
@@ -256,198 +205,163 @@ public class LeaderService {
     }
 
     public void forwardCreateBoard(Board board) {
-        if (isLeader()) {
-            int response = 0;
+        int response = 0;
 
-            URI uri1 = URI.create("http://localhost/boards");
-            List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        URI uri1 = URI.create("http://localhost/boards");
+        List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
-            // call post endpoint of other replicas
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+        // call post endpoint of other replicas
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-            JSONObject obj = new JSONObject();
-            obj.put("id", board.getId().toString());
-            obj.put("isPublic", String.valueOf(board.isPublic()));
-            obj.put("isOpen", String.valueOf(board.isOpen()));
-            obj.put("year", board.getYear());
-            obj.put("userId", board.getUserId().toString());
+        JSONObject obj = new JSONObject();
+        obj.put("id", board.getId().toString());
+        obj.put("isPublic", String.valueOf(board.isPublic()));
+        obj.put("isOpen", String.valueOf(board.isOpen()));
+        obj.put("year", board.getYear());
+        obj.put("userId", board.getUserId().toString());
 
-            HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
+        HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
-            List<Future<String>> futures = new ArrayList<>();
+        List<Future<String>> futures = new ArrayList<>();
+        for (URI replicaURI : replicaURIs) {
+            futures.add(asyncPostForObject(replicaURI, request));
+        }
+
+        for (Future<String> future : futures) {
             try {
-                for (URI replicaURI : replicaURIs) {
-                    futures.add(asyncPostForObject(replicaURI, request));
-                }
+                future.get();
+                response++;
+            } catch (Exception e) {
+                // handle the exception??
             }
-            catch (Exception e) {
-                handleIfBackupCrashed(e.getMessage());
-            }
+        }
 
-            for (Future<String> future : futures) {
-                try {
-                    future.get();
-                    response++;
-                } catch (Exception e) {
-                    // handle the exception??
-                }
-            }
-
-            // if response == number of replicas (for now), then we get all acks
-            if (response == 1) {
-                System.out.println(" I have received 1 ACKS from the replicas");
-            }
+        // if response == number of replicas (for now), then we get all acks
+        if (response == 1) {
+            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
     public void forwardCreateMessage(ObjectId boardId, Message msg) {
-        if (isLeader()) {
-            int response = 0;
+        int response = 0;
 
-            URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages");
+        URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages");
 
-            List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
-            // call post endpoint of other replicas
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
+        // call post endpoint of other replicas
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-            JSONObject obj = new JSONObject();
-            obj.put("id", msg.getId().toString());
-            obj.put("fromUserId", msg.getFromUserId().toString());
-            obj.put("toUserId", msg.getToUserId().toString());
-            obj.put("lastUpdatedDate", msg.getLastUpdatedDate().toString());
-            obj.put("msgText", msg.getMsgText());
+        JSONObject obj = new JSONObject();
+        obj.put("id", msg.getId().toString());
+        obj.put("fromUserId", msg.getFromUserId().toString());
+        obj.put("toUserId", msg.getToUserId().toString());
+        obj.put("lastUpdatedDate", msg.getLastUpdatedDate().toString());
+        obj.put("msgText", msg.getMsgText());
 
-            HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
+        HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
-            List<Future<String>> futures = new ArrayList<>();
+        List<Future<String>> futures = new ArrayList<>();
+        for (URI replicaURI : replicaURIs) {
+            futures.add(asyncPostForObject(replicaURI, request));
+        }
+
+        for (Future<String> future : futures) {
             try {
-                for (URI replicaURI : replicaURIs) {
-                    futures.add(asyncPostForObject(replicaURI, request));
-                }
+                future.get();
+                response++;
+            } catch (Exception e) {
+                // handle the exception??
             }
-            catch (Exception e) {
-                handleIfBackupCrashed(e.getMessage());
-            }
+        }
 
-            for (Future<String> future : futures) {
-                try {
-                    future.get();
-                    response++;
-                } catch (Exception e) {
-                    // handle the exception??
-                }
-            }
-
-            // if response == number of replicas (for now), then we get all acks
-            if (response == 1) {
-                System.out.println(" I have received 1 ACKS from the replicas");
-            }
+        // if response == number of replicas (for now), then we get all acks
+        if (response == 1) {
+            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
     public void forwardBoardPatch(String url) {
-        if (isLeader()) {
-            int response = 0;
+        int response = 0;
 
-            URI uri1 = URI.create(url);
-            List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        URI uri1 = URI.create(url);
+        List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
-            HttpEntity<String> request = new HttpEntity<>(null, null);
+        HttpEntity<String> request = new HttpEntity<>(null, null);
 
-            List<Future<String>> futures = new ArrayList<>();
+        List<Future<String>> futures = new ArrayList<>();
+        for (URI replicaURI : replicaURIs) {
+            futures.add(asyncPatchForObject(replicaURI, request));
+        }
+
+        for (Future<String> future : futures) {
             try {
-                for (URI replicaURI : replicaURIs) {
-                    futures.add(asyncPatchForObject(replicaURI, request));
-                }
+                future.get();
+                response++;
+            } catch (Exception e) {
+                // handle the exception??
             }
-            catch (Exception e) {
-                handleIfBackupCrashed(e.getMessage());
-            }
+        }
 
-            for (Future<String> future : futures) {
-                try {
-                    future.get();
-                    response++;
-                } catch (Exception e) {
-                    // handle the exception??
-                }
-            }
-
-            // if response == number of replicas (for now), then we get all acks
-            if (response == 1) {
-                System.out.println(" I have received 1 ACKS from the replicas");
-            }
+        // if response == number of replicas (for now), then we get all acks
+        if (response == 1) {
+            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
     public void forwardUpdateMessage(ObjectId boardId, ObjectId msgId, Map<String, String> payload) {
-        if (isLeader()) {
-            int response = 0;
+        int response = 0;
 
-            URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages/" + msgId);
-            List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages/" + msgId);
+        List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
-            HttpEntity<?> request = new HttpEntity<>(payload, null);
+        HttpEntity<?> request = new HttpEntity<>(payload, null);
 
-            List<Future<String>> futures = new ArrayList<>();
+        List<Future<String>> futures = new ArrayList<>();
+        for (URI replicaURI : replicaURIs) {
+            futures.add(asyncPatchForObject(replicaURI, request));
+        }
+
+        for (Future<String> future : futures) {
             try {
-                for (URI replicaURI : replicaURIs) {
-                    futures.add(asyncPatchForObject(replicaURI, request));
-                }
+                future.get();
+                response++;
+            } catch (Exception e) {
+                // handle the exception??
             }
-            catch (Exception e) {
-                handleIfBackupCrashed(e.getMessage());
-            }
+        }
 
-            for (Future<String> future : futures) {
-                try {
-                    future.get();
-                    response++;
-                } catch (Exception e) {
-                    // handle the exception??
-                }
-            }
-
-            // if response == number of replicas (for now), then we get all acks
-            if (response == 1) {
-                System.out.println(" I have received 1 ACKS from the replicas");
-            }
+        // if response == number of replicas (for now), then we get all acks
+        if (response == 1) {
+            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
     public void forwardDeleteReq(String url) {
-        if (isLeader()) {
-            int response = 0;
+        int response = 0;
 
-            URI uri1 = URI.create(url);
-            List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        URI uri1 = URI.create(url);
+        List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
-            List<Future<String>> futures = new ArrayList<>();
+        List<Future<String>> futures = new ArrayList<>();
+        for (URI replicaURI : replicaURIs) {
+            futures.add(asyncDelete(replicaURI));
+        }
+
+        for (Future<String> future : futures) {
             try {
-                for (URI replicaURI : replicaURIs) {
-                    futures.add(asyncDelete(replicaURI));
-                }
+                future.get();
+                response++;
+            } catch (Exception e) {
+                // handle the exception??
             }
-            catch (Exception e) {
-                handleIfBackupCrashed(e.getMessage());
-            }
+        }
 
-            for (Future<String> future : futures) {
-                try {
-                    future.get();
-                    response++;
-                } catch (Exception e) {
-                    // handle the exception??
-                }
-            }
-
-            // if response == number of replicas (for now), then we get all acks
-            if (response == 1) {
-                System.out.println(" I have received 1 ACKS from the replicas");
-            }
+        // if response == number of replicas (for now), then we get all acks
+        if (response == 1) {
+            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
