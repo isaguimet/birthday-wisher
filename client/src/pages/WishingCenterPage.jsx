@@ -29,29 +29,64 @@ function compare(a, b) {
     }
 }
 
+
+
+// const checkServerAvailable = () => {
+//     for (let i = 0; i < servers.length; i++) {
+//         axios.get(`http://localhost:${servers[i]}`)
+//         .then((response) => {
+            
+//             return servers[i];
+            
+//         })
+//         .catch((err) => {
+//             console.log("HELLO");
+//         })
+//     }
+//     return servers[0];
+// }
+// const s = checkServerAvailable();
+
 const WishingCenterPage = () => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
 
     const userId = useSelector((state) => state.user.id);
-
+    
     useEffect(() => {
+        const servers = [8080, 8081, 8082];
         setLoading(true);
-        axios.get(`http://localhost:8080/users/friendList/${userId}`).then((response) => {
-            setLoading(false);
-            setData(getUpcomingBirthdays(response.data.sort(compare)));
-            console.log("response data: " + JSON.stringify(response.data))
-            setError(null);
-        }).catch((err) => {
-            setLoading(false);
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
-            console.log(error)
-        });
+            axios.get(`http://localhost:${servers[0]}/users/friendList/6409806af230fe7750858163`).then((response) => {
+                setLoading(false);
+                setData(getUpcomingBirthdays(response.data.sort(compare)));
+                console.log("response data: " + JSON.stringify(response.data))
+                setError(null);
+            }).catch((err) => {
+                axios.get(`http://localhost:${servers[1]}/users/friendList/6409806af230fe7750858163`).then((response) => {
+                    setLoading(false);
+                    setData(getUpcomingBirthdays(response.data.sort(compare)));
+                    console.log("response data: " + JSON.stringify(response.data))
+                    setError(null);
+                }).catch((err) => {
+                    axios.get(`http://localhost:${servers[2]}/users/friendList/6409806af230fe7750858163`).then((response) => {
+                        setLoading(false);
+                        setData(getUpcomingBirthdays(response.data.sort(compare)));
+                        console.log("response data: " + JSON.stringify(response.data))
+                        setError(null);
+                    }).catch((err) => {
+                        setLoading(false);
+                        if (err.response) {
+                            setError(err.response.data);
+                        } else {
+                            setError(err.message);
+                        }
+                        console.log(error)
+                    });
+                });
+
+            });
+        
     }, []);
 
     const handleAlertToggle = () => {
