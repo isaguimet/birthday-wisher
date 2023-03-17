@@ -44,6 +44,19 @@ public class LeaderService {
         return serverProperties.getPort() == 8080;
     }
 
+    private void handleIfBackupCrashed(String errMsg) {
+        Matcher matcher = pattern.matcher(errMsg);
+        if (matcher.find()) {
+            Integer portToRemove = Integer.valueOf(matcher.group(2));
+            try {
+                serverGroup.remove(portToRemove);
+                System.out.println("Updated server group: " + serverGroup);
+            } catch (Exception e) {
+                System.out.println("Error removing port from server group: " + e.getMessage());
+            }
+        }
+    }
+
     public void forwardUserReqToBackups(User user, String typeOfRequest) {
         if (isLeader()) {
             int response = 0;
@@ -90,14 +103,19 @@ public class LeaderService {
             HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
 
             List<Future<String>> futures = new ArrayList<>();
-            for (URI replicaURI : replicaURIs) {
-                String url = UriComponentsBuilder.fromUri(replicaURI)
-                        .queryParam("userId", userId)
-                        .queryParam("friendEmail", friendEmail)
-                        .encode()
-                        .toUriString();
+            try {
+                for (URI replicaURI : replicaURIs) {
+                    String url = UriComponentsBuilder.fromUri(replicaURI)
+                            .queryParam("userId", userId)
+                            .queryParam("friendEmail", friendEmail)
+                            .encode()
+                            .toUriString();
 
-                futures.add(asyncPatchForObject(url, request));
+                    futures.add(asyncPatchForObject(url, request));
+                }
+            }
+            catch (Exception e) {
+                handleIfBackupCrashed(e.getMessage());
             }
 
             for (Future<String> future : futures) {
@@ -152,20 +170,8 @@ public class LeaderService {
             }
         }
         catch (Exception e) {
-            Matcher matcher = pattern.matcher(e.getMessage());
-            if (matcher.find()) {
-                Integer portToRemove = Integer.valueOf(matcher.group(2));
-                try {
-                    serverGroup.remove(portToRemove);
-                } catch (Exception e1) {
-                    System.out.println("Error from removing port: " + e1.getMessage());
-                }
-                System.out.println("server group: " + serverGroup);
-            } else {
-                System.out.println("did not match");
-            }
+            handleIfBackupCrashed(e.getMessage());
         }
-
 
         for (Future<String> future : futures) {
             try {
@@ -188,8 +194,13 @@ public class LeaderService {
         List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         List<Future<String>> futures = new ArrayList<>();
-        for (URI replicaURI : replicaURIs) {
-            futures.add(asyncDelete(replicaURI + String.valueOf(userId)));
+        try {
+            for (URI replicaURI : replicaURIs) {
+                futures.add(asyncDelete(replicaURI + String.valueOf(userId)));
+            }
+        }
+        catch (Exception e) {
+            handleIfBackupCrashed(e.getMessage());
         }
 
         for (Future<String> future : futures) {
@@ -214,14 +225,19 @@ public class LeaderService {
         HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
 
         List<Future<String>> futures = new ArrayList<>();
-        for (URI replicaURI : replicaURIs) {
-            String url = UriComponentsBuilder.fromUri(replicaURI)
-                    .queryParam("userEmail", userEmail)
-                    .queryParam("friendEmail", friendEmail)
-                    .encode()
-                    .toUriString();
+        try {
+            for (URI replicaURI : replicaURIs) {
+                String url = UriComponentsBuilder.fromUri(replicaURI)
+                        .queryParam("userEmail", userEmail)
+                        .queryParam("friendEmail", friendEmail)
+                        .encode()
+                        .toUriString();
 
-            futures.add(asyncPatchForObject(url, request));
+                futures.add(asyncPatchForObject(url, request));
+            }
+        }
+        catch (Exception e) {
+            handleIfBackupCrashed(e.getMessage());
         }
 
         for (Future<String> future : futures) {
@@ -260,8 +276,13 @@ public class LeaderService {
             HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
             List<Future<String>> futures = new ArrayList<>();
-            for (URI replicaURI : replicaURIs) {
-                futures.add(asyncPostForObject(replicaURI, request));
+            try {
+                for (URI replicaURI : replicaURIs) {
+                    futures.add(asyncPostForObject(replicaURI, request));
+                }
+            }
+            catch (Exception e) {
+                handleIfBackupCrashed(e.getMessage());
             }
 
             for (Future<String> future : futures) {
@@ -302,8 +323,13 @@ public class LeaderService {
             HttpEntity<JSONObject> request = new HttpEntity<>(obj, headers);
 
             List<Future<String>> futures = new ArrayList<>();
-            for (URI replicaURI : replicaURIs) {
-                futures.add(asyncPostForObject(replicaURI, request));
+            try {
+                for (URI replicaURI : replicaURIs) {
+                    futures.add(asyncPostForObject(replicaURI, request));
+                }
+            }
+            catch (Exception e) {
+                handleIfBackupCrashed(e.getMessage());
             }
 
             for (Future<String> future : futures) {
@@ -332,8 +358,13 @@ public class LeaderService {
             HttpEntity<String> request = new HttpEntity<>(null, null);
 
             List<Future<String>> futures = new ArrayList<>();
-            for (URI replicaURI : replicaURIs) {
-                futures.add(asyncPatchForObject(replicaURI, request));
+            try {
+                for (URI replicaURI : replicaURIs) {
+                    futures.add(asyncPatchForObject(replicaURI, request));
+                }
+            }
+            catch (Exception e) {
+                handleIfBackupCrashed(e.getMessage());
             }
 
             for (Future<String> future : futures) {
@@ -362,8 +393,13 @@ public class LeaderService {
             HttpEntity<?> request = new HttpEntity<>(payload, null);
 
             List<Future<String>> futures = new ArrayList<>();
-            for (URI replicaURI : replicaURIs) {
-                futures.add(asyncPatchForObject(replicaURI, request));
+            try {
+                for (URI replicaURI : replicaURIs) {
+                    futures.add(asyncPatchForObject(replicaURI, request));
+                }
+            }
+            catch (Exception e) {
+                handleIfBackupCrashed(e.getMessage());
             }
 
             for (Future<String> future : futures) {
@@ -390,8 +426,13 @@ public class LeaderService {
             List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
             List<Future<String>> futures = new ArrayList<>();
-            for (URI replicaURI : replicaURIs) {
-                futures.add(asyncDelete(replicaURI));
+            try {
+                for (URI replicaURI : replicaURIs) {
+                    futures.add(asyncDelete(replicaURI));
+                }
+            }
+            catch (Exception e) {
+                handleIfBackupCrashed(e.getMessage());
             }
 
             for (Future<String> future : futures) {
