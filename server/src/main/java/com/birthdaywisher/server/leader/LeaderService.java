@@ -31,7 +31,7 @@ public class LeaderService {
     // server group
     private final List<Integer> serverGroup = new ArrayList<>(Arrays.asList(8080, 8081, 8082));
 
-    private final Pattern pattern = Pattern.compile("I/O error on (POST|GET|PATCH|DELETE) request for \"http://localhost:(\\d{4,})/users/signUp\": " +
+    private final Pattern pattern = Pattern.compile("I/O error on (POST|PATCH|DELETE) request for \"http://localhost:(\\d{4,})(/)\\b(users|boards)\\b(/[a-zA-Z0-9?=&]+)*\": " +
             "Connect to http://localhost:(\\d{4,}) \\[localhost/127.0.0.1, localhost/0:0:0:0:0:0:0:1\\] failed: Connection refused");
 
     public LeaderService(ServerProperties serverProperties, RestTemplate restTemplate) {
