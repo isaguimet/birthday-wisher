@@ -21,6 +21,10 @@ const FriendsPage = () => {
     const [dataForSendingRequest, setDataForSendingRequest] = useState(null);
     const [errorForSendingRequest, setErrorForSendingRequest] = useState(null);
 
+    const [loadingForPendingFriends, setLoadingForPendingFriends] = useState(false);
+    const [dataForPendingFriends, setDataForPendingFriends] = useState([]);
+    const [errorForPendingFriends, setErrorForPendingFriends] = useState(null);
+
     const handleAlertToggle = () => {
         setError(null);
     }
@@ -35,6 +39,8 @@ const FriendsPage = () => {
         axios.patch(`http://localhost:8080/users/friendRequest`, null, {params: queryParams})
             .then((response) => {
                 setLoadingForSendingRequest(false);
+                // Adds a pending friend onto the old data list
+                setDataForPendingFriends(oldData => [...oldData, response.data]);
                 setDataForSendingRequest(response.data);
                 setErrorForSendingRequest(null);
             }).catch((err) => {
@@ -81,7 +87,15 @@ const FriendsPage = () => {
                         <FriendCard userId={loggedInUser}/>
                     </Container>
                     <Container>
-                        <PendingFriendCard userId={loggedInUser}/>
+                        <PendingFriendCard
+                            userId={loggedInUser}
+                            setData={setDataForPendingFriends}
+                            data={dataForPendingFriends}
+                            setError={setErrorForPendingFriends}
+                            error={errorForPendingFriends}
+                            setLoading={setLoadingForPendingFriends}
+                            loading={loadingForPendingFriends}
+                        />
                     </Container>
                 </Container>
             </Container>

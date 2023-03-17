@@ -4,6 +4,8 @@ import axios from "axios";
 import {BoardContainer} from "../../pages/ProfilePage.style";
 import {Alert} from "reactstrap";
 import Container from "react-bootstrap/Container";
+import Button from "@mui/material/Button";
+import {useSelector} from "react-redux";
 
 /**
  * A component for fetching and rendering information about all boards that belong to a specific user.
@@ -17,6 +19,9 @@ const BoardSection = (props) => {
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState(null);
     const [error, setError] = useState(null);
+
+    const loggedInUser = useSelector((state) => state.user.id);
+    const loggedInUserIsProfileUser = loggedInUser === props.profileUser;
 
     useEffect(() => {
         setLoading(true);
@@ -37,7 +42,26 @@ const BoardSection = (props) => {
 
     const handleAlertToggle = () => {
         setError(null);
-    }
+    };
+
+    const createBoard = () => {
+        const data = {
+            user: props.profileUser,
+        };
+        setLoading(true);
+        axios.post("http://localhost:8080/boards", data).then((response) => {
+            setLoading(false);
+            setData(response.data);
+            setError(null);
+        }).catch((err) => {
+            setLoading(false);
+            if (err.response) {
+                setError(err.response.data);
+            } else {
+                setError(err.message);
+            }
+        });
+    };
 
     return (
         <BoardContainer>
@@ -48,7 +72,12 @@ const BoardSection = (props) => {
                     </Alert>
                 )}
                 {loading && <div>Loading board info...</div>}
-                {!loading && data ? (
+                {!loading && data ? <>
+                    {loggedInUserIsProfileUser && (
+                        <Button variant="contained" size="small" onClick={createBoard}>
+                            New Board
+                        </Button>
+                    )}
                     <div>
                         {data.map((board) => (
                             <BirthdayBoard
@@ -66,7 +95,7 @@ const BoardSection = (props) => {
                             />
                         ))}
                     </div>
-                ) : null}
+                </> : null}
             </Container>
         </BoardContainer>
     );
