@@ -14,7 +14,7 @@ const FriendRequestCard = (props) => {
 
         // accept the friend request (returns updated list of pending friends)
         props.setLoadingForPendingFriends(true);
-        axiosInstance.patch(`users/pendingFriendRequests/accept`, null, {params: queryParams})
+        axiosInstance.patch(`http://localhost:8080/users/pendingFriendRequests/accept`, null, {params: queryParams})
             .then((response) => {
                 const [updatedPending, updatedFriends] = response.data;
                 props.setLoadingForPendingFriends(false);
@@ -22,12 +22,30 @@ const FriendRequestCard = (props) => {
                 props.setDataForFriends(updatedFriends);
                 props.setErrorForPendingFriends(null);
             }).catch((err) => {
-            props.setLoadingForPendingFriends(false);
-            if (err.response) {
-                props.setErrorForPendingFriends(err.response.data);
-            } else {
-                props.setErrorForPendingFriends(err.message);
-            }
+                axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/accept`, null, {params: queryParams})
+                .then((response) => {
+                    const [updatedPending, updatedFriends] = response.data;
+                    props.setLoadingForPendingFriends(false);
+                    props.setDataForPendingFriends(updatedPending);
+                    props.setDataForFriends(updatedFriends);
+                    props.setErrorForPendingFriends(null);
+                }).catch((err) => {
+                    axiosInstance.patch(`http://localhost:8082/users/pendingFriendRequests/accept`, null, {params: queryParams})
+                    .then((response) => {
+                        const [updatedPending, updatedFriends] = response.data;
+                        props.setLoadingForPendingFriends(false);
+                        props.setDataForPendingFriends(updatedPending);
+                        props.setDataForFriends(updatedFriends);
+                        props.setErrorForPendingFriends(null);
+                    }).catch((err) => {
+                    props.setLoadingForPendingFriends(false);
+                    if (err.response) {
+                        props.setErrorForPendingFriends(err.response.data);
+                    } else {
+                        props.setErrorForPendingFriends(err.message);
+                    }
+                });
+            });
         });
     }
 
@@ -39,18 +57,32 @@ const FriendRequestCard = (props) => {
         }
 
         props.setLoadingForPendingFriends(true);
-        axiosInstance.patch(`users/pendingFriendRequests/decline`, null, {params: queryParams})
+        axiosInstance.patch(`http://localhost:8080/users/pendingFriendRequests/decline`, null, {params: queryParams})
             .then((response) => {
                 props.setLoadingForPendingFriends(false);
                 props.setDataForPendingFriends(response.data);
                 props.setErrorForPendingFriends(null);
             }).catch((err) => {
-            props.setLoadingForPendingFriends(false);
-            if (err.response) {
-                props.setErrorForPendingFriends(err.response.data);
-            } else {
-                props.setErrorForPendingFriends(err.message);
-            }
+                axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/decline`, null, {params: queryParams})
+                .then((response) => {
+                    props.setLoadingForPendingFriends(false);
+                    props.setDataForPendingFriends(response.data);
+                    props.setErrorForPendingFriends(null);
+                }).catch((err) => {
+                    axiosInstance.patch(`http://localhost:8082/users/pendingFriendRequests/decline`, null, {params: queryParams})
+                    .then((response) => {
+                        props.setLoadingForPendingFriends(false);
+                        props.setDataForPendingFriends(response.data);
+                        props.setErrorForPendingFriends(null);
+                    }).catch((err) => {
+                    props.setLoadingForPendingFriends(false);
+                    if (err.response) {
+                        props.setErrorForPendingFriends(err.response.data);
+                    } else {
+                        props.setErrorForPendingFriends(err.message);
+                    }
+                });
+            });
         });
     }
 

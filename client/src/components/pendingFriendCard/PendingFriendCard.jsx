@@ -14,17 +14,29 @@ const PendingFriendCard = (props) => {
 
     useEffect(() => {
         props.setLoadingForPendingFriends(true);
-        axiosInstance.get(`users/pendingFriendRequests/${props.userId}`).then((response) => {
+        axiosInstance.get(`http://localhost:8080/users/pendingFriendRequests/${props.userId}`).then((response) => {
             props.setLoadingForPendingFriends(false);
             props.setDataForPendingFriends(response.data);
             setError(null);
         }).catch((err) => {
-            props.setLoadingForPendingFriends(false);
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
+            axiosInstance.get(`http://localhost:8081/users/pendingFriendRequests/${props.userId}`).then((response) => {
+                props.setLoadingForPendingFriends(false);
+                props.setDataForPendingFriends(response.data);
+                setError(null);
+            }).catch((err) => {
+                axiosInstance.get(`http://localhost:8082/users/pendingFriendRequests/${props.userId}`).then((response) => {
+                    props.setLoadingForPendingFriends(false);
+                    props.setDataForPendingFriends(response.data);
+                    setError(null);
+                }).catch((err) => {
+                    props.setLoadingForPendingFriends(false);
+                    if (err.response) {
+                        setError(err.response.data);
+                    } else {
+                        setError(err.message);
+                    }
+                });
+            });
         });
     }, []);
 

@@ -23,17 +23,29 @@ const ProfileSection = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axiosInstance.get(`users/${props.profileUser}`).then((response) => {
+        axiosInstance.get(`http://localhost:8080/users/${props.profileUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
         }).catch((err) => {
-            setLoading(false);
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
+            axiosInstance.get(`http://localhost:8081/users/${props.profileUser}`).then((response) => {
+                setLoading(false);
+                setData(response.data);
+                setError(null);
+            }).catch((err) => {
+                axiosInstance.get(`http://localhost:8082/users/${props.profileUser}`).then((response) => {
+                    setLoading(false);
+                    setData(response.data);
+                    setError(null);
+                }).catch((err) => {
+                    setLoading(false);
+                    if (err.response) {
+                        setError(err.response.data);
+                    } else {
+                        setError(err.message);
+                    }
+                });
+            });
         });
     }, []);
 
