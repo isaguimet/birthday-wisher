@@ -66,7 +66,7 @@ public class LeaderService {
             uri = URI.create("http://localhost/users/forwarded/pendingFriendRequests/accept");
         }
         if ("declineFriendRequest".equals(typeOfRequest)) {
-            uri = URI.create("http://localhost/users/pendingFriendRequests/decline");
+            uri = URI.create("http://localhost/users/forwarded/pendingFriendRequests/decline");
         }
 
         List<URI> replicaURIs = buildURIForEachReplica(uri);
@@ -173,7 +173,7 @@ public class LeaderService {
     }
 
     private void sendFriendRequest(String userEmail, String friendEmail, int response) {
-        URI uri = URI.create("http://localhost/users/friendRequest");
+        URI uri = URI.create("http://localhost/users/forwarded/friendRequest");
         List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         HttpEntity<JSONObject> request = new HttpEntity<>(null, null);

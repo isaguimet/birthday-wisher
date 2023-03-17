@@ -175,6 +175,37 @@ public class UserController {
         }
     }
 
+    @PatchMapping("/forwarded/friendRequest")
+    public ResponseEntity<?> forwardSendFriendRequest(@RequestParam String userEmail,
+                                                      @RequestParam String friendEmail) {
+        try {
+            Optional<User> optionalUser = userService.findUserByEmail(userEmail);
+            Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
+
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User email does not exist: " + userEmail, HttpStatus.NOT_FOUND);
+            }
+            if (optionalFriend.isEmpty()) {
+                return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
+            }
+
+            Boolean areFriendsAlready = userService.checkIfAlreadyFriends(optionalUser.get(), optionalFriend.get());
+            if (areFriendsAlready) {
+                return new ResponseEntity<>("User email " + userEmail + " and friend email " + friendEmail + " are already friends",
+                        HttpStatus.BAD_REQUEST);
+            }
+            Boolean isDupFriendRequest = userService.isDuplicatedFriendRequest(optionalUser.get(), optionalFriend.get());
+            if (isDupFriendRequest) {
+                return new ResponseEntity<>("User email " + userEmail + " already sent a friend request to " + friendEmail,
+                        HttpStatus.BAD_REQUEST);
+            }
+            userService.sendFriendRequest(optionalUser.get(), optionalFriend.get());
+            return new ResponseEntity<>(optionalFriend.get(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/pendingFriendRequests/{userId}")
     public ResponseEntity<?> getPendingFriendRequests(@PathVariable ObjectId userId) {
         try {
@@ -220,7 +251,7 @@ public class UserController {
 
     @PatchMapping("/forwarded/pendingFriendRequests/accept")
     public ResponseEntity<?> forwardAcceptFriendRequest(@RequestParam ObjectId userId,
-                                                 @RequestParam String friendEmail) {
+                                                        @RequestParam String friendEmail) {
         try {
             Optional<User> optionalUser = userService.getSingleUser(userId);
             Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
@@ -264,6 +295,32 @@ public class UserController {
                         "This userId cannot decline the request ", HttpStatus.BAD_REQUEST);
             }
             leaderService.forwardUserReqToBackups(userId, friendEmail, "declineFriendRequest");
+            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/forwarded/pendingFriendRequests/decline")
+    public ResponseEntity<?> forwardDeclineFriendRequest(@RequestParam ObjectId userId,
+                                                         @RequestParam String friendEmail) {
+        try {
+            Optional<User> optionalUser = userService.getSingleUser(userId);
+            Optional<User> optionalFriend = userService.findUserByEmail(friendEmail);
+
+            if (optionalUser.isEmpty()) {
+                return new ResponseEntity<>("User id given does not exist: " + userId, HttpStatus.NOT_FOUND);
+            }
+            if (optionalFriend.isEmpty()) {
+                return new ResponseEntity<>("Friend email does not exist: " + friendEmail, HttpStatus.NOT_FOUND);
+            }
+
+            Boolean isDeclined = userService.declineFriendRequest(optionalUser.get(), optionalFriend.get());
+            if (!isDeclined) {
+                return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
+                        "This userId cannot decline the request ", HttpStatus.BAD_REQUEST);
+            }
             return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
         }
         catch (Exception e) {
