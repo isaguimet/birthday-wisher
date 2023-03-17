@@ -80,7 +80,11 @@ public class LeaderService {
                     .encode()
                     .toUriString();
 
-            futures.add(asyncPatchForObject(url, request));
+            try {
+                futures.add(asyncPatchForObject(url, request));
+            } catch (Exception e) {
+                // handle?
+            }
         }
 
         for (Future<String> future : futures) {
@@ -129,7 +133,11 @@ public class LeaderService {
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
-            futures.add(asyncPostForObject(replicaURI, request));
+            try {
+                futures.add(asyncPostForObject(replicaURI, request));
+            } catch (Exception e) {
+                // handle?
+            }
         }
 
         for (Future<String> future : futures) {
@@ -154,7 +162,11 @@ public class LeaderService {
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
-            futures.add(asyncDelete(replicaURI + String.valueOf(userId)));
+            try {
+                futures.add(asyncDelete(replicaURI + String.valueOf(userId)));
+            } catch (Exception e) {
+                // handle?
+            }
         }
 
         for (Future<String> future : futures) {
@@ -186,7 +198,11 @@ public class LeaderService {
                     .encode()
                     .toUriString();
 
-            futures.add(asyncPatchForObject(url, request));
+            try {
+                futures.add(asyncPatchForObject(url, request));
+            } catch (Exception e) {
+                // handle?
+            }
         }
 
         for (Future<String> future : futures) {
@@ -225,7 +241,11 @@ public class LeaderService {
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
-            futures.add(asyncPostForObject(replicaURI, request));
+            try {
+                futures.add(asyncPostForObject(replicaURI, request));
+            } catch (Exception e) {
+                // handle?
+            }
         }
 
         for (Future<String> future : futures) {
@@ -265,7 +285,11 @@ public class LeaderService {
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
-            futures.add(asyncPostForObject(replicaURI, request));
+            try {
+                futures.add(asyncPostForObject(replicaURI, request));
+            } catch (Exception e) {
+                // handle?
+            }
         }
 
         for (Future<String> future : futures) {
@@ -293,7 +317,11 @@ public class LeaderService {
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
-            futures.add(asyncPatchForObject(replicaURI, request));
+            try {
+                futures.add(asyncPatchForObject(replicaURI, request));
+            } catch (Exception e) {
+                // handle?
+            }
         }
 
         for (Future<String> future : futures) {
@@ -321,7 +349,11 @@ public class LeaderService {
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
-            futures.add(asyncPatchForObject(replicaURI, request));
+            try {
+                futures.add(asyncPatchForObject(replicaURI, request));
+            } catch (Exception e) {
+                // handle?
+            }
         }
 
         for (Future<String> future : futures) {
@@ -347,7 +379,11 @@ public class LeaderService {
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
-            futures.add(asyncDelete(replicaURI));
+            try {
+                futures.add(asyncDelete(replicaURI));
+            } catch (Exception e) {
+                // handle?
+            }
         }
 
         for (Future<String> future : futures) {
