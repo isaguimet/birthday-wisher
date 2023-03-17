@@ -25,10 +25,10 @@ public class Application {
     @Autowired
     private BoardRepository boardRepository;
 
-    private ObjectId aliceId = new ObjectId("63e947477d6de33dfab29aac");
-    private ObjectId bobId = new ObjectId("63e8878d9598d713e77c3b79");
-    private ObjectId eveId = new ObjectId("63f3ec13353bb43e7c82eb21");
-    private ObjectId malloryId = new ObjectId("63f2f66168b165647bbfb41a");
+    private ObjectId aliceId = new ObjectId();
+    private ObjectId bobId = new ObjectId();
+    private ObjectId eveId = new ObjectId();
+    private ObjectId malloryId = new ObjectId();
 
     private List<User> users = Arrays.asList(
             new User(
@@ -108,9 +108,9 @@ public class Application {
     InitializingBean initDatabaseDemo() {
         return () -> {
             //resetUserRepo();
-            //populateUserRepo();
+            populateUserRepo();
 
-            resetBoardRepo();
+            //resetBoardRepo();
             populateBoardRepo();
         };
     }
