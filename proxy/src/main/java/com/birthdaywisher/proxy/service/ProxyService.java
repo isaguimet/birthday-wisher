@@ -1,37 +1,39 @@
-package com.birthdaywisher.server.leader;
+package com.birthdaywisher.proxy.service;
 
-import com.birthdaywisher.server.model.Board;
-import com.birthdaywisher.server.model.Message;
-import com.birthdaywisher.server.model.User;
+import com.birthdaywisher.proxy.model.Board;
 import org.bson.types.ObjectId;
 import org.json.simple.JSONObject;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 @Service
-public class LeaderService {
+public class ProxyService {
 
     private final RestTemplate restTemplate;
+    private List<Integer> servers = Arrays.asList(8081, 8082, 8083);
 
-    private final ServerProperties serverProperties;
-
-    // server group
-    private final List<Integer> serverGroup = new ArrayList<>(Arrays.asList(8081, 8082, 8083));
-
-    public LeaderService(ServerProperties serverProperties, RestTemplate restTemplate) {
-        this.serverProperties = serverProperties;
+    public ProxyService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+    }
+
+    public ResponseEntity<?> forwardReqToPrimary() {
+        try {
+            return new ResponseEntity<>("cool", HttpStatus.OK);
+        }
+        catch (Exception e) {
+            return new ResponseEntity(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public void forwardUserReqToBackups(User user, String typeOfRequest) {
@@ -63,10 +65,10 @@ public class LeaderService {
 
         URI uri = URI.create("");
         if ("acceptFriendRequest".equals(typeOfRequest)) {
-            uri = URI.create("http://localhost/users/forwarded/pendingFriendRequests/accept");
+            uri = URI.create("http://localhost/users/pendingFriendRequests/accept");
         }
         if ("declineFriendRequest".equals(typeOfRequest)) {
-            uri = URI.create("http://localhost/users/forwarded/pendingFriendRequests/decline");
+            uri = URI.create("http://localhost/users/pendingFriendRequests/decline");
         }
 
         List<URI> replicaURIs = buildURIForEachReplica(uri);
@@ -100,17 +102,15 @@ public class LeaderService {
 
     private List<URI> buildURIForEachReplica(URI uri) {
         List<URI> replicaURIs = new ArrayList<>();
-        for (Integer port : serverGroup) {
-            if (port.intValue() > serverProperties.getPort().intValue()) {
-                uri = UriComponentsBuilder.fromUri(uri).port(port).build().toUri();
-                replicaURIs.add(uri);
-            }
+        for (Integer port : servers) {
+            uri = UriComponentsBuilder.fromUri(uri).port(port).build().toUri();
+            replicaURIs.add(uri);
         }
         return replicaURIs;
     }
 
     private void addUserPOSTRequest(User user, int response) {
-        URI uri = URI.create("http://localhost/users/forwarded/signUp");
+        URI uri = URI.create("http://localhost/users/signUp");
         List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         // call post endpoint of other replicas
@@ -149,7 +149,7 @@ public class LeaderService {
     }
 
     private void deleteUserRequest(ObjectId userId, int response) {
-        URI uri = URI.create("http://localhost/users/forwarded/");
+        URI uri = URI.create("http://localhost/users/");
         List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         List<Future<String>> futures = new ArrayList<>();
@@ -173,7 +173,7 @@ public class LeaderService {
     }
 
     private void sendFriendRequest(String userEmail, String friendEmail, int response) {
-        URI uri = URI.create("http://localhost/users/forwarded/friendRequest");
+        URI uri = URI.create("http://localhost/users/friendRequest");
         List<URI> replicaURIs = buildURIForEachReplica(uri);
 
         HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
@@ -205,12 +205,9 @@ public class LeaderService {
     }
 
     public void forwardCreateBoard(Board board) {
-        int response = 0;
-
-        URI uri1 = URI.create("http://localhost/boards/forwarded");
+        URI uri1 = URI.create("http://localhost/boards");
         List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
-        // call post endpoint of other replicas
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -225,9 +222,14 @@ public class LeaderService {
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
-            futures.add(asyncPostForObject(replicaURI, request));
+            try {
+                futures.add(asyncPostForObject(replicaURI, request));
+            } catch (Exception e) {
+                // handle the exception??
+            }
         }
 
+        boolean receivedResponse;
         for (Future<String> future : futures) {
             try {
                 future.get();
@@ -246,7 +248,7 @@ public class LeaderService {
     public void forwardCreateMessage(ObjectId boardId, Message msg) {
         int response = 0;
 
-        URI uri1 = URI.create("http://localhost/boards/forwarded/" + boardId + "/messages");
+        URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages");
 
         List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
@@ -314,7 +316,7 @@ public class LeaderService {
     public void forwardUpdateMessage(ObjectId boardId, ObjectId msgId, Map<String, String> payload) {
         int response = 0;
 
-        URI uri1 = URI.create("http://localhost/boards/forwarded/" + boardId + "/messages/" + msgId);
+        URI uri1 = URI.create("http://localhost/boards/" + boardId + "/messages/" + msgId);
         List<URI> replicaURIs = buildURIForEachReplica(uri1);
 
         HttpEntity<?> request = new HttpEntity<>(payload, null);
@@ -366,28 +368,28 @@ public class LeaderService {
     }
 
     @Async
-    public Future<String> asyncPatchForObject(URI uri, Object request) {
+    public Future<ResponseEntity> asyncPatchForObject(URI uri, Object request) {
         return CompletableFuture.completedFuture(restTemplate.patchForObject(uri, request, String.class));
     }
 
     @Async
-    public Future<String> asyncPatchForObject(String url, Object request) {
+    public Future<ResponseEntity> asyncPatchForObject(String url, Object request) {
         return CompletableFuture.completedFuture(restTemplate.patchForObject(url, request, String.class));
     }
 
     @Async
-    public Future<String> asyncPostForObject(URI uri, Object request) {
+    public Future<ResponseEntity> asyncPostForObject(URI uri, Object request) {
         return CompletableFuture.completedFuture(restTemplate.postForObject(uri, request, String.class));
     }
 
     @Async
-    public Future<String> asyncDelete(URI uri) {
+    public Future<ResponseEntity> asyncDelete(URI uri) {
         restTemplate.delete(uri);
         return CompletableFuture.completedFuture("Done!");
     }
 
     @Async
-    public Future<String> asyncDelete(String url) {
+    public Future<ResponseEntity> asyncDelete(String url) {
         restTemplate.delete(url);
         return CompletableFuture.completedFuture("Done!");
     }
