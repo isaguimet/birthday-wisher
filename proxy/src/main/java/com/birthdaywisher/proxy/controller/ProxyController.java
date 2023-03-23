@@ -2,7 +2,6 @@ package com.birthdaywisher.proxy.controller;
 
 import com.birthdaywisher.proxy.service.ProxyService;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +20,7 @@ public class ProxyController {
     }
 
     @RequestMapping("/**")
-    public ResponseEntity<?> forwardReq(@RequestBody(required = false) String body, HttpMethod method, HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<?> forwardReq(@RequestBody(required = false) String body, HttpMethod method, HttpServletRequest request) {
         try {
             return proxyService.forwardReqToPrimary(body, method, request);
         }
