@@ -1,13 +1,13 @@
 import {Board, BoardContainer} from "../../pages/ProfilePage.style";
 import BirthdayCard from "../birthdayCard/BirthdayCard";
 import {useState} from "react";
-import axios from "axios";
 import {useSelector} from "react-redux";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Switch from "@mui/material/Switch"
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Button from '@mui/material/Button';
+import axiosInstance from "../../utils/API";
 
 /**
  * A component for rendering a User Birthday Board.
@@ -46,25 +46,49 @@ const BirthdayBoard = (props) => {
             msgText: input,
         };
         props.setLoading(true);
-        axios.post(`http://localhost:8080/boards/${props.boardId}/messages`, data).then((response) => {
+        axiosInstance.post(`http://localhost:8080/boards/${props.boardId}/messages`, data).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
         }).catch((err) => {
-            props.setLoading(false);
-            //props.setData(null);
-            if (err.response) {
-                props.setError(err.response.data);
-            } else {
-                props.setError(err.message);
-            }
+            axiosInstance.post(`http://localhost:8081/boards/${props.boardId}/messages`, data).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+            }).catch((err) => {
+                axiosInstance.post(`http://localhost:8082/boards/${props.boardId}/messages`, data).then((response) => {
+                    props.setLoading(false);
+                    props.setData(response.data);
+                    props.setError(null);
+                }).catch((err) => {
+                    props.setLoading(false);
+                    //props.setData(null);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
+                });
+            });
         });
     };
 
     const togglePublic = () => {
         props.setLoading(true);
         if (isPublic) {
-            axios.patch(`http://localhost:8080/boards/setPrivate/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`http://localhost:8081/boards/setPrivate/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setPublic(false);
+            }).catch((err) => {
+                axiosInstance.patch(`http://localhost:8082/boards/setPrivate/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setPublic(false);
+            }).catch((err) => {
+                axiosInstance.patch(`http://localhost:8083/boards/setPrivate/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -78,20 +102,37 @@ const BirthdayBoard = (props) => {
                     props.setError(err.message);
                 }
             });
+            });
+            });
         } else {
-            axios.patch(`http://localhost:8080/boards/setPublic/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`http://localhost:8080/boards/setPublic/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
                 setPublic(true);
             }).catch((err) => {
-                props.setLoading(false);
-                //props.setData(null);
-                if (err.response) {
-                    props.setError(err.response.data);
-                } else {
-                    props.setError(err.message);
-                }
+                axiosInstance.patch(`http://localhost:8081/boards/setPublic/${props.boardId}`).then((response) => {
+                    props.setLoading(false);
+                    props.setData(response.data);
+                    props.setError(null);
+                    setPublic(true);
+                }).catch((err) => {
+                    props.setLoading(false);
+                    axiosInstance.patch(`http://localhost:8082/boards/setPublic/${props.boardId}`).then((response) => {
+                        props.setLoading(false);
+                        props.setData(response.data);
+                        props.setError(null);
+                        setPublic(true);
+                    }).catch((err) => {
+                        props.setLoading(false);
+                        //props.setData(null);
+                        if (err.response) {
+                            props.setError(err.response.data);
+                        } else {
+                            props.setError(err.message);
+                        }
+                    });
+                });
             });
         }
     };
@@ -99,52 +140,92 @@ const BirthdayBoard = (props) => {
     const toggleOpen = () => {
         props.setLoading(true);
         if (isOpen) {
-            axios.patch(`http://localhost:8080/boards/setClosed/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`http://localhost:8080/boards/setClosed/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
                 setOpen(false);
             }).catch((err) => {
-                props.setLoading(false);
-                //props.setData(null);
-                if (err.response) {
-                    props.setError(err.response.data);
-                } else {
-                    props.setError(err.message);
-                }
+                axiosInstance.patch(`http://localhost:8081/boards/setClosed/${props.boardId}`).then((response) => {
+                    props.setLoading(false);
+                    props.setData(response.data);
+                    props.setError(null);
+                    setOpen(false);
+                }).catch((err) => {
+                    axiosInstance.patch(`http://localhost:8082/boards/setClosed/${props.boardId}`).then((response) => {
+                        props.setLoading(false);
+                        props.setData(response.data);
+                        props.setError(null);
+                        setOpen(false);
+                    }).catch((err) => {
+                        props.setLoading(false);
+                        //props.setData(null);
+                        if (err.response) {
+                            props.setError(err.response.data);
+                        } else {
+                            props.setError(err.message);
+                        }
+                    });
+                });
             });
         } else {
-            axios.patch(`http://localhost:8080/boards/setOpen/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`http://localhost:8080/boards/setOpen/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
                 setOpen(true);
             }).catch((err) => {
-                props.setLoading(false);
-                //props.setData(null);
-                if (err.response) {
-                    props.setError(err.response.data);
-                } else {
-                    props.setError(err.message);
-                }
+                axiosInstance.patch(`http://localhost:8081/boards/setOpen/${props.boardId}`).then((response) => {
+                    props.setLoading(false);
+                    props.setData(response.data);
+                    props.setError(null);
+                    setOpen(true);
+                }).catch((err) => {
+                    axiosInstance.patch(`http://localhost:8082/boards/setOpen/${props.boardId}`).then((response) => {
+                        props.setLoading(false);
+                        props.setData(response.data);
+                        props.setError(null);
+                        setOpen(true);
+                    }).catch((err) => {
+                        props.setLoading(false);
+                        //props.setData(null);
+                        if (err.response) {
+                            props.setError(err.response.data);
+                        } else {
+                            props.setError(err.message);
+                        }
+                    });
+                });
             });
         }
     };
 
     const deleteBoard = () => {
         props.setLoading(true);
-        axios.delete(`http://localhost:8080/boards/${props.boardId}`).then((response) => {
+        axiosInstance.delete(`http://localhost:8080/boards/${props.boardId}`).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
         }).catch((err) => {
-            props.setLoading(false);
-            //props.setData(null);
-            if (err.response) {
-                props.setError(err.response.data);
-            } else {
-                props.setError(err.message);
-            }
+            axiosInstance.delete(`http://localhost:8081/boards/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+            }).catch((err) => {
+                axiosInstance.delete(`http://localhost:8082/boards/${props.boardId}`).then((response) => {
+                    props.setLoading(false);
+                    props.setData(response.data);
+                    props.setError(null);
+                }).catch((err) => {
+                    props.setLoading(false);
+                    //props.setData(null);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
+                });
+            });
         });
     };
 

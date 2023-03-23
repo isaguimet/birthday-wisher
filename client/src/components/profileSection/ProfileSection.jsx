@@ -5,8 +5,8 @@ import ProfilePic from "../profilePic/ProfilePic";
 import Icons from "../../Icons";
 import {Age, Profile, ProfileInfo} from "../../pages/ProfilePage.style";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {Alert} from "reactstrap";
+import axiosInstance from "../../utils/API";
 
 /**
  * A component for fetching and rendering personal information about a specific user.
@@ -23,17 +23,29 @@ const ProfileSection = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:8080/users/${props.profileUser}`).then((response) => {
+        axiosInstance.get(`http://localhost:8080/users/${props.profileUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
         }).catch((err) => {
-            setLoading(false);
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
+            axiosInstance.get(`http://localhost:8081/users/${props.profileUser}`).then((response) => {
+                setLoading(false);
+                setData(response.data);
+                setError(null);
+            }).catch((err) => {
+                axiosInstance.get(`http://localhost:8082/users/${props.profileUser}`).then((response) => {
+                    setLoading(false);
+                    setData(response.data);
+                    setError(null);
+                }).catch((err) => {
+                    setLoading(false);
+                    if (err.response) {
+                        setError(err.response.data);
+                    } else {
+                        setError(err.message);
+                    }
+                });
+            });
         });
     }, []);
 

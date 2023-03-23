@@ -1,14 +1,11 @@
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {Alert} from "reactstrap";
-import Card from "react-bootstrap/Card";
-import button from "bootstrap/js/src/button";
 import FriendRequestCard from "../friendRequestCard/FriendRequestCard";
+import axiosInstance from "../../utils/API";
+import Container from "react-bootstrap/Container";
 
 const PendingFriendCard = (props) => {
 
-    const [loading, setLoading] = useState(false);
-    const [data, setData] = useState(null);
     const [error, setError] = useState(null);
 
     const handleAlertToggle = () => {
@@ -16,52 +13,56 @@ const PendingFriendCard = (props) => {
     }
 
     useEffect(() => {
-        setLoading(true);
-        axios.get(`http://localhost:8080/users/pendingFriendRequests/${props.userId}`).then((response) => {
-            setLoading(false);
-            setData(response.data);
+        props.setLoadingForPendingFriends(true);
+        axiosInstance.get(`http://localhost:8080/users/pendingFriendRequests/${props.userId}`).then((response) => {
+            props.setLoadingForPendingFriends(false);
+            props.setDataForPendingFriends(response.data);
             setError(null);
         }).catch((err) => {
-            setLoading(false);
-            if (err.response) {
-                setError(err.response.data);
-            } else {
-                setError(err.message);
-            }
+            axiosInstance.get(`http://localhost:8081/users/pendingFriendRequests/${props.userId}`).then((response) => {
+                props.setLoadingForPendingFriends(false);
+                props.setDataForPendingFriends(response.data);
+                setError(null);
+            }).catch((err) => {
+                axiosInstance.get(`http://localhost:8082/users/pendingFriendRequests/${props.userId}`).then((response) => {
+                    props.setLoadingForPendingFriends(false);
+                    props.setDataForPendingFriends(response.data);
+                    setError(null);
+                }).catch((err) => {
+                    props.setLoadingForPendingFriends(false);
+                    if (err.response) {
+                        setError(err.response.data);
+                    } else {
+                        setError(err.message);
+                    }
+                });
+            });
         });
     }, []);
 
     return (
-        <>
+        <Container>
             <h2>Pending Friend Requests</h2>
             {!!error && (
                 <Alert color={"danger"} toggle={handleAlertToggle}>
                     Error: {error}
                 </Alert>
             )}
-            {loading && <div>Loading pending friend requests...</div>}
-            {!loading && data ? (
+            {props.loadingForPendingFriends && <div>Loading pending friend requests...</div>}
+            {!(props.loadingForPendingFriends) && props.dataForPendingFriends ? (
                 <div>
-                    {data.map((friendInfo) => (
-                        <Card key={friendInfo.id} style={{width: '30rem'}}>
-                            <Card.Body>
-                                {Object.values(friendInfo.pendingFriends)[0] === true ? (
-                                        <div style={{display: "flex", justifyContent: "space-between"}}>
-                                            {friendInfo.firstName} {friendInfo.lastName}
-                                            <FriendRequestCard userId={props.userId} friendEmail={friendInfo.email}/>
-                                        </div>
-                                    ) :
-                                    <div style={{display: "flex", justifyContent: "space-between"}}>
-                                        {friendInfo.firstName} {friendInfo.lastName} &nbsp;&nbsp;&nbsp;
-                                        <button disabled>Friend request sent</button>
-                                    </div>
-                                }
-                            </Card.Body>
-                        </Card>
+                    {props.dataForPendingFriends.map((friendInfo) => (
+                        <FriendRequestCard userId={props.userId}
+                                           friendEmail={friendInfo.email}
+                                           friendInfo={friendInfo}
+                                           setDataForPendingFriends={props.setDataForPendingFriends}
+                                           setLoadingForPendingFriends={props.setLoadingForPendingFriends}
+                                           setErrorForPendingFriends={setError}
+                                           setDataForFriends={props.setDataForFriends}/>
                     ))}
                 </div>
             ) : null}
-        </>
+        </Container>
     );
 }
 

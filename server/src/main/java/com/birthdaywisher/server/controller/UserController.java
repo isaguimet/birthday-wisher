@@ -168,7 +168,7 @@ public class UserController {
             userService.sendFriendRequest(optionalUser.get(), optionalFriend.get());
 
             leaderService.forwardUserReqToBackups(userEmail, friendEmail, "friendRequest");
-            return new ResponseEntity<>(optionalFriend.get(), HttpStatus.OK);
+            return new ResponseEntity<>(userService.getPendingFriendRequests(optionalUser.get()), HttpStatus.OK);
         }
         catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -241,8 +241,15 @@ public class UserController {
                 return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
                         "This userId cannot accept the request ", HttpStatus.BAD_REQUEST);
             }
+
             leaderService.forwardUserReqToBackups(userId, friendEmail, "acceptFriendRequest");
-            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+
+            List<User> updatedPendingFriends = userService.getPendingFriendRequests(optionalUser.get());
+
+            List<User> updatedFriendList = userService.getFriendListByUser(optionalUser.get());
+            updatedFriendList.sort(Comparator.comparing(friend -> MonthDay.from(friend.getBirthdate())));
+
+            return new ResponseEntity<>(Arrays.asList(updatedPendingFriends, updatedFriendList), HttpStatus.OK);
         }
         catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -295,7 +302,7 @@ public class UserController {
                         "This userId cannot decline the request ", HttpStatus.BAD_REQUEST);
             }
             leaderService.forwardUserReqToBackups(userId, friendEmail, "declineFriendRequest");
-            return new ResponseEntity<>(optionalUser.get(), HttpStatus.OK);
+            return new ResponseEntity<>(userService.getPendingFriendRequests(optionalUser.get()), HttpStatus.OK);
         }
         catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
