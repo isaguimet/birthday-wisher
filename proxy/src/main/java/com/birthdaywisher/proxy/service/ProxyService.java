@@ -43,8 +43,13 @@ public class ProxyService {
                 System.out.println("Attempting to forward request to " + uri);
                 responseEntity = restTemplate.exchange(uri, method, httpEntity, String.class);
 
+                // if response from server does not have Access-Control-Allow-Origin response header, then keep the
+                // headers from the server's response. otherwise, ignore headers from server in order to avoid cors error
+                HttpHeaders responseHeaders = (responseEntity.getHeaders().getAccessControlAllowOrigin() == null)
+                        ? responseEntity.getHeaders() : new HttpHeaders();
+
                 return ResponseEntity.status(responseEntity.getStatusCode())
-                        .headers(new HttpHeaders())
+                        .headers(responseHeaders)
                         .body(responseEntity.getBody());
             } catch (HttpStatusCodeException e) {
                 System.out.println("Failed to forward request to " + serverPort + "(HttpStatusCodeException): " + e.getMessage());
