@@ -3,6 +3,7 @@ package com.birthdaywisher.proxy.service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -40,7 +41,11 @@ public class ProxyService {
 
             try {
                 System.out.println("Attempting to forward request to " + uri);
-                return restTemplate.exchange(uri, method, httpEntity, String.class);
+                responseEntity = restTemplate.exchange(uri, method, httpEntity, String.class);
+
+                return ResponseEntity.status(responseEntity.getStatusCode())
+                        .headers(new HttpHeaders())
+                        .body(responseEntity.getBody());
             } catch (HttpStatusCodeException e) {
                 System.out.println("Failed to forward request to " + serverPort + "(HttpStatusCodeException): " + e.getMessage());
                 responseEntity = ResponseEntity.status(e.getStatusCode())
