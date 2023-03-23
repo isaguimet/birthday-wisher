@@ -20,18 +20,14 @@ public class BoardService {
         this.boardRepository = boardRepository;
     }
 
-    public boolean shouldCreateNewBoard(Map<String, String> payload) {
+    public boolean shouldCreateNewBoard(Board board) {
         Optional<Board> userBoardForThisYear = boardRepository.findBoardByUserIdAndYear(
-                new ObjectId(payload.get("user")), String.valueOf(LocalDate.now().getYear()));
+                board.getUserId(), String.valueOf(LocalDate.now().getYear()));
         return userBoardForThisYear.isEmpty();
     }
 
-    public List<Board> createBoard(Map<String, String> payload) {
-        ObjectId oId = new ObjectId(payload.get("user"));
-        Board board = new Board();
-        board.setUserId(oId);
-        boardRepository.save(board);
-        return boardRepository.findBoardsByUserId(oId);
+    public Board createBoard(Board board) {
+        return boardRepository.save(board);
     }
 
     public Optional<Board> getBoardById(ObjectId id) {
@@ -88,13 +84,12 @@ public class BoardService {
         return false;
     }
 
-    public List<Board> createMessage(ObjectId boardId, Message msg) {
+    public Board createMessage(ObjectId boardId, Message msg) {
         Board board = boardRepository.findById(boardId).get();
         Map<ObjectId, Message> messages = board.getMessages();
         messages.put(msg.getId(), msg);
         board.setMessages(messages);
-        board = boardRepository.save(board);
-        return boardRepository.findBoardsByUserId(board.getUserId());
+        return boardRepository.save(board);
     }
 
     public Message getMsgById(ObjectId boardId, ObjectId msgId) {

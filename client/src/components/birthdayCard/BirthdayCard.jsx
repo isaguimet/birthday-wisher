@@ -2,9 +2,9 @@ import Card from 'react-bootstrap/Card';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import {useState} from "react";
-import axios from "axios";
 import {useSelector} from "react-redux";
 import Button from '@mui/material/Button';
+import axiosInstance from "../../utils/API";
 
 /**
  * A component for rendering a User Birthday Message.
@@ -39,35 +39,58 @@ const BirthdayCard = (props) => {
     const handleSubmit = (event) => {
         const body = {msgText: input};
         props.setLoading(true);
-        axios.patch(`http://localhost:8080/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
+        axiosInstance.patch(`http://localhost:8080/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
         }).catch((err) => {
-            props.setLoading(false);
-            //props.setData(null);
-            if (err.response) {
-                props.setError(err.response.data);
-            } else {
-                props.setError(err.message);
-            }
+            axiosInstance.patch(`http://localhost:8081/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+            }).catch((err) => {
+                axiosInstance.patch(`http://localhost:8082/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
+                    props.setLoading(false);
+                    props.setData(response.data);
+                    props.setError(null);
+                }).catch((err) => {
+                    props.setLoading(false);
+                    //props.setData(null);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
+                });
+            });
         });
     };
 
     const handleDelete = () => {
         props.setLoading(true);
-        axios.delete(`http://localhost:8080/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
+        axiosInstance.delete(`http://localhost:8080/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
         }).catch((err) => {
+            axiosInstance.delete(`http://localhost:8081/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
             props.setLoading(false);
-            //props.setData(null);
-            if (err.response) {
-                props.setError(err.response.data);
-            } else {
-                props.setError(err.message);
-            }
+            props.setData(response.data);
+            props.setError(null);
+            }).catch((err) => {
+                axiosInstance.delete(`http://localhost:8082/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
+                    props.setLoading(false);
+                    props.setData(response.data);
+                    props.setError(null);
+                    }).catch((err) => {
+                    //props.setData(null);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
+                });
+            });
         });
     };
 
