@@ -27,7 +27,7 @@ public class LeaderService {
     private final ServerProperties serverProperties;
 
     // server group
-    private final List<Integer> serverGroup = new ArrayList<>(Arrays.asList(8080, 8081, 8082));
+    private final List<Integer> serverGroup = new ArrayList<>(Arrays.asList(8081, 8082, 8083));
 
     public LeaderService(ServerProperties serverProperties, RestTemplate restTemplate) {
         this.serverProperties = serverProperties;
@@ -105,7 +105,7 @@ public class LeaderService {
     private List<URI> buildURIForEachReplica(URI uri) {
         List<URI> replicaURIs = new ArrayList<>();
         for (Integer port : serverGroup) {
-            if (port.intValue() > serverProperties.getPort().intValue()) {
+            if (port.intValue() != serverProperties.getPort().intValue()) {
                 uri = UriComponentsBuilder.fromUri(uri).port(port).build().toUri();
                 replicaURIs.add(uri);
             }
@@ -197,7 +197,6 @@ public class LeaderService {
                     .queryParam("friendEmail", friendEmail)
                     .encode()
                     .toUriString();
-
             try {
                 futures.add(asyncPatchForObject(url, request));
             } catch (Exception e) {
