@@ -30,6 +30,12 @@ public class Application {
     private ObjectId eveId = new ObjectId("641497f20a359a777e5fd802");
     private ObjectId malloryId = new ObjectId("641497f20a359a777e5fd803");
 
+    private List<String> boardIds = Arrays.asList(
+            "641cae268a11e84e03f51c5b", "641cae268a11e84e03f51c5c", "641cae268a11e84e03f51c5d",
+            "641cae268a11e84e03f51c64", "641cae268a11e84e03f51c65", "641cae268a11e84e03f51c66",
+            "641cae268a11e84e03f51c6d", "641cae268a11e84e03f51c6e", "641cae268a11e84e03f51c6f",
+            "641cae268a11e84e03f51c76", "641cae268a11e84e03f51c77", "641cae268a11e84e03f51c78");
+
     private List<User> users = Arrays.asList(
             new User(
                     aliceId, "Alice", "Wunderland", "alice@mail.com", "alice",
@@ -76,13 +82,14 @@ public class Application {
         List<Board> boards = new ArrayList<>();
         String bdayMsg = "Happy birthday, %s! - %s %s";
 
+        int i = 0;
         for (User toUser : users) {
             ObjectId toUserId = toUser.getId();
             Map<ObjectId, Message> messages2021 = new HashMap<>();
             Map<ObjectId, Message> messages2022 = new HashMap<>();
             Map<ObjectId, Message> messages2023 = new HashMap<>();
 
-            for (User fromUser : users){
+            for (User fromUser : users) {
                 ObjectId fromUserId = fromUser.getId();
 
                 if (toUserId != fromUserId) {
@@ -96,9 +103,10 @@ public class Application {
                 }
             }
 
-            boards.add(new Board(new ObjectId(), true, false, "2021", toUserId, messages2021));
-            boards.add(new Board(new ObjectId(), false, true, "2022", toUserId, messages2022));
-            boards.add(new Board(new ObjectId(), true, true, "2023", toUserId, messages2023));
+            boards.add(new Board(new ObjectId(boardIds.get(i)), true, false, "2021", toUserId, messages2021));
+            boards.add(new Board(new ObjectId(boardIds.get(i+1)), false, true, "2022", toUserId, messages2022));
+            boards.add(new Board(new ObjectId(boardIds.get(i+2)), true, true, "2023", toUserId, messages2023));
+            i += 3;
         }
 
         boardRepository.saveAll(boards);
