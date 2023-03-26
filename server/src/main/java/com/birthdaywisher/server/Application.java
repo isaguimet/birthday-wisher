@@ -97,25 +97,36 @@ public class Application {
         String bdayMsg = "Happy birthday, %s! - %s %s";
 
         int i = 0;
+        int j = 0;
         for (User toUser : users) {
             ObjectId toUserId = toUser.getId();
             Map<ObjectId, Message> messages2021 = new HashMap<>();
             Map<ObjectId, Message> messages2022 = new HashMap<>();
             Map<ObjectId, Message> messages2023 = new HashMap<>();
 
-            int j = 0;
             for (User fromUser : users) {
                 ObjectId fromUserId = fromUser.getId();
 
                 if (toUserId != fromUserId) {
-                    ObjectId oId = new ObjectId(msgIds.get(j));
-                    Message m = new Message(
-                            oId, fromUserId, toUserId, LocalDate.parse("2023-02-18"),
+                    ObjectId mId1 = new ObjectId(msgIds.get(j));
+                    ObjectId mId2 = new ObjectId(msgIds.get(j+1));
+                    ObjectId mId3 = new ObjectId(msgIds.get(j+2));
+
+                    Message m1 = new Message(
+                            mId1, fromUserId, toUserId, LocalDate.parse("2023-02-18"),
                             String.format(bdayMsg, toUser.getFirstName(), fromUser.getFirstName(), fromUser.getLastName()));
-                    messages2021.put(oId, m);
-                    messages2022.put(oId, m);
-                    messages2023.put(oId, m);
-                    j++;
+                    Message m2 = new Message(
+                            mId2, fromUserId, toUserId, LocalDate.parse("2023-02-18"),
+                            String.format(bdayMsg, toUser.getFirstName(), fromUser.getFirstName(), fromUser.getLastName()));
+                    Message m3 = new Message(
+                            mId3, fromUserId, toUserId, LocalDate.parse("2023-02-18"),
+                            String.format(bdayMsg, toUser.getFirstName(), fromUser.getFirstName(), fromUser.getLastName()));
+
+                    messages2021.put(mId1, m1);
+                    messages2022.put(mId2, m2);
+                    messages2023.put(mId3, m3);
+
+                    j += 3;
                 }
             }
 
