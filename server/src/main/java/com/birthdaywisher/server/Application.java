@@ -36,6 +36,20 @@ public class Application {
             "641cae268a11e84e03f51c6d", "641cae268a11e84e03f51c6e", "641cae268a11e84e03f51c6f",
             "641cae268a11e84e03f51c76", "641cae268a11e84e03f51c77", "641cae268a11e84e03f51c78");
 
+    private List<String> msgIds = Arrays.asList(
+            "641f854128b32706b66b8ea0", "641f854128b32706b66b8ea1", "641f854128b32706b66b8ea2",
+            "641f854128b32706b66b8ea3", "641f854128b32706b66b8ea4", "641f854128b32706b66b8ea5",
+            "641f854128b32706b66b8ea6", "641f854128b32706b66b8ea7", "641f854128b32706b66b8ea8",
+            "641f854128b32706b66b8ea9", "641f854128b32706b66b8eaa", "641f854128b32706b66b8eab",
+            "641f854128b32706b66b8eac", "641f854128b32706b66b8ead", "641f854128b32706b66b8eae",
+            "641f853d3d403a56acb81440", "641f853d3d403a56acb81441", "641f853d3d403a56acb81442",
+            "641f853d3d403a56acb81443", "641f853d3d403a56acb81444", "641f853d3d403a56acb81445",
+            "641f853d3d403a56acb81446", "641f853d3d403a56acb81447", "641f853d3d403a56acb81448",
+            "641f853d3d403a56acb81449", "641f853d3d403a56acb8144a", "641f853d3d403a56acb8144b",
+            "641f853d3d403a56acb8144c", "641f853d3d403a56acb8144d", "641f853d3d403a56acb8144e",
+            "641f853cee75e1442f74cd80", "641f853cee75e1442f74cd81", "641f853cee75e1442f74cd82",
+            "641f853cee75e1442f74cd83", "641f853cee75e1442f74cd84", "641f853cee75e1442f74cd85");
+
     private List<User> users = Arrays.asList(
             new User(
                     aliceId, "Alice", "Wunderland", "alice@mail.com", "alice",
@@ -89,17 +103,19 @@ public class Application {
             Map<ObjectId, Message> messages2022 = new HashMap<>();
             Map<ObjectId, Message> messages2023 = new HashMap<>();
 
+            int j = 0;
             for (User fromUser : users) {
                 ObjectId fromUserId = fromUser.getId();
 
                 if (toUserId != fromUserId) {
-                    ObjectId oId = new ObjectId();
+                    ObjectId oId = new ObjectId(msgIds.get(j));
                     Message m = new Message(
                             oId, fromUserId, toUserId, LocalDate.parse("2023-02-18"),
                             String.format(bdayMsg, toUser.getFirstName(), fromUser.getFirstName(), fromUser.getLastName()));
                     messages2021.put(oId, m);
                     messages2022.put(oId, m);
                     messages2023.put(oId, m);
+                    j++;
                 }
             }
 
