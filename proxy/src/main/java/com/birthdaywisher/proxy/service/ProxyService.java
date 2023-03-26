@@ -16,7 +16,7 @@ import java.util.List;
 public class ProxyService {
 
     private final RestTemplate restTemplate;
-    private List<Integer> servers = Arrays.asList(8081, 8082, 8083, 8084, 8085, 8086);
+    private List<Integer> servers = Arrays.asList(8082, 8083, 8084, 8085, 8086, 8087);
 
     public ProxyService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;

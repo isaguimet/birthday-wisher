@@ -27,7 +27,7 @@ public class LeaderService {
     private final ServerProperties serverProperties;
 
     // server group
-    private final List<Integer> serverGroup = new ArrayList<>(Arrays.asList(8081, 8082, 8083, 8084, 8085, 8086));
+    private final List<Integer> serverGroup = new ArrayList<>(Arrays.asList(8082, 8083, 8084, 8085, 8086, 8087));
 
     public LeaderService(ServerProperties serverProperties, RestTemplate restTemplate) {
         this.serverProperties = serverProperties;
