@@ -3,7 +3,6 @@ package com.birthdaywisher.proxy.service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -17,7 +16,7 @@ import java.util.List;
 public class ProxyService {
 
     private final RestTemplate restTemplate;
-    private List<Integer> servers = Arrays.asList(8081, 8082, 8083);
+    private List<Integer> servers = Arrays.asList(8082, 8083, 8084, 8085, 8086, 8087);
 
     public ProxyService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
