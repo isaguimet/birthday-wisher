@@ -77,7 +77,7 @@ const ProfileSection = (props) => {
                     {!loading && data ? (
                         <>
                             {/*TODO: if we are storing user profile pic in db, should access from data.profilePic*/}
-                            <Col style={{display: "flex", justifyContent: "center"}}><ProfilePic src={Icons[4]}/></Col>
+                            <Col style={{display: "flex", justifyContent: "center"}}><ProfilePic src={Icons[3]}/></Col>
                             <Col xs={"auto"}>
                                 <Container>
                                     <Row>
