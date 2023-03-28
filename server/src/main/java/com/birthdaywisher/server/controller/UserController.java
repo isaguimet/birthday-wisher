@@ -13,7 +13,6 @@ import java.time.MonthDay;
 import java.util.*;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/users")
 public class UserController {
     private UserService userService;

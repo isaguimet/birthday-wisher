@@ -59,19 +59,27 @@ const BoardSection = (props) => {
             setLoading(false);
             setData(response.data);
             setError(null);
-        }).catch((err) => {
-            axiosInstance.post("http://localhost:8081/boards", data).then((response) => {
+        }).catch((err8080) => {
+            // TODO: should probably make other requests check if err.response too before trying next proxy
+            if(err8080.response) {
                 setLoading(false);
-                setData(response.data);
-                setError(null);
-            }).catch((err) => {
-                setLoading(false);
-                if (err.response) {
-                    setError(err.response.data);
-                } else {
-                    setError(err.message);
-                }
-            });
+                setError(err8080.response.data);
+            } else {
+                axiosInstance.post("http://localhost:8081/boards", data).then((response) => {
+                    setLoading(false);
+                    setData(response.data);
+                    setError(null);
+                }).catch((err) => {
+                    console.log(err)
+                    setLoading(false);
+                    if (err.response) {
+                        setError(err.response.data);
+                    } else {
+                        setError(err.message);
+                    }
+                });
+            }
+
         });
     };
 
