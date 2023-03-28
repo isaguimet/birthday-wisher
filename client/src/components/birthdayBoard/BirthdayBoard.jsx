@@ -56,10 +56,31 @@ const BirthdayBoard = (props) => {
                 props.setData(response.data);
                 props.setError(null);
             }).catch((err) => {
-                axiosInstance.post(`http://localhost:8082/boards/${props.boardId}/messages`, data).then((response) => {
+                props.setLoading(false);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
+            });
+        });
+    };
+
+    const togglePublic = () => {
+        props.setLoading(true);
+        if (isPublic) {
+            axiosInstance.patch(`http://localhost:8080/boards/setPrivate/${props.boardId}`).then((response) => {
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
+                setPublic(false);
+            }).catch((err) => {
+                axiosInstance.patch(`http://localhost:8081/boards/setPrivate/${props.boardId}`).then((response) => {
                     props.setLoading(false);
                     props.setData(response.data);
                     props.setError(null);
+                    setPublic(false);
                 }).catch((err) => {
                     props.setLoading(false);
                     //props.setData(null);
@@ -69,40 +90,6 @@ const BirthdayBoard = (props) => {
                         props.setError(err.message);
                     }
                 });
-            });
-        });
-    };
-
-    const togglePublic = () => {
-        props.setLoading(true);
-        if (isPublic) {
-            axiosInstance.patch(`http://localhost:8081/boards/setPrivate/${props.boardId}`).then((response) => {
-                props.setLoading(false);
-                props.setData(response.data);
-                props.setError(null);
-                setPublic(false);
-            }).catch((err) => {
-                axiosInstance.patch(`http://localhost:8082/boards/setPrivate/${props.boardId}`).then((response) => {
-                props.setLoading(false);
-                props.setData(response.data);
-                props.setError(null);
-                setPublic(false);
-            }).catch((err) => {
-                axiosInstance.patch(`http://localhost:8083/boards/setPrivate/${props.boardId}`).then((response) => {
-                props.setLoading(false);
-                props.setData(response.data);
-                props.setError(null);
-                setPublic(false);
-            }).catch((err) => {
-                props.setLoading(false);
-                //props.setData(null);
-                if (err.response) {
-                    props.setError(err.response.data);
-                } else {
-                    props.setError(err.message);
-                }
-            });
-            });
             });
         } else {
             axiosInstance.patch(`http://localhost:8080/boards/setPublic/${props.boardId}`).then((response) => {
@@ -118,20 +105,12 @@ const BirthdayBoard = (props) => {
                     setPublic(true);
                 }).catch((err) => {
                     props.setLoading(false);
-                    axiosInstance.patch(`http://localhost:8082/boards/setPublic/${props.boardId}`).then((response) => {
-                        props.setLoading(false);
-                        props.setData(response.data);
-                        props.setError(null);
-                        setPublic(true);
-                    }).catch((err) => {
-                        props.setLoading(false);
-                        //props.setData(null);
-                        if (err.response) {
-                            props.setError(err.response.data);
-                        } else {
-                            props.setError(err.message);
-                        }
-                    });
+                    //props.setData(null);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
                 });
             });
         }
@@ -152,20 +131,13 @@ const BirthdayBoard = (props) => {
                     props.setError(null);
                     setOpen(false);
                 }).catch((err) => {
-                    axiosInstance.patch(`http://localhost:8082/boards/setClosed/${props.boardId}`).then((response) => {
-                        props.setLoading(false);
-                        props.setData(response.data);
-                        props.setError(null);
-                        setOpen(false);
-                    }).catch((err) => {
-                        props.setLoading(false);
-                        //props.setData(null);
-                        if (err.response) {
-                            props.setError(err.response.data);
-                        } else {
-                            props.setError(err.message);
-                        }
-                    });
+                    props.setLoading(false);
+                    //props.setData(null);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
                 });
             });
         } else {
@@ -181,20 +153,13 @@ const BirthdayBoard = (props) => {
                     props.setError(null);
                     setOpen(true);
                 }).catch((err) => {
-                    axiosInstance.patch(`http://localhost:8082/boards/setOpen/${props.boardId}`).then((response) => {
-                        props.setLoading(false);
-                        props.setData(response.data);
-                        props.setError(null);
-                        setOpen(true);
-                    }).catch((err) => {
-                        props.setLoading(false);
-                        //props.setData(null);
-                        if (err.response) {
-                            props.setError(err.response.data);
-                        } else {
-                            props.setError(err.message);
-                        }
-                    });
+                    props.setLoading(false);
+                    //props.setData(null);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
                 });
             });
         }
@@ -212,19 +177,13 @@ const BirthdayBoard = (props) => {
                 props.setData(response.data);
                 props.setError(null);
             }).catch((err) => {
-                axiosInstance.delete(`http://localhost:8082/boards/${props.boardId}`).then((response) => {
-                    props.setLoading(false);
-                    props.setData(response.data);
-                    props.setError(null);
-                }).catch((err) => {
-                    props.setLoading(false);
-                    //props.setData(null);
-                    if (err.response) {
-                        props.setError(err.response.data);
-                    } else {
-                        props.setError(err.message);
-                    }
-                });
+                props.setLoading(false);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
             });
         });
     };

@@ -24,18 +24,12 @@ const PendingFriendCard = (props) => {
                 props.setDataForPendingFriends(response.data);
                 setError(null);
             }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/users/pendingFriendRequests/${props.userId}`).then((response) => {
-                    props.setLoadingForPendingFriends(false);
-                    props.setDataForPendingFriends(response.data);
-                    setError(null);
-                }).catch((err) => {
-                    props.setLoadingForPendingFriends(false);
-                    if (err.response) {
-                        setError(err.response.data);
-                    } else {
-                        setError(err.message);
-                    }
-                });
+                props.setLoadingForPendingFriends(false);
+                if (err.response) {
+                    setError(err.response.data);
+                } else {
+                    setError(err.message);
+                }
             });
         });
     }, []);

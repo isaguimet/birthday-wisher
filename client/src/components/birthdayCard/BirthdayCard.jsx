@@ -49,19 +49,13 @@ const BirthdayCard = (props) => {
                 props.setData(response.data);
                 props.setError(null);
             }).catch((err) => {
-                axiosInstance.patch(`http://localhost:8082/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
-                    props.setLoading(false);
-                    props.setData(response.data);
-                    props.setError(null);
-                }).catch((err) => {
-                    props.setLoading(false);
-                    //props.setData(null);
-                    if (err.response) {
-                        props.setError(err.response.data);
-                    } else {
-                        props.setError(err.message);
-                    }
-                });
+                props.setLoading(false);
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
             });
         });
     };
@@ -74,22 +68,16 @@ const BirthdayCard = (props) => {
             props.setError(null);
         }).catch((err) => {
             axiosInstance.delete(`http://localhost:8081/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
-            props.setLoading(false);
-            props.setData(response.data);
-            props.setError(null);
+                props.setLoading(false);
+                props.setData(response.data);
+                props.setError(null);
             }).catch((err) => {
-                axiosInstance.delete(`http://localhost:8082/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
-                    props.setLoading(false);
-                    props.setData(response.data);
-                    props.setError(null);
-                    }).catch((err) => {
-                    //props.setData(null);
-                    if (err.response) {
-                        props.setError(err.response.data);
-                    } else {
-                        props.setError(err.message);
-                    }
-                });
+                //props.setData(null);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
             });
         });
     };

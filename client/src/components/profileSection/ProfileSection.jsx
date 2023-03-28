@@ -33,18 +33,12 @@ const ProfileSection = (props) => {
                 setData(response.data);
                 setError(null);
             }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/users/${props.profileUser}`).then((response) => {
-                    setLoading(false);
-                    setData(response.data);
-                    setError(null);
-                }).catch((err) => {
-                    setLoading(false);
-                    if (err.response) {
-                        setError(err.response.data);
-                    } else {
-                        setError(err.message);
-                    }
-                });
+                setLoading(false);
+                if (err.response) {
+                    setError(err.response.data);
+                } else {
+                    setError(err.message);
+                }
             });
         });
     }, []);

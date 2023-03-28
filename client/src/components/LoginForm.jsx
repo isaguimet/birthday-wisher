@@ -31,17 +31,13 @@ export default function (props) {
             axiosInstance.post(`http://localhost:8081/users/signUp`, data).then((response) => {
                 alert("Success! Try logging in with these credentials now.");
             }).catch((err) => {
-                axiosInstance.post(`http://localhost:8082/users/signUp`, data).then((response) => {
-                    alert("Success! Try logging in with these credentials now.");
-                }).catch((err) => {
-                    let error = "";
-                    if (err.response) {
-                        error = err.response.data;
-                    } else {
-                        error = err.message;
-                    }
-                    alert("Sign Up Error: " + error);
-                });
+                let error = "";
+                if (err.response) {
+                    error = err.response.data;
+                } else {
+                    error = err.message;
+                }
+                alert("Sign Up Error: " + error);
             });
         });
     };
@@ -71,22 +67,13 @@ export default function (props) {
                 );
                 navigate("/wishing-center");
             }).catch((err) => {
-                axiosInstance.post(`http://localhost:8082/users/login`, data).then((response) => {
-                    dispatch(
-                        setLogin({
-                            user: response.data
-                        })
-                    );
-                    navigate("/wishing-center");
-                }).catch((err) => {
-                    let error = "";
-                    if (err.response) {
-                        error = err.response.data;
-                    } else {
-                        error = err.message;
-                    }
-                    alert("Sign In Error: " + error);
-                });
+                let error = "";
+                if (err.response) {
+                    error = err.response.data;
+                } else {
+                    error = err.message;
+                }
+                alert("Sign In Error: " + error);
             });
         });
     };

@@ -21,18 +21,12 @@ const SearchBar = (props) => {
                 props.setData(response.data)
                 props.setError(null)
             }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/users/byEmail/${input}`).then((response) => {
-                    props.setLoading(false)
-                    props.setData(response.data)
-                    props.setError(null)
-                }).catch((err) => {
-                    props.setLoading(false);
-                    if (err.response) {
-                        props.setError(err.response.data);
-                    } else {
-                        props.setError(err.message);
-                    }
-                });
+                props.setLoading(false);
+                if (err.response) {
+                    props.setError(err.response.data);
+                } else {
+                    props.setError(err.message);
+                }
             });
         });
     }

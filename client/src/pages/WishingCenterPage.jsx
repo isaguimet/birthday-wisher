@@ -51,20 +51,13 @@ const WishingCenterPage = () => {
                 console.log("response data: " + JSON.stringify(response.data))
                 setError(null);
             }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/users/friendList/${userId}`).then((response) => {
-                    setLoading(false);
-                    setData(getUpcomingBirthdays(response.data.sort(compare)));
-                    console.log("response data: " + JSON.stringify(response.data))
-                    setError(null);
-                }).catch((err) => {
-                    setLoading(false);
-                    if (err.response) {
-                        setError(err.response.data);
-                    } else {
-                        setError(err.message);
-                    }
-                    console.log(error)
-                });
+                setLoading(false);
+                if (err.response) {
+                    setError(err.response.data);
+                } else {
+                    setError(err.message);
+                }
+                console.log(error)
             });
         });
     }, []);

@@ -35,19 +35,13 @@ const BoardSection = (props) => {
                 setData(response.data);
                 setError(null);
             }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/boards/byUserId/${props.profileUser}`).then((response) => {
-                    setLoading(false);
-                    setData(response.data);
-                    setError(null);
-                }).catch((err) => {
-                    setLoading(false);
-                    //setData(null);
-                    if (err.response) {
-                        setError(err.response.data);
-                    } else {
-                        setError(err.message);
-                    }
-                });
+                setLoading(false);
+                //setData(null);
+                if (err.response) {
+                    setError(err.response.data);
+                } else {
+                    setError(err.message);
+                }
             });
         });
     }, []);
@@ -71,18 +65,12 @@ const BoardSection = (props) => {
                 setData(response.data);
                 setError(null);
             }).catch((err) => {
-                axiosInstance.post("http://localhost:8082/boards", data).then((response) => {
-                    setLoading(false);
-                    setData(response.data);
-                    setError(null);
-                }).catch((err) => {
-                    setLoading(false);
-                    if (err.response) {
-                        setError(err.response.data);
-                    } else {
-                        setError(err.message);
-                    }
-                });
+                setLoading(false);
+                if (err.response) {
+                    setError(err.response.data);
+                } else {
+                    setError(err.message);
+                }
             });
         });
     };
