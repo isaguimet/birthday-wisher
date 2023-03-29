@@ -43,20 +43,25 @@ const BirthdayCard = (props) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
-        }).catch((err) => {
-            axiosInstance.patch(`http://localhost:8081/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 props.setLoading(false);
-                props.setData(response.data);
-                props.setError(null);
-            }).catch((err) => {
-                props.setLoading(false);
-                //props.setData(null);
-                if (err.response) {
-                    props.setError(err.response.data);
-                } else {
-                    props.setError(err.message);
-                }
-            });
+                props.setError(err8080.response.data);
+            } else {
+                axiosInstance.patch(`http://localhost:8081/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
+                    props.setLoading(false);
+                    props.setData(response.data);
+                    props.setError(null);
+                }).catch((err) => {
+                    props.setLoading(false);
+                    //props.setData(null);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
+                });
+            }
         });
     };
 
@@ -66,19 +71,25 @@ const BirthdayCard = (props) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
-        }).catch((err) => {
-            axiosInstance.delete(`http://localhost:8081/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 props.setLoading(false);
-                props.setData(response.data);
-                props.setError(null);
-            }).catch((err) => {
-                //props.setData(null);
-                if (err.response) {
-                    props.setError(err.response.data);
-                } else {
-                    props.setError(err.message);
-                }
-            });
+                props.setError(err8080.response.data);
+            } else {
+                axiosInstance.delete(`http://localhost:8081/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
+                    props.setLoading(false);
+                    props.setData(response.data);
+                    props.setError(null);
+                }).catch((err) => {
+                    props.setLoading(false);
+                    //props.setData(null);
+                    if (err.response) {
+                        props.setError(err.response.data);
+                    } else {
+                        props.setError(err.message);
+                    }
+                });
+            }
         });
     };
 

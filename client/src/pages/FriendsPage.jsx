@@ -44,21 +44,26 @@ const FriendsPage = () => {
             setDataForPendingFriends(response.data);
             setDataForSendingRequest(response.data);
             setErrorForSendingRequest(null);
-        }).catch((err) => {
-            axiosInstance.patch(`http://localhost:8081/users/friendRequest`, null, {params: queryParams}).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 setLoadingForSendingRequest(false);
-                // Adds a pending friend onto the old data list
-                setDataForPendingFriends(response.data);
-                setDataForSendingRequest(response.data);
-                setErrorForSendingRequest(null);
-            }).catch((err) => {
-                setLoadingForSendingRequest(false);
-                if (err.response) {
-                    setErrorForSendingRequest(err.response.data);
-                } else {
-                    setErrorForSendingRequest(err.message);
-                }
-            });
+                setErrorForSendingRequest(err8080.response.data);
+            } else {
+                axiosInstance.patch(`http://localhost:8081/users/friendRequest`, null, {params: queryParams}).then((response) => {
+                    setLoadingForSendingRequest(false);
+                    // Adds a pending friend onto the old data list
+                    setDataForPendingFriends(response.data);
+                    setDataForSendingRequest(response.data);
+                    setErrorForSendingRequest(null);
+                }).catch((err) => {
+                    setLoadingForSendingRequest(false);
+                    if (err.response) {
+                        setErrorForSendingRequest(err.response.data);
+                    } else {
+                        setErrorForSendingRequest(err.message);
+                    }
+                });
+            }
         });
     }
 

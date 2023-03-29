@@ -43,22 +43,28 @@ const WishingCenterPage = () => {
             setData(getUpcomingBirthdays(response.data.sort(compare)));
             console.log("response data: " + JSON.stringify(response.data))
             setError(null);
-        }).catch((err) => {
-            setLoading(false);
-            axiosInstance.get(`http://localhost:8081/users/friendList/${userId}`).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 setLoading(false);
-                setData(getUpcomingBirthdays(response.data.sort(compare)));
-                console.log("response data: " + JSON.stringify(response.data))
-                setError(null);
-            }).catch((err) => {
-                setLoading(false);
-                if (err.response) {
-                    setError(err.response.data);
-                } else {
-                    setError(err.message);
-                }
+                setError(err8080.response.data);
                 console.log(error)
-            });
+            } else {
+                setLoading(false);
+                axiosInstance.get(`http://localhost:8081/users/friendList/${userId}`).then((response) => {
+                    setLoading(false);
+                    setData(getUpcomingBirthdays(response.data.sort(compare)));
+                    console.log("response data: " + JSON.stringify(response.data))
+                    setError(null);
+                }).catch((err) => {
+                    setLoading(false);
+                    if (err.response) {
+                        setError(err.response.data);
+                    } else {
+                        setError(err.message);
+                    }
+                    console.log(error)
+                });
+            }
         });
     }, []);
 

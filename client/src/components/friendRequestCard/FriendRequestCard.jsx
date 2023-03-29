@@ -20,21 +20,26 @@ const FriendRequestCard = (props) => {
             props.setDataForPendingFriends(updatedPending);
             props.setDataForFriends(updatedFriends);
             props.setErrorForPendingFriends(null);
-        }).catch((err) => {
-            axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/accept`, null, {params: queryParams}).then((response) => {
-                const [updatedPending, updatedFriends] = response.data;
+        }).catch((err8080) => {
+            if (err8080.response) {
                 props.setLoadingForPendingFriends(false);
-                props.setDataForPendingFriends(updatedPending);
-                props.setDataForFriends(updatedFriends);
-                props.setErrorForPendingFriends(null);
-            }).catch((err) => {
-                props.setLoadingForPendingFriends(false);
-                if (err.response) {
-                    props.setErrorForPendingFriends(err.response.data);
-                } else {
-                    props.setErrorForPendingFriends(err.message);
-                }
-            });
+                props.setErrorForPendingFriends(err8080.response.data);
+            } else {
+                axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/accept`, null, {params: queryParams}).then((response) => {
+                    const [updatedPending, updatedFriends] = response.data;
+                    props.setLoadingForPendingFriends(false);
+                    props.setDataForPendingFriends(updatedPending);
+                    props.setDataForFriends(updatedFriends);
+                    props.setErrorForPendingFriends(null);
+                }).catch((err) => {
+                    props.setLoadingForPendingFriends(false);
+                    if (err.response) {
+                        props.setErrorForPendingFriends(err.response.data);
+                    } else {
+                        props.setErrorForPendingFriends(err.message);
+                    }
+                });
+            }
         });
     }
 
@@ -50,19 +55,24 @@ const FriendRequestCard = (props) => {
                 props.setLoadingForPendingFriends(false);
                 props.setDataForPendingFriends(response.data);
                 props.setErrorForPendingFriends(null);
-        }).catch((err) => {
-            axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/decline`, null, {params: queryParams}).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 props.setLoadingForPendingFriends(false);
-                props.setDataForPendingFriends(response.data);
-                props.setErrorForPendingFriends(null);
-            }).catch((err) => {
-                props.setLoadingForPendingFriends(false);
-                if (err.response) {
-                    props.setErrorForPendingFriends(err.response.data);
-                } else {
-                    props.setErrorForPendingFriends(err.message);
-                }
-            });
+                props.setErrorForPendingFriends(err8080.response.data);
+            } else {
+                axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/decline`, null, {params: queryParams}).then((response) => {
+                    props.setLoadingForPendingFriends(false);
+                    props.setDataForPendingFriends(response.data);
+                    props.setErrorForPendingFriends(null);
+                }).catch((err) => {
+                    props.setLoadingForPendingFriends(false);
+                    if (err.response) {
+                        props.setErrorForPendingFriends(err.response.data);
+                    } else {
+                        props.setErrorForPendingFriends(err.message);
+                    }
+                });
+            }
         });
     }
 

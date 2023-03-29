@@ -26,6 +26,7 @@ public class ProxyService {
     public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) {
         ResponseEntity<?> responseEntity = null;
 
+        // copy request headers
         HttpHeaders headers = new HttpHeaders();
         Enumeration<String> headersNames = request.getHeaderNames();
         while (headersNames.hasMoreElements()) {
@@ -35,6 +36,7 @@ public class ProxyService {
 
         HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
 
+        // try forwarding the request to one of the server ports until one succeeds
         URI uri = URI.create(String.valueOf(request.getRequestURL()));
         for (Integer serverPort : servers) {
             try {

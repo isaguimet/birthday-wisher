@@ -18,19 +18,24 @@ const PendingFriendCard = (props) => {
             props.setLoadingForPendingFriends(false);
             props.setDataForPendingFriends(response.data);
             setError(null);
-        }).catch((err) => {
-            axiosInstance.get(`http://localhost:8081/users/pendingFriendRequests/${props.userId}`).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 props.setLoadingForPendingFriends(false);
-                props.setDataForPendingFriends(response.data);
-                setError(null);
-            }).catch((err) => {
-                props.setLoadingForPendingFriends(false);
-                if (err.response) {
-                    setError(err.response.data);
-                } else {
-                    setError(err.message);
-                }
-            });
+                setError(err8080.response.data);
+            } else {
+                axiosInstance.get(`http://localhost:8081/users/pendingFriendRequests/${props.userId}`).then((response) => {
+                    props.setLoadingForPendingFriends(false);
+                    props.setDataForPendingFriends(response.data);
+                    setError(null);
+                }).catch((err) => {
+                    props.setLoadingForPendingFriends(false);
+                    if (err.response) {
+                        setError(err.response.data);
+                    } else {
+                        setError(err.message);
+                    }
+                });
+            }
         });
     }, []);
 

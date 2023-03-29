@@ -27,18 +27,22 @@ export default function (props) {
         };
         axiosInstance.post(`http://localhost:8080/users/signUp`, data).then((response) => {
             alert("Success! Try logging in with these credentials now.");
-        }).catch((err) => {
-            axiosInstance.post(`http://localhost:8081/users/signUp`, data).then((response) => {
-                alert("Success! Try logging in with these credentials now.");
-            }).catch((err) => {
-                let error = "";
-                if (err.response) {
-                    error = err.response.data;
-                } else {
-                    error = err.message;
-                }
-                alert("Sign Up Error: " + error);
-            });
+        }).catch((err8080) => {
+            if (err8080.response) {
+                alert("Sign Up Error: " + err8080.response.data);
+            } else {
+                axiosInstance.post(`http://localhost:8081/users/signUp`, data).then((response) => {
+                    alert("Success! Try logging in with these credentials now.");
+                }).catch((err) => {
+                    let error = "";
+                    if (err.response) {
+                        error = err.response.data;
+                    } else {
+                        error = err.message;
+                    }
+                    alert("Sign Up Error: " + error);
+                });
+            }
         });
     };
 
@@ -58,23 +62,27 @@ export default function (props) {
                 })
             );
             navigate("/wishing-center");
-        }).catch((err) => {
-            axiosInstance.post(`http://localhost:8081/users/login`, data).then((response) => {
-                dispatch(
-                    setLogin({
-                        user: response.data
-                    })
-                );
-                navigate("/wishing-center");
-            }).catch((err) => {
-                let error = "";
-                if (err.response) {
-                    error = err.response.data;
-                } else {
-                    error = err.message;
-                }
-                alert("Sign In Error: " + error);
-            });
+        }).catch((err8080) => {
+            if (err8080.response) {
+                alert("Sign In Error: " + err8080.response.data);
+            } else {
+                axiosInstance.post(`http://localhost:8081/users/login`, data).then((response) => {
+                    dispatch(
+                        setLogin({
+                            user: response.data
+                        })
+                    );
+                    navigate("/wishing-center");
+                }).catch((err) => {
+                    let error = "";
+                    if (err.response) {
+                        error = err.response.data;
+                    } else {
+                        error = err.message;
+                    }
+                    alert("Sign In Error: " + error);
+                });
+            }
         });
     };
 
