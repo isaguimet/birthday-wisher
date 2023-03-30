@@ -7,6 +7,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
 import java.util.Arrays;
@@ -23,7 +24,7 @@ public class ProxyService {
         this.restTemplate = restTemplate;
     }
 
-    public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) {
+    public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) throws UnsupportedEncodingException {
         ResponseEntity<?> responseEntity = null;
 
         // copy request headers
@@ -36,18 +37,18 @@ public class ProxyService {
 
         HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
 
-        // try forwarding the request to one of the server ports until one succeeds
         URI uri = URI.create(String.valueOf(request.getRequestURL()));
+        String queryString = request.getQueryString() == null
+                ? request.getQueryString()
+                : URLDecoder.decode(request.getQueryString(), "UTF-8");
+
+        // try forwarding the request to one of the server ports until one succeeds
         for (Integer serverPort : servers) {
             try {
-                String queryString = request.getQueryString() == null
-                        ? request.getQueryString()
-                        : URLDecoder.decode(request.getQueryString(), "UTF-8");
-
-                uri = UriComponentsBuilder.fromUri(uri).port(serverPort.intValue()).query(queryString).build().toUri();
-
-                System.out.println("Attempting to forward request to " + uri);
-                responseEntity = restTemplate.exchange(uri, method, httpEntity, String.class);
+                URI portUri = UriComponentsBuilder.fromUri(uri).port(serverPort.intValue()).query(queryString).build().toUri();
+                System.out.println("Attempting to forward request to " + portUri);
+                responseEntity = restTemplate.exchange(portUri, method, httpEntity, String.class);
+                System.out.println("Successfully forwarded to " + serverPort);
 
                 return ResponseEntity.status(responseEntity.getStatusCode())
                         .headers(responseEntity.getHeaders())
