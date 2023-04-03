@@ -15,13 +15,12 @@ const SearchBar = (props) => {
             props.setLoading(false)
             props.setData(response.data)
             props.setError(null)
-        }).catch((err) => {
-            axiosInstance.get(`http://localhost:8081/users/byEmail/${input}`).then((response) => {
-                props.setLoading(false)
-                props.setData(response.data)
-                props.setError(null)
-            }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/users/byEmail/${input}`).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
+                props.setLoading(false);
+                props.setError(err8080.response.data);
+            } else {
+                axiosInstance.get(`http://localhost:8081/users/byEmail/${input}`).then((response) => {
                     props.setLoading(false)
                     props.setData(response.data)
                     props.setError(null)
@@ -33,7 +32,7 @@ const SearchBar = (props) => {
                         props.setError(err.message);
                     }
                 });
-            });
+            }
         });
     }
 

@@ -27,13 +27,12 @@ const ProfileSection = (props) => {
             setLoading(false);
             setData(response.data);
             setError(null);
-        }).catch((err) => {
-            axiosInstance.get(`http://localhost:8081/users/${props.profileUser}`).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 setLoading(false);
-                setData(response.data);
-                setError(null);
-            }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/users/${props.profileUser}`).then((response) => {
+                setError(err8080.response.data);
+            } else {
+                axiosInstance.get(`http://localhost:8081/users/${props.profileUser}`).then((response) => {
                     setLoading(false);
                     setData(response.data);
                     setError(null);
@@ -45,7 +44,7 @@ const ProfileSection = (props) => {
                         setError(err.message);
                     }
                 });
-            });
+            }
         });
     }, []);
 
@@ -77,7 +76,7 @@ const ProfileSection = (props) => {
                     {!loading && data ? (
                         <>
                             {/*TODO: if we are storing user profile pic in db, should access from data.profilePic*/}
-                            <Col style={{display: "flex", justifyContent: "center"}}><ProfilePic src={Icons[4]}/></Col>
+                            <Col style={{display: "flex", justifyContent: "center"}}><ProfilePic src={Icons[3]}/></Col>
                             <Col xs={"auto"}>
                                 <Container>
                                     <Row>

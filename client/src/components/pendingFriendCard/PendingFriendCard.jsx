@@ -18,13 +18,12 @@ const PendingFriendCard = (props) => {
             props.setLoadingForPendingFriends(false);
             props.setDataForPendingFriends(response.data);
             setError(null);
-        }).catch((err) => {
-            axiosInstance.get(`http://localhost:8081/users/pendingFriendRequests/${props.userId}`).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 props.setLoadingForPendingFriends(false);
-                props.setDataForPendingFriends(response.data);
-                setError(null);
-            }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/users/pendingFriendRequests/${props.userId}`).then((response) => {
+                setError(err8080.response.data);
+            } else {
+                axiosInstance.get(`http://localhost:8081/users/pendingFriendRequests/${props.userId}`).then((response) => {
                     props.setLoadingForPendingFriends(false);
                     props.setDataForPendingFriends(response.data);
                     setError(null);
@@ -36,7 +35,7 @@ const PendingFriendCard = (props) => {
                         setError(err.message);
                     }
                 });
-            });
+            }
         });
     }, []);
 

@@ -1,20 +1,25 @@
 # birthday-wisher
 
+## Running the proxy
+1. Change directory into `birthday-wisher/proxy`.
+2. Build the project: `./gradlew build -x test`.
+3. Run the project: (note that terminal output will indicate that it only runs to 80% as it waits for requests)
+    * To run a proxy instance on 8080: `./gradlew bootRun --args='--spring.profiles.active=inst1'`
+    * To run a proxy instance on 8081: `./gradlew bootRun --args='--spring.profiles.active=inst2'`
+
 ## Running the server
-
-### From Command Line
-* To build the project: `./gradlew build`
-* To run the project: `./gradlew bootRun`
-
-### For IntelliJ
-Recommended instructions for IntelliJ:
-* File > Project Structure:
-    * Use SDK greater than 17? I used Oracle OpenJDK 19
-    * Press the "Apply" and "OK" buttons
-* Right-click the server/build.gradle file and select "Link Gradle Project". You should see a progress bar start going
-  at the bottom of the IDE, wait a few mins for that to finish.
-* Right-click DemoApplication.java and then "Run" to run the server.
+1. Change directory into `birthday-wisher/server`.
+2. Build the project: `./gradlew build -x test`.
+3. Run the project: (note that terminal output will indicate that it only runs to 80% as it waits for requests)
+   * To run a server instance on 8082: `./gradlew bootRun --args='--spring.profiles.active=inst1'`
+   * To run a server instance on 8083: `./gradlew bootRun --args='--spring.profiles.active=inst2'`
+   * To run a server instance on 8084: `./gradlew bootRun --args='--spring.profiles.active=inst3'`
+   * To run a server instance on 8085: `./gradlew bootRun --args='--spring.profiles.active=inst4'`
+   * To run a server instance on 8086: `./gradlew bootRun --args='--spring.profiles.active=inst5'`
+   * To run a server instance on 8087: `./gradlew bootRun --args='--spring.profiles.active=inst6'`
 
 ## Running the client
-* Change directory into `birthday-wisher/client` and run `npm install` to download project dependencies.
-* Still from within this `client` directory, run `npm start` to start the app. Open http://localhost:3000 to view it in your browser.
+1. Change directory into `birthday-wisher/client`. 
+2. Run `npm install` to download project dependencies. 
+3. Run `npm start` to start the app.
+4. Open http://localhost:3000 to view the app in your browser.

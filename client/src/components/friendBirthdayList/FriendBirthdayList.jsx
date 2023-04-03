@@ -17,13 +17,12 @@ const FriendBirthdayList = (props) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
-        }).catch((err) => {
-            axiosInstance.get(`http://localhost:8081/users/friendList/${props.loggedInUser}`).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 props.setLoading(false);
-                props.setData(response.data);
-                props.setError(null);
-            }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/users/friendList/${props.loggedInUser}`).then((response) => {
+                props.setError(err8080.response.data);
+            } else {
+                axiosInstance.get(`http://localhost:8081/users/friendList/${props.loggedInUser}`).then((response) => {
                     props.setLoading(false);
                     props.setData(response.data);
                     props.setError(null);
@@ -35,7 +34,7 @@ const FriendBirthdayList = (props) => {
                         props.setError(err.message);
                     }
                 });
-            });
+            }
         });
     }, []);
 

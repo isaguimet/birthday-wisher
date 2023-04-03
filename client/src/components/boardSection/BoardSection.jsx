@@ -29,13 +29,12 @@ const BoardSection = (props) => {
             setLoading(false);
             setData(response.data);
             setError(null);
-        }).catch((err) => {
-            axiosInstance.get(`http://localhost:8081/boards/byUserId/${props.profileUser}`).then((response) => {
+        }).catch((err8080) => {
+            if (err8080.response) {
                 setLoading(false);
-                setData(response.data);
-                setError(null);
-            }).catch((err) => {
-                axiosInstance.get(`http://localhost:8082/boards/byUserId/${props.profileUser}`).then((response) => {
+                setError(err8080.response.data);
+            } else {
+                axiosInstance.get(`http://localhost:8081/boards/byUserId/${props.profileUser}`).then((response) => {
                     setLoading(false);
                     setData(response.data);
                     setError(null);
@@ -48,7 +47,7 @@ const BoardSection = (props) => {
                         setError(err.message);
                     }
                 });
-            });
+            }
         });
     }, []);
 
@@ -65,17 +64,17 @@ const BoardSection = (props) => {
             setLoading(false);
             setData(response.data);
             setError(null);
-        }).catch((err) => {
-            axiosInstance.post("http://localhost:8081/boards", data).then((response) => {
+        }).catch((err8080) => {
+            if(err8080.response) {
                 setLoading(false);
-                setData(response.data);
-                setError(null);
-            }).catch((err) => {
-                axiosInstance.post("http://localhost:8082/boards", data).then((response) => {
+                setError(err8080.response.data);
+            } else {
+                axiosInstance.post("http://localhost:8081/boards", data).then((response) => {
                     setLoading(false);
                     setData(response.data);
                     setError(null);
                 }).catch((err) => {
+                    console.log(err)
                     setLoading(false);
                     if (err.response) {
                         setError(err.response.data);
@@ -83,7 +82,8 @@ const BoardSection = (props) => {
                         setError(err.message);
                     }
                 });
-            });
+            }
+
         });
     };
 
