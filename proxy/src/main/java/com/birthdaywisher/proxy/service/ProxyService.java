@@ -10,18 +10,21 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ProxyService {
 
     private final RestTemplate restTemplate;
-    private List<Integer> servers = Arrays.asList(8082, 8083, 8084, 8085, 8086, 8087);
+    private List<Integer> servers = new ArrayList<>();
 
     public ProxyService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
+    }
+
+    public void setServers(Integer port) {
+        servers.add(port);
+        System.out.println("Servers: " + servers);
     }
 
     public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) throws UnsupportedEncodingException {
