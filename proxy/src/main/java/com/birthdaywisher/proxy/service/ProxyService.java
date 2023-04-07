@@ -27,6 +27,10 @@ public class ProxyService {
         System.out.println("Servers: " + servers);
     }
 
+    public List<Integer> getServers() {
+        return this.servers;
+    }
+
     public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) throws UnsupportedEncodingException {
         ResponseEntity<?> responseEntity = null;
 

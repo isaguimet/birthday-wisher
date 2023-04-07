@@ -24,13 +24,24 @@ public class UserController {
         this.leaderService = leaderService;
     }
 
+    @PostMapping ("/saveAll")
+    public ResponseEntity<?> saveUsersDB(@RequestBody Iterable<User> users) {
+        try {
+            userService.saveAllUsers(users);
+            return new ResponseEntity<>(users, HttpStatus.CREATED);
+        }
+        catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/")
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<?> getAllUsers() {
         try {
             return new ResponseEntity<>(userService.getAllUsers(), HttpStatus.OK);
         }
         catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

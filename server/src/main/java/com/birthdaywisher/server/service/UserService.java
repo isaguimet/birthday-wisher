@@ -15,7 +15,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public List<User> getAllUsers() {
+    public Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
 
@@ -159,5 +159,11 @@ public class UserService {
     public User setProfilePic(User user, String profilePic) {
         user.setProfilePic(profilePic);
         return userRepository.save(user);
+    }
+
+    public void saveAllUsers(Iterable<User> users) {
+        // Delete all documents for this user collection then save copy of users documents into DB
+        userRepository.deleteAll();
+        userRepository.saveAll(users);
     }
 }
