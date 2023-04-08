@@ -3,8 +3,11 @@ package com.birthdaywisher.server.service;
 import com.birthdaywisher.server.model.User;
 import com.birthdaywisher.server.repository.UserRepository;
 import org.bson.types.ObjectId;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -161,9 +164,27 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public void saveAllUsers(Iterable<User> users) {
+    public void saveAllUsers(JSONArray users) {
         // Delete all documents for this user collection then save copy of users documents into DB
         userRepository.deleteAll();
-        userRepository.saveAll(users);
+
+        List<User> userList = new ArrayList<>();
+
+        for (Object userObject : users) {
+            JSONObject object = (JSONObject) userObject;
+            User user = new User(new ObjectId((String) object.get("id")),
+                    (String) object.get("firstName"),
+                    (String) object.get("lastName"),
+                    (String) object.get("email"),
+                    (String) object.get("password"),
+                    LocalDate.parse((String) object.get("birthdate")),
+                    (ArrayList<ObjectId>) object.get("friends"),
+                    (HashMap<ObjectId, Boolean>) object.get("pendingFriends"),
+                    (String) object.get("profilePic"));
+            System.out.println("user: " + user);
+            userList.add(user);
+        }
+
+        userRepository.saveAll(userList);
     }
 }

@@ -24,17 +24,6 @@ public class UserController {
         this.leaderService = leaderService;
     }
 
-    @PostMapping ("/saveAll")
-    public ResponseEntity<?> saveUsersDB(@RequestBody Iterable<User> users) {
-        try {
-            userService.saveAllUsers(users);
-            return new ResponseEntity<>(users, HttpStatus.CREATED);
-        }
-        catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @GetMapping("/")
     public ResponseEntity<?> getAllUsers() {
         try {

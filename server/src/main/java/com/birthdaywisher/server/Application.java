@@ -1,7 +1,10 @@
 package com.birthdaywisher.server;
 
+import com.birthdaywisher.server.service.UserService;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import org.bson.types.ObjectId;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -26,6 +29,9 @@ public class Application {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private UserService userService;
 
     private List<Integer> proxyGroup = Arrays.asList(8080, 8081);
 
@@ -54,6 +60,15 @@ public class Application {
                     responseEntity = restTemplate.exchange(portUri, HttpMethod.GET, httpEntity, String.class);
                     System.out.println("Successfully forwarded to " + proxyPort);
 
+                    // Case where server list is not empty. Response returned contains DB copy to save
+                    if (responseEntity.getBody() != null) {
+                        JSONParser parser = new JSONParser();
+                        JSONArray object = (JSONArray) parser.parse((String) responseEntity.getBody());
+
+                        System.out.println(object);
+                        userService.saveAllUsers(object);
+                        // TODO: add this rebooted server to server list
+                    }
                 } catch (HttpStatusCodeException e) {
                     // connection refused seems to go to the general Exception catch block anyway but doesn't hurt to check
                     if (!e.getMessage().contains("Connection refused")) {
