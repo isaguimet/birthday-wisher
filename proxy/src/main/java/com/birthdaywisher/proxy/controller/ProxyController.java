@@ -59,11 +59,31 @@ public class ProxyController {
                 }
             } else {
                 // Only add new server if DB copy request is successful
-                proxyService.setServers(portId);
+                proxyService.addServerToGroup(portId);
             }
             return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/addServerToGroup/{portNum}")
+    public ResponseEntity<?> addServerToGroup(@PathVariable Integer portNum) {
+        try {
+            proxyService.addServerToGroup(portNum);
+            return new ResponseEntity<>(proxyService.getServers(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PatchMapping("/removeServerFromGroup/{portNum}")
+    public ResponseEntity<?> removeServerFromGroup(@PathVariable Integer portNum) {
+        try {
+            proxyService.removeServerFromGroup(portNum);
+            return new ResponseEntity<>(proxyService.getServers(), HttpStatus.OK);
+        } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

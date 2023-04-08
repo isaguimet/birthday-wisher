@@ -22,9 +22,14 @@ public class ProxyService {
         this.restTemplate = restTemplate;
     }
 
-    public void setServers(Integer port) {
-        servers.add(port);
-        System.out.println("Servers: " + servers);
+    public void addServerToGroup(Integer portNum) {
+        servers.add(portNum);
+        System.out.println("Server Group: " + servers);
+    }
+
+    public void removeServerFromGroup(Integer portNum) {
+        servers.remove(portNum);
+        System.out.println("Server Group: " + servers);
     }
 
     public List<Integer> getServers() {
