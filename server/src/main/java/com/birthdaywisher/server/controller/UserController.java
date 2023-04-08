@@ -1,6 +1,6 @@
 package com.birthdaywisher.server.controller;
 
-import com.birthdaywisher.server.leader.LeaderService;
+import com.birthdaywisher.server.service.CommService;
 import com.birthdaywisher.server.model.User;
 import com.birthdaywisher.server.service.UserService;
 import org.bson.types.ObjectId;
@@ -16,12 +16,12 @@ import java.util.*;
 @RequestMapping("/users")
 public class UserController {
     private UserService userService;
-    private LeaderService leaderService;
+    private CommService commService;
 
     // Constructor dependency injection
-    public UserController(UserService userService, LeaderService leaderService) {
+    public UserController(UserService userService, CommService commService) {
         this.userService = userService;
-        this.leaderService = leaderService;
+        this.commService = commService;
     }
 
     @GetMapping("/")
@@ -74,7 +74,7 @@ public class UserController {
                         HttpStatus.BAD_REQUEST);
             }
             User newUser = userService.addUser(user);
-            leaderService.forwardUserReqToBackups(newUser, "signUp");
+            commService.forwardUserReqToBackups(newUser, "signUp");
             return new ResponseEntity<>(newUser, HttpStatus.CREATED);
         }
         catch (Exception e) {
@@ -121,7 +121,7 @@ public class UserController {
     public ResponseEntity<String> deleteUser(@PathVariable ObjectId id) {
         try {
             userService.deleteUser(id);
-            leaderService.forwardUserReqToBackups(id, "delete");
+            commService.forwardUserReqToBackups(id, "delete");
             return new ResponseEntity<>("User has been deleted by id: " + id, HttpStatus.OK);
         }
         catch (Exception e) {
@@ -166,7 +166,7 @@ public class UserController {
             }
             userService.sendFriendRequest(optionalUser.get(), optionalFriend.get());
 
-            leaderService.forwardUserReqToBackups(userEmail, friendEmail, "friendRequest");
+            commService.forwardUserReqToBackups(userEmail, friendEmail, "friendRequest");
             return new ResponseEntity<>(userService.getPendingFriendRequests(optionalUser.get()), HttpStatus.OK);
         }
         catch (Exception e) {
@@ -241,7 +241,7 @@ public class UserController {
                         "This userId cannot accept the request ", HttpStatus.BAD_REQUEST);
             }
 
-            leaderService.forwardUserReqToBackups(userId, friendEmail, "acceptFriendRequest");
+            commService.forwardUserReqToBackups(userId, friendEmail, "acceptFriendRequest");
 
             List<User> updatedPendingFriends = userService.getPendingFriendRequests(optionalUser.get());
 
@@ -300,7 +300,7 @@ public class UserController {
                 return new ResponseEntity<>("User id given, " + userId +  ", sent the friend request. " +
                         "This userId cannot decline the request ", HttpStatus.BAD_REQUEST);
             }
-            leaderService.forwardUserReqToBackups(userId, friendEmail, "declineFriendRequest");
+            commService.forwardUserReqToBackups(userId, friendEmail, "declineFriendRequest");
             return new ResponseEntity<>(userService.getPendingFriendRequests(optionalUser.get()), HttpStatus.OK);
         }
         catch (Exception e) {

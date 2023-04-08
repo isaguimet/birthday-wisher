@@ -1,4 +1,4 @@
-package com.birthdaywisher.server.leader;
+package com.birthdaywisher.server.service;
 
 import com.birthdaywisher.server.model.Board;
 import com.birthdaywisher.server.model.Message;
@@ -19,19 +19,34 @@ import java.net.URI;
 import java.util.*;
 import java.util.concurrent.Future;
 
+/**
+ * A service for the server to communicate with proxies and other servers.
+ */
 @Service
-public class LeaderService {
+public class CommService {
 
     private final RestTemplate restTemplate;
 
     private final ServerProperties serverProperties;
 
     // server group
-    private final List<Integer> serverGroup = new ArrayList<>(Arrays.asList(8082, 8083, 8084, 8085, 8086, 8087));
+    private final List<Integer> serverGroup = new ArrayList<>();
 
-    public LeaderService(ServerProperties serverProperties, RestTemplate restTemplate) {
+    public CommService(ServerProperties serverProperties, RestTemplate restTemplate) {
         this.serverProperties = serverProperties;
         this.restTemplate = restTemplate;
+    }
+
+    public void addServerToGroup(Integer portNum) {
+        serverGroup.add(portNum);
+    }
+
+    public void removeServerFromGroup(Integer portNum) {
+        serverGroup.remove(portNum);
+    }
+
+    public List<Integer> getServerGroup() {
+        return serverGroup;
     }
 
     public void forwardUserReqToBackups(User user, String typeOfRequest) {
