@@ -17,25 +17,31 @@ public class ProxyService {
 
     private final RestTemplate restTemplate;
     private List<Integer> servers = new ArrayList<>();
+    private List<Integer> proxies = Arrays.asList(8080, 8081);
 
     public ProxyService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public void addServerToGroup(Integer portNum) {
+    public List<Integer> getProxies() {
+        return this.proxies;
+    }
+
+    public synchronized void addServerToGroup(Integer portNum) {
         servers.add(portNum);
         System.out.println("Server Group: " + servers);
     }
 
-    public void removeServerFromGroup(Integer portNum) {
+    public synchronized void removeServerFromGroup(Integer portNum) {
         servers.remove(portNum);
         System.out.println("Server Group: " + servers);
     }
 
-    public List<Integer> getServers() {
+    public synchronized List<Integer> getServers() {
         return this.servers;
     }
 
+    // TODO: this reads "servers"...should it also be synchronized?
     public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) throws UnsupportedEncodingException {
         ResponseEntity<?> responseEntity = null;
 

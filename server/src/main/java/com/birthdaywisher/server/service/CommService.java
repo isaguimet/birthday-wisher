@@ -3,6 +3,8 @@ package com.birthdaywisher.server.service;
 import com.birthdaywisher.server.model.Board;
 import com.birthdaywisher.server.model.Message;
 import com.birthdaywisher.server.model.User;
+import com.birthdaywisher.server.repository.BoardRepository;
+import com.birthdaywisher.server.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.json.simple.JSONObject;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -10,6 +12,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
+
+import java.time.LocalDate;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -29,23 +33,32 @@ public class CommService {
 
     private final ServerProperties serverProperties;
 
+    private final BoardRepository boardRepository;
+
+    private final UserRepository userRepository;
+
     // server group
     private final List<Integer> serverGroup = new ArrayList<>();
 
-    public CommService(ServerProperties serverProperties, RestTemplate restTemplate) {
+    public CommService(
+            ServerProperties serverProperties, RestTemplate restTemplate, BoardRepository boardRepository,
+            UserRepository userRepository
+    ) {
         this.serverProperties = serverProperties;
         this.restTemplate = restTemplate;
+        this.boardRepository = boardRepository;
+        this.userRepository = userRepository;
     }
 
-    public void addServerToGroup(Integer portNum) {
+    public synchronized void addServerToGroup(Integer portNum) {
         serverGroup.add(portNum);
     }
 
-    public void removeServerFromGroup(Integer portNum) {
+    public synchronized void removeServerFromGroup(Integer portNum) {
         serverGroup.remove(portNum);
     }
 
-    public List<Integer> getServerGroup() {
+    public synchronized List<Integer> getServerGroup() {
         return serverGroup;
     }
 
@@ -117,6 +130,7 @@ public class CommService {
         }
     }
 
+    // TODO: this reads serverGroup, so should it be synchronized too?
     private List<URI> buildURIForEachReplica(URI uri) {
         List<URI> replicaURIs = new ArrayList<>();
         for (Integer port : serverGroup) {
@@ -440,5 +454,49 @@ public class CommService {
     public Future<String> asyncDelete(String url) {
         restTemplate.delete(url);
         return CompletableFuture.completedFuture("Done!");
+    }
+
+    public List<Iterable<?>> dataDump() {
+        List<Iterable<?>> dataList = new ArrayList<>();
+        dataList.add(userRepository.findAll());
+        dataList.add(boardRepository.findAll());
+        return dataList;
+    }
+
+    public void dataReset(List<Iterable<?>> data) {
+        // Wipe all collections & repopulate them with given data
+        userRepository.deleteAll();
+        boardRepository.deleteAll();
+
+        List<User> userList = new ArrayList<>();
+        for (Object userObject : data.get(0)) {
+            LinkedHashMap object = (LinkedHashMap) userObject;
+            User user = new User(new ObjectId((String) object.get("id")),
+                    (String) object.get("firstName"),
+                    (String) object.get("lastName"),
+                    (String) object.get("email"),
+                    (String) object.get("password"),
+                    LocalDate.parse((String) object.get("birthdate")),
+                    (ArrayList<ObjectId>) object.get("friends"),
+                    (HashMap<ObjectId, Boolean>) object.get("pendingFriends"),
+                    (String) object.get("profilePic"));
+            userList.add(user);
+        }
+
+        List<Board> boardList = new ArrayList<>();
+        for (Object boardObject : data.get(1)) {
+            LinkedHashMap object = (LinkedHashMap) boardObject;
+            Board board = new Board(
+                    new ObjectId((String) object.get("id")),
+                    (boolean) object.get("public"),
+                    (boolean) object.get("open"),
+                    (String) object.get("year"),
+                    new ObjectId((String) object.get("userId")),
+                    (Map<ObjectId, Message>) object.get("messages"));
+            boardList.add(board);
+        }
+
+        userRepository.saveAll(userList);
+        boardRepository.saveAll(boardList);
     }
 }
