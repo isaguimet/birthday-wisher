@@ -62,10 +62,8 @@ public class Application {
                 // This only needs to be done once, so break out of the loop now
                 break;
             } catch (HttpStatusCodeException e) {
-                if (!e.getMessage().contains("Connection refused")) {
-                    System.out.println("Bad response from proxy: " + e.getStatusCode() + "\n" + e.getResponseHeaders()
-                            + "\n" + e.getResponseBodyAsString());
-                }
+                System.out.println("Bad response from proxy: " + e.getStatusCode() + "\n" + e.getResponseHeaders()
+                        + "\n" + e.getResponseBodyAsString());
             } catch (Exception e) {
                 System.out.println("Failed to send register request to " + proxyPort + ": " + e.getMessage());
             }
