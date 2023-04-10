@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,6 +71,10 @@ public class ProxyApplication {
 
 	public List<Integer> convertListStringToListObject(String listStr) {
 		String replace = listStr.replaceAll("^\\[|]$", "");
-		return Arrays.stream(replace.split(",")).map(Integer::parseInt).collect(Collectors.toList());
+		if (replace.isEmpty()) {
+			return new ArrayList<>();
+		} else {
+			return Arrays.stream(replace.split(",")).map(Integer::parseInt).collect(Collectors.toList());
+		}
 	}
 }
