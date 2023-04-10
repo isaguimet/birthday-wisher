@@ -13,15 +13,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
-
-import java.time.LocalDate;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 /**
@@ -39,7 +38,7 @@ public class CommService {
     private final UserRepository userRepository;
 
     // server group
-    private final List<String> serverGroup = new ArrayList<>();
+    private final Set<String> serverGroup = new LinkedHashSet<>();
 
     @Value("${systemId}")
     private String systemId;
@@ -66,7 +65,7 @@ public class CommService {
         serverGroup.remove(serverId);
     }
 
-    public synchronized List<String> getServerGroup() {
+    public synchronized Set<String> getServerGroup() {
         return serverGroup;
     }
 

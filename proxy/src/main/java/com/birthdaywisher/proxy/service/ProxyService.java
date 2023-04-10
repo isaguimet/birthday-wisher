@@ -11,14 +11,17 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Service
 public class ProxyService {
 
     private final RestTemplate restTemplate;
-    private List<String> servers = new ArrayList<>();
-    private List<String> proxies = Arrays.asList("proxy1", "proxy2");
+    private Set<String> servers = new LinkedHashSet<>();
+    private Set<String> proxies = new LinkedHashSet<>(Arrays.asList("proxy1", "proxy2"));
 
     @Value("${systemId}")
     private String systemId;
@@ -27,7 +30,7 @@ public class ProxyService {
         this.restTemplate = restTemplate;
     }
 
-    public List<String> getProxies() {
+    public Set<String> getProxies() {
         return this.proxies;
     }
 
@@ -41,11 +44,11 @@ public class ProxyService {
         System.out.println("Server Group: " + servers);
     }
 
-    public synchronized List<String> getServers() {
+    public synchronized Set<String> getServers() {
         return this.servers;
     }
 
-    public synchronized void setServers(List<String> serverGroup) {
+    public synchronized void setServers(Set<String> serverGroup) {
         this.servers = serverGroup;
         System.out.println("Server Group: " + servers);
     }
