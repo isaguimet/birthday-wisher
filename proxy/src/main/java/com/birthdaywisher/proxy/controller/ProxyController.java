@@ -6,6 +6,7 @@ import org.json.simple.parser.JSONParser;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -70,13 +71,19 @@ public class ProxyController {
             }
 
             // Now tell the other proxy to add this server to their list too
-            // TODO: might need better handling here in case primary is down ? so request backup proxy makes to primary here will fail
             URI uri = URI.create("http://localhost/addServerToGroup/" + portId);
             for(Integer proxyPort : proxyService.getProxies()) {
                 if (proxyPort.intValue() != myPortNum.intValue()) {
-                    System.out.println("Adding server " + portId + " to server group on proxy " + proxyPort);
-                    URI portUri = UriComponentsBuilder.fromUri(uri).port(proxyPort).build().toUri();
-                    restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
+                    try {
+                        System.out.println("Adding server " + portId + " to server group on proxy " + proxyPort);
+                        URI portUri = UriComponentsBuilder.fromUri(uri).port(proxyPort).build().toUri();
+                        restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
+                    } catch (HttpStatusCodeException e) {
+                        System.out.println("Bad response from proxy: " + e.getStatusCode() + "\n" +
+                                e.getResponseHeaders() + "\n" + e.getResponseBodyAsString());
+                    } catch (Exception e) {
+                        System.out.println("Failed to send request to proxy " + proxyPort + ": " + e.getMessage());
+                    }
                 }
             }
 
@@ -113,6 +120,15 @@ public class ProxyController {
     public ResponseEntity<?> removeServerFromGroup(@PathVariable Integer portNum) {
         try {
             proxyService.removeServerFromGroup(portNum);
+            return new ResponseEntity<>(proxyService.getServers(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/serverGroup")
+    public ResponseEntity<?> getServerGroupList() {
+        try {
             return new ResponseEntity<>(proxyService.getServers(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

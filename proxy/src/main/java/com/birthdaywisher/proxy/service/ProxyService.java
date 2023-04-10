@@ -44,6 +44,11 @@ public class ProxyService {
         return this.servers;
     }
 
+    public synchronized void setServers(List<Integer> serverGroup) {
+        this.servers = serverGroup;
+        System.out.println("Server Group: " + servers);
+    }
+
     // TODO: this reads "servers"...should it also be synchronized?
     public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) throws UnsupportedEncodingException {
         ResponseEntity<?> responseEntity = null;
