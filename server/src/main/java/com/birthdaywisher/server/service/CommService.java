@@ -56,6 +56,7 @@ public class CommService {
 
     public synchronized void removeServerFromGroup(Integer portNum) {
         serverGroup.remove(portNum);
+        System.out.println("Server group: " + serverGroup);
     }
 
     public synchronized List<Integer> getServerGroup() {

@@ -1,6 +1,7 @@
 package com.birthdaywisher.proxy.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -18,9 +19,11 @@ public class ProxyService {
     private final RestTemplate restTemplate;
     private List<Integer> servers = new ArrayList<>();
     private List<Integer> proxies = Arrays.asList(8080, 8081);
+    private final Integer myPortNum;
 
-    public ProxyService(RestTemplate restTemplate) {
+    public ProxyService(RestTemplate restTemplate, ServerProperties serverProperties) {
         this.restTemplate = restTemplate;
+        this.myPortNum = serverProperties.getPort();
     }
 
     public List<Integer> getProxies() {
@@ -81,6 +84,31 @@ public class ProxyService {
                 }
             } catch (Exception e) {
                 System.out.println("Failed to forward request to " + serverPort + ": " + e.getMessage());
+
+                // assumes primary server failed, remove server from server group in all replicas
+                // remove server from my own group
+                removeServerFromGroup(serverPort);
+
+                // remove server from all proxy backups
+                for (Integer proxyReplicaPort : getProxies()) {
+                    if (!Objects.equals(proxyReplicaPort, myPortNum)) {
+                        uri = URI.create("http://localhost/removeServerFromGroup/" + serverPort);
+                        URI portUri = UriComponentsBuilder.fromUri(uri).port(proxyReplicaPort).build().toUri();
+                        System.out.println("Removing " + serverPort + " from server group at proxy " + proxyReplicaPort);
+                        restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
+                    }
+                }
+
+                // remove server from all server backups
+                for (Integer serverReplicaPort : getServers()) {
+                    // do not call this endpoint for serverPort because this server has crashed
+                    if (!serverReplicaPort.equals(serverPort)) {
+                        uri = URI.create("http://localhost/comm/removeServerFromGroup/" + serverPort);
+                        URI portUri = UriComponentsBuilder.fromUri(uri).port(serverReplicaPort).build().toUri();
+                        System.out.println("Removing " + serverPort + " from server group at server " + serverReplicaPort);
+                        restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
+                    }
+                }
             }
         }
 
