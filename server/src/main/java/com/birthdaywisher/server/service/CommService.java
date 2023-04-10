@@ -7,6 +7,7 @@ import com.birthdaywisher.server.repository.BoardRepository;
 import com.birthdaywisher.server.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -38,7 +39,10 @@ public class CommService {
     private final UserRepository userRepository;
 
     // server group
-    private final List<Integer> serverGroup = new ArrayList<>();
+    private final List<String> serverGroup = new ArrayList<>();
+
+    @Value("${systemId}")
+    private String systemId;
 
     public CommService(
             ServerProperties serverProperties, RestTemplate restTemplate, BoardRepository boardRepository,
@@ -50,15 +54,19 @@ public class CommService {
         this.userRepository = userRepository;
     }
 
-    public synchronized void addServerToGroup(Integer portNum) {
-        serverGroup.add(portNum);
+    public String getSystemId() {
+        return this.systemId;
     }
 
-    public synchronized void removeServerFromGroup(Integer portNum) {
-        serverGroup.remove(portNum);
+    public synchronized void addServerToGroup(String serverId) {
+        serverGroup.add(serverId);
     }
 
-    public synchronized List<Integer> getServerGroup() {
+    public synchronized void removeServerFromGroup(String serverId) {
+        serverGroup.remove(serverId);
+    }
+
+    public synchronized List<String> getServerGroup() {
         return serverGroup;
     }
 
@@ -89,15 +97,15 @@ public class CommService {
     public void forwardUserReqToBackups(ObjectId userId, String friendEmail, String typeOfRequest) {
         int response = 0;
 
-        URI uri = URI.create("");
+        String urlTemplate = "";
         if ("acceptFriendRequest".equals(typeOfRequest)) {
-            uri = URI.create("http://localhost/users/forwarded/pendingFriendRequests/accept");
+            urlTemplate = "https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/pendingFriendRequests/accept";
         }
         if ("declineFriendRequest".equals(typeOfRequest)) {
-            uri = URI.create("http://localhost/users/forwarded/pendingFriendRequests/decline");
+            urlTemplate = "https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/pendingFriendRequests/decline";
         }
 
-        List<URI> replicaURIs = buildURIForEachReplica(uri);
+        List<URI> replicaURIs = buildURIForEachReplica(urlTemplate);
         HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
 
         List<Future<String>> futures = new ArrayList<>();
@@ -131,11 +139,11 @@ public class CommService {
     }
 
     // TODO: this reads serverGroup, so should it be synchronized too?
-    private List<URI> buildURIForEachReplica(URI uri) {
+    private List<URI> buildURIForEachReplica(String urlTemplate) {
         List<URI> replicaURIs = new ArrayList<>();
-        for (Integer port : serverGroup) {
-            if (port.intValue() != serverProperties.getPort().intValue()) {
-                uri = UriComponentsBuilder.fromUri(uri).port(port).build().toUri();
+        for (String serverId : serverGroup) {
+            if (!serverId.equals(systemId)) {
+                URI uri = URI.create(String.format(urlTemplate, serverId));
                 replicaURIs.add(uri);
             }
         }
@@ -143,8 +151,7 @@ public class CommService {
     }
 
     private void addUserPOSTRequest(User user, int response) {
-        URI uri = URI.create("http://localhost/users/forwarded/signUp");
-        List<URI> replicaURIs = buildURIForEachReplica(uri);
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/signUp");
 
         // call post endpoint of other replicas
         HttpHeaders headers = new HttpHeaders();
@@ -186,8 +193,7 @@ public class CommService {
     }
 
     private void deleteUserRequest(ObjectId userId, int response) {
-        URI uri = URI.create("http://localhost/users/forwarded/");
-        List<URI> replicaURIs = buildURIForEachReplica(uri);
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/");
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
@@ -214,8 +220,7 @@ public class CommService {
     }
 
     private void sendFriendRequest(String userEmail, String friendEmail, int response) {
-        URI uri = URI.create("http://localhost/users/forwarded/friendRequest");
-        List<URI> replicaURIs = buildURIForEachReplica(uri);
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/friendRequest");
 
         HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
 
@@ -251,8 +256,7 @@ public class CommService {
     public void forwardCreateBoard(Board board) {
         int response = 0;
 
-        URI uri1 = URI.create("http://localhost/boards/forwarded");
-        List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded");
 
         // call post endpoint of other replicas
         HttpHeaders headers = new HttpHeaders();
@@ -294,9 +298,7 @@ public class CommService {
     public void forwardCreateMessage(ObjectId boardId, Message msg) {
         int response = 0;
 
-        URI uri1 = URI.create("http://localhost/boards/forwarded/" + boardId + "/messages");
-
-        List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/" + boardId + "/messages");
 
         // call post endpoint of other replicas
         HttpHeaders headers = new HttpHeaders();
@@ -338,8 +340,7 @@ public class CommService {
     public void forwardBoardPatch(String url) {
         int response = 0;
 
-        URI uri1 = URI.create(url);
-        List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        List<URI> replicaURIs = buildURIForEachReplica(url);
 
         HttpEntity<String> request = new HttpEntity<>(null, null);
 
@@ -370,8 +371,7 @@ public class CommService {
     public void forwardUpdateMessage(ObjectId boardId, ObjectId msgId, Map<String, String> payload) {
         int response = 0;
 
-        URI uri1 = URI.create("http://localhost/boards/forwarded/" + boardId + "/messages/" + msgId);
-        List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/" + boardId + "/messages/" + msgId);
 
         HttpEntity<?> request = new HttpEntity<>(payload, null);
 
@@ -402,8 +402,7 @@ public class CommService {
     public void forwardDeleteReq(String url) {
         int response = 0;
 
-        URI uri1 = URI.create(url);
-        List<URI> replicaURIs = buildURIForEachReplica(uri1);
+        List<URI> replicaURIs = buildURIForEachReplica(url);
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {

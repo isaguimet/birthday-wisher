@@ -16,20 +16,20 @@ public class CommController {
         this.commService = commService;
     }
 
-    @PatchMapping("/addServerToGroup/{portNum}")
-    public ResponseEntity<?> addServerToGroup(@PathVariable Integer portNum) {
+    @PatchMapping("/addServerToGroup/{serverId}")
+    public ResponseEntity<?> addServerToGroup(@PathVariable String serverId) {
         try {
-            commService.addServerToGroup(portNum);
+            commService.addServerToGroup(serverId);
             return new ResponseEntity<>(commService.getServerGroup(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PatchMapping("/removeServerFromGroup/{portNum}")
-    public ResponseEntity<?> removeServerFromGroup(@PathVariable Integer portNum) {
+    @PatchMapping("/removeServerFromGroup/{serverId}")
+    public ResponseEntity<?> removeServerFromGroup(@PathVariable String serverId) {
         try {
-            commService.removeServerFromGroup(portNum);
+            commService.removeServerFromGroup(serverId);
             return new ResponseEntity<>(commService.getServerGroup(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

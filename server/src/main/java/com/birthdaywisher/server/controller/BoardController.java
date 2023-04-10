@@ -67,7 +67,7 @@ public class BoardController {
     @PatchMapping("/setPublic/{id}")
     public ResponseEntity<?> setBoardPublic(@PathVariable ObjectId id) {
         try {
-            commService.forwardBoardPatch("http://localhost/boards/forwarded/setPublic/" + id);
+            commService.forwardBoardPatch("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/setPublic/" + id);
             return new ResponseEntity<>(boardService.setBoardPublic(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -86,7 +86,7 @@ public class BoardController {
     @PatchMapping("/setPrivate/{id}")
     public ResponseEntity<?> setBoardPrivate(@PathVariable ObjectId id) {
         try {
-            commService.forwardBoardPatch("http://localhost/boards/forwarded/setPrivate/" + id);
+            commService.forwardBoardPatch("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/setPrivate/" + id);
             return new ResponseEntity<>(boardService.setBoardPrivate(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -105,7 +105,7 @@ public class BoardController {
     @PatchMapping("/setOpen/{id}")
     public ResponseEntity<?> setBoardOpen(@PathVariable ObjectId id) {
         try {
-            commService.forwardBoardPatch("http://localhost/boards/forwarded/setOpen/" + id);
+            commService.forwardBoardPatch("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/setOpen/" + id);
             return new ResponseEntity<>(boardService.setBoardOpen(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -124,7 +124,7 @@ public class BoardController {
     @PatchMapping("/setClosed/{id}")
     public ResponseEntity<?> setBoardClosed(@PathVariable ObjectId id) {
         try {
-            commService.forwardBoardPatch("http://localhost/boards/forwarded/setClosed/" + id);
+            commService.forwardBoardPatch("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/setClosed/" + id);
             return new ResponseEntity<>(boardService.setBoardClosed(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -143,7 +143,7 @@ public class BoardController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteBoard(@PathVariable ObjectId id) {
         try {
-            commService.forwardDeleteReq("http://localhost/boards/forwarded/" + id);
+            commService.forwardDeleteReq("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/" + id);
             return new ResponseEntity<>(boardService.deleteBoard(id), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -231,7 +231,7 @@ public class BoardController {
     @DeleteMapping("/{boardId}/messages/{msgId}")
     public ResponseEntity<?> deleteMessage(@PathVariable ObjectId boardId, @PathVariable ObjectId msgId) {
         try {
-            commService.forwardDeleteReq("http://localhost/boards/forwarded/" + boardId + "/messages/" + msgId);
+            commService.forwardDeleteReq("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/" + boardId + "/messages/" + msgId);
             return new ResponseEntity<>(boardService.deleteMessage(boardId, msgId), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
