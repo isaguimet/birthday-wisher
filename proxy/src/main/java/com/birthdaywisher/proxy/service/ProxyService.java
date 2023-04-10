@@ -1,6 +1,7 @@
 package com.birthdaywisher.proxy.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -16,34 +17,41 @@ import java.util.*;
 public class ProxyService {
 
     private final RestTemplate restTemplate;
-    private List<Integer> servers = new ArrayList<>();
-    private List<Integer> proxies = Arrays.asList(8080, 8081);
+    private List<String> servers = new ArrayList<>();
+    private List<String> proxies = Arrays.asList("proxy1", "proxy2");
+
+    @Value("${systemId}")
+    private String systemId;
 
     public ProxyService(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
-    public List<Integer> getProxies() {
+    public List<String> getProxies() {
         return this.proxies;
     }
 
-    public synchronized void addServerToGroup(Integer portNum) {
-        servers.add(portNum);
+    public synchronized void addServerToGroup(String id) {
+        servers.add(id);
         System.out.println("Server Group: " + servers);
     }
 
-    public synchronized void removeServerFromGroup(Integer portNum) {
-        servers.remove(portNum);
+    public synchronized void removeServerFromGroup(String id) {
+        servers.remove(id);
         System.out.println("Server Group: " + servers);
     }
 
-    public synchronized List<Integer> getServers() {
+    public synchronized List<String> getServers() {
         return this.servers;
     }
 
-    public synchronized void setServers(List<Integer> serverGroup) {
+    public synchronized void setServers(List<String> serverGroup) {
         this.servers = serverGroup;
         System.out.println("Server Group: " + servers);
+    }
+
+    public String getSystemId() {
+        return this.systemId;
     }
 
     // TODO: this reads "servers"...should it also be synchronized?
@@ -60,18 +68,19 @@ public class ProxyService {
 
         HttpEntity<String> httpEntity = new HttpEntity<>(body, headers);
 
-        URI uri = URI.create(String.valueOf(request.getRequestURL()));
+        String urlTemplate = String.valueOf(request.getRequestURL()).replaceFirst("proxy\\d", "%s");
         String queryString = request.getQueryString() == null
                 ? request.getQueryString()
                 : URLDecoder.decode(request.getQueryString(), "UTF-8");
 
         // try forwarding the request to one of the server ports until one succeeds
-        for (Integer serverPort : servers) {
+        for (String serverId : servers) {
             try {
-                URI portUri = UriComponentsBuilder.fromUri(uri).port(serverPort.intValue()).query(queryString).build().toUri();
-                System.out.println("Attempting to forward request to " + portUri);
-                responseEntity = restTemplate.exchange(portUri, method, httpEntity, String.class);
-                System.out.println("Successfully forwarded to " + serverPort);
+                URI uri = URI.create(String.format(urlTemplate, serverId));
+                uri = UriComponentsBuilder.fromUri(uri).query(queryString).build().toUri();
+                System.out.println("Attempting to forward request to " + uri);
+                responseEntity = restTemplate.exchange(uri, method, httpEntity, String.class);
+                System.out.println("Successfully forwarded to " + serverId);
 
                 return ResponseEntity.status(responseEntity.getStatusCode())
                         .headers(responseEntity.getHeaders())
@@ -85,7 +94,7 @@ public class ProxyService {
                             .body(e.getResponseBodyAsString());
                 }
             } catch (Exception e) {
-                System.out.println("Failed to forward request to " + serverPort + ": " + e.getMessage());
+                System.out.println("Failed to forward request to " + serverId + ": " + e.getMessage());
             }
         }
 

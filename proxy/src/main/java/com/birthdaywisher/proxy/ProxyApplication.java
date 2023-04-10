@@ -6,19 +6,17 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = MongoAutoConfiguration.class)
@@ -26,9 +24,6 @@ public class ProxyApplication {
 
 	@Autowired
 	private ProxyService proxyService;
-
-	@Autowired
-	private ServerProperties serverProperties;
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -43,14 +38,14 @@ public class ProxyApplication {
 	@EventListener(ApplicationReadyEvent.class)
 	public void getServerGroupList() {
 		HttpEntity<String> requestEntity = new HttpEntity<>(null, null);
-		URI uri = URI.create("http://localhost/serverGroup");
+		String serverGroupUrl = "https://%s-ey7sfy2hcq-wl.a.run.app/serverGroup";
 
-		for (Integer proxyPort : proxyService.getProxies()) {
-			if (proxyPort.intValue() != serverProperties.getPort().intValue()) {
+		for (String proxyId : proxyService.getProxies()) {
+			if (!proxyId.equals(proxyService.getSystemId())) {
 				try {
-					URI portUri = UriComponentsBuilder.fromUri(uri).port(proxyPort).build().toUri();
-					System.out.println("Attempting to fetch server group from existing proxy instance: " + portUri);
-					HttpEntity<String> responseEntity = restTemplate.exchange(portUri, HttpMethod.GET, requestEntity, String.class);
+					URI uri = URI.create(String.format(serverGroupUrl, proxyId));
+					System.out.println("Attempting to fetch server group from existing proxy instance: " + uri);
+					HttpEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity, String.class);
 					proxyService.setServers(convertListStringToListObject(responseEntity.getBody()));
 
 					// This only needs to be done once, so break out of the loop now
@@ -62,14 +57,14 @@ public class ProxyApplication {
 					}
 				} catch (Exception e) {
 					// This is expected if the other proxy is not alive
-					System.out.println("Failed to send request to " + proxyPort + ": " + e.getMessage());
+					System.out.println("Failed to send request to " + proxyId + ": " + e.getMessage());
 				}
 			}
 		}
 	}
 
-	public List<Integer> convertListStringToListObject(String listStr) {
+	public List<String> convertListStringToListObject(String listStr) {
 		String replace = listStr.replaceAll("^\\[|]$", "");
-		return Arrays.stream(replace.split(",")).map(Integer::parseInt).collect(Collectors.toList());
+		return new ArrayList<String>(Arrays.asList(replace.split(",")));
 	}
 }
