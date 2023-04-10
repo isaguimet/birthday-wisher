@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = MongoAutoConfiguration.class)
@@ -64,7 +65,11 @@ public class ProxyApplication {
 		if (replace.isEmpty()) {
 			return new LinkedHashSet<>();
 		} else {
-			return new LinkedHashSet<>(Arrays.asList(replace.split(",")));
+			Set<String> ids = new LinkedHashSet<>();
+			for (String id : replace.split(",")) {
+				ids.add(id.replaceAll("\"", ""));
+			}
+			return ids;
 		}
 	}
 }
