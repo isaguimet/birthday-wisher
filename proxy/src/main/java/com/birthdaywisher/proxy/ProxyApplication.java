@@ -51,10 +51,8 @@ public class ProxyApplication {
 					// This only needs to be done once, so break out of the loop now
 					break;
 				} catch (HttpStatusCodeException e) {
-					if (!e.getMessage().contains("Connection refused")) {
-						System.out.println("Bad response from proxy: " + e.getStatusCode() + "\n" + e.getResponseHeaders()
-								+ "\n" + e.getResponseBodyAsString());
-					}
+					System.out.println("Bad response from proxy: " + e.getStatusCode() + "\n" + e.getResponseHeaders()
+							+ "\n" + e.getResponseBodyAsString());
 				} catch (Exception e) {
 					// This is expected if the other proxy is not alive
 					System.out.println("Failed to send request to " + proxyId + ": " + e.getMessage());
