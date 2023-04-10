@@ -18,7 +18,7 @@ public class ProxyService {
 
     private final RestTemplate restTemplate;
     private List<Integer> servers = new ArrayList<>();
-    private List<Integer> proxies = Arrays.asList(8080, 8081);
+    private final List<Integer> proxies = Arrays.asList(8080, 8081);
     private final Integer myPortNum;
 
     public ProxyService(RestTemplate restTemplate, ServerProperties serverProperties) {
@@ -95,7 +95,7 @@ public class ProxyService {
                         uri = URI.create("http://localhost/removeServerFromGroup/" + serverPort);
                         URI portUri = UriComponentsBuilder.fromUri(uri).port(proxyReplicaPort).build().toUri();
                         System.out.println("Removing " + serverPort + " from server group at proxy " + proxyReplicaPort);
-                        restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
+                        restTemplate.exchange(portUri, HttpMethod.PATCH, new HttpEntity<>(null, null), String.class);
                     }
                 }
 
@@ -106,7 +106,7 @@ public class ProxyService {
                         uri = URI.create("http://localhost/comm/removeServerFromGroup/" + serverPort);
                         URI portUri = UriComponentsBuilder.fromUri(uri).port(serverReplicaPort).build().toUri();
                         System.out.println("Removing " + serverPort + " from server group at server " + serverReplicaPort);
-                        restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
+                        restTemplate.exchange(portUri, HttpMethod.PATCH, new HttpEntity<>(null, null), String.class);
                     }
                 }
             }

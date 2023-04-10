@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 
@@ -39,6 +40,7 @@ public class CommService {
 
     // server group
     private List<Integer> serverGroup = new ArrayList<>();
+    private final List<Integer> proxies = Arrays.asList(8080, 8081);
 
     public CommService(
             ServerProperties serverProperties, RestTemplate restTemplate, BoardRepository boardRepository,
@@ -48,10 +50,6 @@ public class CommService {
         this.restTemplate = restTemplate;
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
-    }
-
-    public synchronized void addServerToGroup(Integer portNum) {
-        serverGroup.add(portNum);
     }
 
     public synchronized void removeServerFromGroup(Integer portNum) {
@@ -124,7 +122,8 @@ public class CommService {
             try {
                 futures.add(asyncPatchForObject(url, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -133,13 +132,8 @@ public class CommService {
                 future.get();
                 response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println("I have received 1 ACK from the replicas");
         }
     }
 
@@ -178,7 +172,8 @@ public class CommService {
             try {
                 futures.add(asyncPostForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -188,13 +183,9 @@ public class CommService {
                 System.out.println("future result: " + result);
                 response++;
             } catch (Exception e) {
-                // handle the exception??
+                // I am not sure when this would be caught or if we have ever caught this exception before, but we can keep it
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println("I have received 1 ACKS from the replicas");
         }
     }
 
@@ -207,7 +198,8 @@ public class CommService {
             try {
                 futures.add(asyncDelete(replicaURI + String.valueOf(userId)));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -216,13 +208,8 @@ public class CommService {
                 future.get();
                 response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println("I have received 1 ACK from the replicas");
         }
     }
 
@@ -242,7 +229,8 @@ public class CommService {
             try {
                 futures.add(asyncPatchForObject(url, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -251,13 +239,8 @@ public class CommService {
                 future.get();
                 response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println("I have received 1 ACK from the replicas");
         }
     }
 
@@ -285,7 +268,8 @@ public class CommService {
             try {
                 futures.add(asyncPostForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -294,13 +278,8 @@ public class CommService {
                 future.get();
                 response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
@@ -329,7 +308,8 @@ public class CommService {
             try {
                 futures.add(asyncPostForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -338,13 +318,8 @@ public class CommService {
                 future.get();
                 response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
@@ -361,7 +336,8 @@ public class CommService {
             try {
                 futures.add(asyncPatchForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -370,13 +346,8 @@ public class CommService {
                 future.get();
                 response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
@@ -393,7 +364,8 @@ public class CommService {
             try {
                 futures.add(asyncPatchForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -402,13 +374,8 @@ public class CommService {
                 future.get();
                 response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
@@ -423,7 +390,8 @@ public class CommService {
             try {
                 futures.add(asyncDelete(replicaURI));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -432,13 +400,37 @@ public class CommService {
                 future.get();
                 response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
+            }
+        }
+    }
+
+    private void removeBackupServerFromReplicas(URI replicaURI) {
+        URI uri;
+        System.out.println("Server to remove: " + replicaURI.getPort());
+
+        HttpEntity<?> httpEntity = new HttpEntity<>(null, null);
+
+        // remove backup server from my own group (primary server)
+        removeServerFromGroup(replicaURI.getPort());
+
+        // remove backup server from all other backup servers
+        for (Integer serverReplicaPort : getServerGroup()) {
+            if (!serverReplicaPort.equals(serverProperties.getPort())) {
+                // do not call endpoint to remove crashed server on primary server (we just removed it)
+                uri = URI.create("http://localhost/comm/removeServerFromGroup/" + replicaURI.getPort());
+                URI portUri = UriComponentsBuilder.fromUri(uri).port(serverReplicaPort).build().toUri();
+                System.out.println("Removing " + replicaURI.getPort() + " from server group at server " + serverReplicaPort);
+                restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
             }
         }
 
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
+        // remove backup server from all proxies
+        for (Integer proxyPort : proxies) {
+            uri = URI.create("http://localhost/removeServerFromGroup/" + replicaURI.getPort());
+            URI portUri = UriComponentsBuilder.fromUri(uri).port(proxyPort).build().toUri();
+            System.out.println("Removing " + replicaURI.getPort() + " from server group at proxy " + proxyPort);
+            restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
         }
     }
 
