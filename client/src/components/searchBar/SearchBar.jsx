@@ -11,7 +11,7 @@ const SearchBar = (props) => {
     const handleSubmit = (event) => {
         event.preventDefault();
         props.setLoading(true);
-        axiosInstance.get(`http://localhost:8080/users/byEmail/${input}`).then((response) => {
+        axiosInstance.get(`https://proxy1-ey7sfy2hcq-wl.a.run.app/users/byEmail/${input}`).then((response) => {
             props.setLoading(false)
             props.setData(response.data)
             props.setError(null)
@@ -20,7 +20,7 @@ const SearchBar = (props) => {
                 props.setLoading(false);
                 props.setError(err8080.response.data);
             } else {
-                axiosInstance.get(`http://localhost:8081/users/byEmail/${input}`).then((response) => {
+                axiosInstance.get(`https://proxy2-ey7sfy2hcq-wl.a.run.app/users/byEmail/${input}`).then((response) => {
                     props.setLoading(false)
                     props.setData(response.data)
                     props.setError(null)

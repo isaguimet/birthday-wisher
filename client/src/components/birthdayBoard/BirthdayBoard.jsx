@@ -46,7 +46,7 @@ const BirthdayBoard = (props) => {
             msgText: input,
         };
         props.setLoading(true);
-        axiosInstance.post(`http://localhost:8080/boards/${props.boardId}/messages`, data).then((response) => {
+        axiosInstance.post(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}/messages`, data).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
@@ -55,7 +55,7 @@ const BirthdayBoard = (props) => {
                 props.setLoading(false);
                 props.setError(err8080.response.data);
             } else {
-                axiosInstance.post(`http://localhost:8081/boards/${props.boardId}/messages`, data).then((response) => {
+                axiosInstance.post(`https://proxy2-ey7sfy2hcq-wl.a.run.app/${props.boardId}/messages`, data).then((response) => {
                     props.setLoading(false);
                     props.setData(response.data);
                     props.setError(null);
@@ -75,7 +75,7 @@ const BirthdayBoard = (props) => {
     const togglePublic = () => {
         props.setLoading(true);
         if (isPublic) {
-            axiosInstance.patch(`http://localhost:8080/boards/setPrivate/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/setPrivate/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -85,7 +85,7 @@ const BirthdayBoard = (props) => {
                     props.setLoading(false);
                     props.setError(err8080.response.data);
                 } else {
-                    axiosInstance.patch(`http://localhost:8081/boards/setPrivate/${props.boardId}`).then((response) => {
+                    axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/setPrivate/${props.boardId}`).then((response) => {
                         props.setLoading(false);
                         props.setData(response.data);
                         props.setError(null);
@@ -102,7 +102,7 @@ const BirthdayBoard = (props) => {
                 }
             });
         } else {
-            axiosInstance.patch(`http://localhost:8080/boards/setPublic/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/setPublic/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -112,7 +112,7 @@ const BirthdayBoard = (props) => {
                     props.setLoading(false);
                     props.setError(err8080.response.data);
                 } else {
-                    axiosInstance.patch(`http://localhost:8081/boards/setPublic/${props.boardId}`).then((response) => {
+                    axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/setPublic/${props.boardId}`).then((response) => {
                         props.setLoading(false);
                         props.setData(response.data);
                         props.setError(null);
@@ -134,7 +134,7 @@ const BirthdayBoard = (props) => {
     const toggleOpen = () => {
         props.setLoading(true);
         if (isOpen) {
-            axiosInstance.patch(`http://localhost:8080/boards/setClosed/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/setClosed/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -144,7 +144,7 @@ const BirthdayBoard = (props) => {
                     props.setLoading(false);
                     props.setError(err8080.response.data);
                 } else {
-                    axiosInstance.patch(`http://localhost:8081/boards/setClosed/${props.boardId}`).then((response) => {
+                    axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/setClosed/${props.boardId}`).then((response) => {
                         props.setLoading(false);
                         props.setData(response.data);
                         props.setError(null);
@@ -161,7 +161,7 @@ const BirthdayBoard = (props) => {
                 }
             });
         } else {
-            axiosInstance.patch(`http://localhost:8080/boards/setOpen/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/setOpen/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -171,7 +171,7 @@ const BirthdayBoard = (props) => {
                     props.setLoading(false);
                     props.setError(err8080.response.data);
                 } else {
-                    axiosInstance.patch(`http://localhost:8081/boards/setOpen/${props.boardId}`).then((response) => {
+                    axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/setOpen/${props.boardId}`).then((response) => {
                         props.setLoading(false);
                         props.setData(response.data);
                         props.setError(null);
@@ -192,7 +192,7 @@ const BirthdayBoard = (props) => {
 
     const deleteBoard = () => {
         props.setLoading(true);
-        axiosInstance.delete(`http://localhost:8080/boards/${props.boardId}`).then((response) => {
+        axiosInstance.delete(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}`).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
@@ -201,7 +201,7 @@ const BirthdayBoard = (props) => {
                 props.setLoading(false);
                 props.setError(err8080.response.data);
             } else {
-                axiosInstance.delete(`http://localhost:8081/boards/${props.boardId}`).then((response) => {
+                axiosInstance.delete(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}`).then((response) => {
                     props.setLoading(false);
                     props.setData(response.data);
                     props.setError(null);

@@ -14,7 +14,7 @@ const FriendRequestCard = (props) => {
 
         // accept the friend request (returns updated list of pending friends)
         props.setLoadingForPendingFriends(true);
-        axiosInstance.patch(`http://localhost:8080/users/pendingFriendRequests/accept`, null, {params: queryParams}).then((response) => {
+        axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/users/pendingFriendRequests/accept`, null, {params: queryParams}).then((response) => {
             const [updatedPending, updatedFriends] = response.data;
             props.setLoadingForPendingFriends(false);
             props.setDataForPendingFriends(updatedPending);
@@ -25,7 +25,7 @@ const FriendRequestCard = (props) => {
                 props.setLoadingForPendingFriends(false);
                 props.setErrorForPendingFriends(err8080.response.data);
             } else {
-                axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/accept`, null, {params: queryParams}).then((response) => {
+                axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/users/pendingFriendRequests/accept`, null, {params: queryParams}).then((response) => {
                     const [updatedPending, updatedFriends] = response.data;
                     props.setLoadingForPendingFriends(false);
                     props.setDataForPendingFriends(updatedPending);
@@ -51,7 +51,7 @@ const FriendRequestCard = (props) => {
         }
 
         props.setLoadingForPendingFriends(true);
-        axiosInstance.patch(`http://localhost:8080/users/pendingFriendRequests/decline`, null, {params: queryParams}).then((response) => {
+        axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/users/pendingFriendRequests/decline`, null, {params: queryParams}).then((response) => {
                 props.setLoadingForPendingFriends(false);
                 props.setDataForPendingFriends(response.data);
                 props.setErrorForPendingFriends(null);
@@ -60,7 +60,7 @@ const FriendRequestCard = (props) => {
                 props.setLoadingForPendingFriends(false);
                 props.setErrorForPendingFriends(err8080.response.data);
             } else {
-                axiosInstance.patch(`http://localhost:8081/users/pendingFriendRequests/decline`, null, {params: queryParams}).then((response) => {
+                axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/users/pendingFriendRequests/decline`, null, {params: queryParams}).then((response) => {
                     props.setLoadingForPendingFriends(false);
                     props.setDataForPendingFriends(response.data);
                     props.setErrorForPendingFriends(null);

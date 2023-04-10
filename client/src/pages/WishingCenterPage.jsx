@@ -38,7 +38,7 @@ const WishingCenterPage = () => {
 
     useEffect(() => {
         setLoading(true);
-        axiosInstance.get(`http://localhost:8080/users/friendList/${userId}`).then((response) => {
+        axiosInstance.get(`https://proxy1-ey7sfy2hcq-wl.a.run.app/users/friendList/${userId}`).then((response) => {
             setLoading(false);
             setData(getUpcomingBirthdays(response.data.sort(compare)));
             console.log("response data: " + JSON.stringify(response.data))
@@ -50,7 +50,7 @@ const WishingCenterPage = () => {
                 console.log(error)
             } else {
                 setLoading(false);
-                axiosInstance.get(`http://localhost:8081/users/friendList/${userId}`).then((response) => {
+                axiosInstance.get(`https://proxy2-ey7sfy2hcq-wl.a.run.app/users/friendList/${userId}`).then((response) => {
                     setLoading(false);
                     setData(getUpcomingBirthdays(response.data.sort(compare)));
                     console.log("response data: " + JSON.stringify(response.data))
