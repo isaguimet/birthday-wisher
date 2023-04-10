@@ -1,0 +1,5 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', 'us-west2-docker.pkg.dev/trusty-catbird-380105/bday-docker-repo/bday-proxy1:tag1', '.' ]
+images:
+- 'us-west2-docker.pkg.dev/trusty-catbird-380105/bday-docker-repo/bday-proxy1:tag1'
