@@ -55,4 +55,14 @@ public class CommController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("/setServerGroup")
+    public ResponseEntity<?> setServerGroup(@RequestBody String serversGroup) {
+        try {
+            commService.setServerGroup(serversGroup);
+            return new ResponseEntity<>(commService.getServerGroup(), HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

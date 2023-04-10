@@ -11,6 +11,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class ProxyController {
@@ -52,11 +53,11 @@ public class ProxyController {
                     JSONParser parser = new JSONParser();
                     List<Iterable<?>> data = (List<Iterable<?>>) parser.parse(responseEntity.getBody());
 
-                    System.out.println("Resetting data on server " + portUri);
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);
                     uri = URI.create("http://localhost/comm/dataReset");
                     portUri = UriComponentsBuilder.fromUri(uri).port(portId).build().toUri();
+                    System.out.println("Resetting data on server " + portUri);
                     restTemplate.exchange(portUri, HttpMethod.PUT, new HttpEntity<>(data, headers), String.class);
 
                     proxyService.addServerToGroup(portId);
@@ -78,6 +79,19 @@ public class ProxyController {
                     restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
                 }
             }
+
+            // Add server to all servers in server group to their list
+            uri = URI.create("http://localhost/comm/setServerGroup");
+            List<Integer> serverGroup = proxyService.getServers();
+            String data = serverGroup.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+            httpEntity = new HttpEntity<>(data, null);
+            for (Integer serverPort : serverGroup) {
+                URI portUri = UriComponentsBuilder.fromUri(uri).port(serverPort).build().toUri();
+                System.out.println("Setting server group " + serverGroup + " to server group on server " + serverPort);
+                restTemplate.exchange(portUri, HttpMethod.PUT, httpEntity, String.class);
+            }
+
             return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception e) {

@@ -38,7 +38,7 @@ public class CommService {
     private final UserRepository userRepository;
 
     // server group
-    private final List<Integer> serverGroup = new ArrayList<>();
+    private List<Integer> serverGroup = new ArrayList<>();
 
     public CommService(
             ServerProperties serverProperties, RestTemplate restTemplate, BoardRepository boardRepository,
@@ -60,6 +60,18 @@ public class CommService {
 
     public synchronized List<Integer> getServerGroup() {
         return serverGroup;
+    }
+
+    public synchronized void setServerGroup(String serverGroup) {
+        String[] sg = serverGroup.split(",");
+        List<Integer> servers = new ArrayList<>();
+        
+        for (String server : sg) {
+            servers.add(Integer.parseInt(server));
+        }
+
+        this.serverGroup = servers;
+        System.out.println("Server group: " + this.serverGroup);
     }
 
     public void forwardUserReqToBackups(User user, String typeOfRequest) {
