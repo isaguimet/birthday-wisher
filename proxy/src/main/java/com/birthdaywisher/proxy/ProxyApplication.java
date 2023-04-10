@@ -65,6 +65,10 @@ public class ProxyApplication {
 
 	public List<String> convertListStringToListObject(String listStr) {
 		String replace = listStr.replaceAll("^\\[|]$", "");
-		return new ArrayList<String>(Arrays.asList(replace.split(",")));
+		if (replace.isEmpty()) {
+			return new ArrayList<>();
+		} else {
+			return new ArrayList<>(Arrays.asList(replace.split(",")));
+		}
 	}
 }
