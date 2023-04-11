@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class ProxyController {
@@ -82,7 +83,7 @@ public class ProxyController {
 
             // Add server to all servers in server group to their list
             String setServerToGroupUrl = "https://%s-ey7sfy2hcq-wl.a.run.app/comm/setServerGroup";
-            List<String> serverGroup = proxyService.getServers();
+            Set<String> serverGroup = proxyService.getServers();
             String data = serverGroup.toString();
 
             httpEntity = new HttpEntity<>(data, null);
