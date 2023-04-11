@@ -36,7 +36,7 @@ public class CommService {
     private final UserRepository userRepository;
 
     // server group
-    private final Set<String> serverGroup = new LinkedHashSet<>();
+    private Set<String> serverGroup = new LinkedHashSet<>();
     private List<String> proxies = Arrays.asList("proxy1", "proxy2");
 
     @Value("${systemId}")
