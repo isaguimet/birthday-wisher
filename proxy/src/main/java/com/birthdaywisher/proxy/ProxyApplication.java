@@ -14,9 +14,8 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 @EnableAutoConfiguration(exclude = MongoAutoConfiguration.class)
@@ -61,12 +60,16 @@ public class ProxyApplication {
 		}
 	}
 
-	public List<String> convertListStringToListObject(String listStr) {
+	public Set<String> convertListStringToListObject(String listStr) {
 		String replace = listStr.replaceAll("^\\[|]$", "");
 		if (replace.isEmpty()) {
-			return new ArrayList<>();
+			return new LinkedHashSet<>();
 		} else {
-			return new ArrayList<>(Arrays.asList(replace.split(",")));
+			Set<String> ids = new LinkedHashSet<>();
+			for (String id : replace.split(",")) {
+				ids.add(id.replaceAll("\"", ""));
+			}
+			return ids;
 		}
 	}
 }

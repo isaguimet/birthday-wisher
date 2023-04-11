@@ -17,7 +17,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @SpringBootApplication
 public class Application {
@@ -28,7 +29,7 @@ public class Application {
     @Autowired
     private CommService commService;
 
-    private List<String> proxyGroup = Arrays.asList("proxy1", "proxy2");
+    private Set<String> proxyGroup = new LinkedHashSet<>(Arrays.asList("proxy1", "proxy2"));
 
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);

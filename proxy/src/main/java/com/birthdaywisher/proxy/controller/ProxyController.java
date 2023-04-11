@@ -40,7 +40,7 @@ public class ProxyController {
                 // Registering server is a backup. It needs to sync its db with primary.
                 try {
                     // fetch data dump from primary server
-                    String primaryServerId = proxyService.getServers().get(0);
+                    String primaryServerId = proxyService.getServers().iterator().next();
                     URI uri = URI.create(String.format("https://%s-ey7sfy2hcq-wl.a.run.app/comm/dataDump", primaryServerId));
 
                     System.out.println("Attempting to fetch data dump from: " + uri);

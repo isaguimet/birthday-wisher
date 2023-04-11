@@ -13,15 +13,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
-
-import java.time.LocalDate;
-import java.util.concurrent.CompletableFuture;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 
 /**
@@ -37,7 +36,7 @@ public class CommService {
     private final UserRepository userRepository;
 
     // server group
-    private List<String> serverGroup = new ArrayList<>();
+    private final Set<String> serverGroup = new LinkedHashSet<>();
     private List<String> proxies = Arrays.asList("proxy1", "proxy2");
 
     @Value("${systemId}")
@@ -58,7 +57,7 @@ public class CommService {
         System.out.println("Server group: " + serverGroup);
     }
 
-    public synchronized List<String> getServerGroup() {
+    public synchronized Set<String> getServerGroup() {
         return serverGroup;
     }
 
