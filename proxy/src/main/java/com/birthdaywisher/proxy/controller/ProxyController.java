@@ -79,6 +79,19 @@ public class ProxyController {
                     }
                 }
             }
+
+            // Add server to all servers in server group to their list
+            String setServerToGroupUrl = "https://%s-ey7sfy2hcq-wl.a.run.app/comm/setServerGroup";
+            List<String> serverGroup = proxyService.getServers();
+            String data = serverGroup.toString();
+
+            httpEntity = new HttpEntity<>(data, null);
+            for (String serverPort : serverGroup) {
+                URI uri = URI.create(String.format(setServerToGroupUrl, serverPort));
+                System.out.println("Setting server group " + serverGroup + " to server group on server " + serverPort);
+                restTemplate.exchange(uri, HttpMethod.PUT, httpEntity, String.class);
+            }
+
             return new ResponseEntity<>(HttpStatus.OK);
         }
         catch (Exception e) {

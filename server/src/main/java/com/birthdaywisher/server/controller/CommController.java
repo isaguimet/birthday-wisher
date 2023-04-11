@@ -16,16 +16,6 @@ public class CommController {
         this.commService = commService;
     }
 
-    @PatchMapping("/addServerToGroup/{serverId}")
-    public ResponseEntity<?> addServerToGroup(@PathVariable String serverId) {
-        try {
-            commService.addServerToGroup(serverId);
-            return new ResponseEntity<>(commService.getServerGroup(), HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @PatchMapping("/removeServerFromGroup/{serverId}")
     public ResponseEntity<?> removeServerFromGroup(@PathVariable String serverId) {
         try {
@@ -51,6 +41,16 @@ public class CommController {
             commService.dataReset(data);
             System.out.println("Successfully synced my db with primary & registered as backup server");
             return new ResponseEntity<>(HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("/setServerGroup")
+    public ResponseEntity<?> setServerGroup(@RequestBody String serversGroup) {
+        try {
+            commService.setServerGroup(serversGroup);
+            return new ResponseEntity<>(commService.getServerGroup(), HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
