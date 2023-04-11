@@ -41,7 +41,7 @@ public class ProxyController {
                 try {
                     // fetch data dump from primary server
                     String primaryServerId = proxyService.getServers().iterator().next();
-                    URI uri = URI.create(String.format("https://%s-ey7sfy2hcq-wl.a.run.app/comm/dataDump", primaryServerId));
+                    URI uri = URI.create(String.format("https://%s.onrender.com/comm/dataDump", primaryServerId));
 
                     System.out.println("Attempting to fetch data dump from: " + uri);
                     HttpEntity<String> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, httpEntity, String.class);
@@ -50,7 +50,7 @@ public class ProxyController {
 
                     HttpHeaders headers = new HttpHeaders();
                     headers.setContentType(MediaType.APPLICATION_JSON);
-                    uri = URI.create(String.format("https://%s-ey7sfy2hcq-wl.a.run.app/comm/dataReset", serverId));
+                    uri = URI.create(String.format("https://%s.onrender.com/comm/dataReset", serverId));
                     System.out.println("Resetting data on server " + uri);
                     restTemplate.exchange(uri, HttpMethod.PUT, new HttpEntity<>(data, headers), String.class);
 
@@ -64,7 +64,7 @@ public class ProxyController {
             }
 
             // Now tell the other proxy to add this server to their list too
-            String addToGroupUrl = "https://%s-ey7sfy2hcq-wl.a.run.app/addServerToGroup/" + serverId;
+            String addToGroupUrl = "https://%s.onrender.com/addServerToGroup/" + serverId;
             for(String proxyId : proxyService.getProxies()) {
                 if (!proxyId.equals(proxyService.getSystemId())) {
                     try {

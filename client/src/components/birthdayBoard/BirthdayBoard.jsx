@@ -46,7 +46,7 @@ const BirthdayBoard = (props) => {
             msgText: input,
         };
         props.setLoading(true);
-        axiosInstance.post(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}/messages`, data).then((response) => {
+        axiosInstance.post(`https://proxy1-08e6.onrender.com/boards/${props.boardId}/messages`, data).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
@@ -55,7 +55,7 @@ const BirthdayBoard = (props) => {
                 props.setLoading(false);
                 props.setError(err8080.response.data);
             } else {
-                axiosInstance.post(`https://proxy2-ey7sfy2hcq-wl.a.run.app/${props.boardId}/messages`, data).then((response) => {
+                axiosInstance.post(`https://proxy2-no3f.onrender.com/${props.boardId}/messages`, data).then((response) => {
                     props.setLoading(false);
                     props.setData(response.data);
                     props.setError(null);
@@ -75,7 +75,7 @@ const BirthdayBoard = (props) => {
     const togglePublic = () => {
         props.setLoading(true);
         if (isPublic) {
-            axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/setPrivate/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`https://proxy1-08e6.onrender.com/boards/setPrivate/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -85,7 +85,7 @@ const BirthdayBoard = (props) => {
                     props.setLoading(false);
                     props.setError(err8080.response.data);
                 } else {
-                    axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/setPrivate/${props.boardId}`).then((response) => {
+                    axiosInstance.patch(`https://proxy2-no3f.onrender.com/boards/setPrivate/${props.boardId}`).then((response) => {
                         props.setLoading(false);
                         props.setData(response.data);
                         props.setError(null);
@@ -102,7 +102,7 @@ const BirthdayBoard = (props) => {
                 }
             });
         } else {
-            axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/setPublic/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`https://proxy1-08e6.onrender.com/boards/setPublic/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -112,7 +112,7 @@ const BirthdayBoard = (props) => {
                     props.setLoading(false);
                     props.setError(err8080.response.data);
                 } else {
-                    axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/setPublic/${props.boardId}`).then((response) => {
+                    axiosInstance.patch(`https://proxy2-no3f.onrender.com/boards/setPublic/${props.boardId}`).then((response) => {
                         props.setLoading(false);
                         props.setData(response.data);
                         props.setError(null);
@@ -134,7 +134,7 @@ const BirthdayBoard = (props) => {
     const toggleOpen = () => {
         props.setLoading(true);
         if (isOpen) {
-            axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/setClosed/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`https://proxy1-08e6.onrender.com/boards/setClosed/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -144,7 +144,7 @@ const BirthdayBoard = (props) => {
                     props.setLoading(false);
                     props.setError(err8080.response.data);
                 } else {
-                    axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/setClosed/${props.boardId}`).then((response) => {
+                    axiosInstance.patch(`https://proxy2-no3f.onrender.com/boards/setClosed/${props.boardId}`).then((response) => {
                         props.setLoading(false);
                         props.setData(response.data);
                         props.setError(null);
@@ -161,7 +161,7 @@ const BirthdayBoard = (props) => {
                 }
             });
         } else {
-            axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/setOpen/${props.boardId}`).then((response) => {
+            axiosInstance.patch(`https://proxy1-08e6.onrender.com/boards/setOpen/${props.boardId}`).then((response) => {
                 props.setLoading(false);
                 props.setData(response.data);
                 props.setError(null);
@@ -171,7 +171,7 @@ const BirthdayBoard = (props) => {
                     props.setLoading(false);
                     props.setError(err8080.response.data);
                 } else {
-                    axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/setOpen/${props.boardId}`).then((response) => {
+                    axiosInstance.patch(`https://proxy2-no3f.onrender.com/boards/setOpen/${props.boardId}`).then((response) => {
                         props.setLoading(false);
                         props.setData(response.data);
                         props.setError(null);
@@ -192,7 +192,7 @@ const BirthdayBoard = (props) => {
 
     const deleteBoard = () => {
         props.setLoading(true);
-        axiosInstance.delete(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}`).then((response) => {
+        axiosInstance.delete(`https://proxy1-08e6.onrender.com/boards/${props.boardId}`).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
@@ -201,7 +201,7 @@ const BirthdayBoard = (props) => {
                 props.setLoading(false);
                 props.setError(err8080.response.data);
             } else {
-                axiosInstance.delete(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}`).then((response) => {
+                axiosInstance.delete(`https://proxy2-no3f.onrender.com/boards/${props.boardId}`).then((response) => {
                     props.setLoading(false);
                     props.setData(response.data);
                     props.setError(null);

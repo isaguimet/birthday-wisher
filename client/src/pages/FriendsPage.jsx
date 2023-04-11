@@ -38,7 +38,7 @@ const FriendsPage = () => {
         }
 
         setLoadingForSendingRequest(true);
-        axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/users/friendRequest`, null, {params: queryParams}).then((response) => {
+        axiosInstance.patch(`https://proxy1-08e6.onrender.com/users/friendRequest`, null, {params: queryParams}).then((response) => {
             setLoadingForSendingRequest(false);
             // Adds a pending friend onto the old data list
             setDataForPendingFriends(response.data);
@@ -49,7 +49,7 @@ const FriendsPage = () => {
                 setLoadingForSendingRequest(false);
                 setErrorForSendingRequest(err8080.response.data);
             } else {
-                axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/users/friendRequest`, null, {params: queryParams}).then((response) => {
+                axiosInstance.patch(`https://proxy2-no3f.onrender.com/users/friendRequest`, null, {params: queryParams}).then((response) => {
                     setLoadingForSendingRequest(false);
                     // Adds a pending friend onto the old data list
                     setDataForPendingFriends(response.data);

@@ -98,10 +98,10 @@ public class CommService {
 
         String urlTemplate = "";
         if ("acceptFriendRequest".equals(typeOfRequest)) {
-            urlTemplate = "https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/pendingFriendRequests/accept";
+            urlTemplate = "https://%s.onrender.com/users/forwarded/pendingFriendRequests/accept";
         }
         if ("declineFriendRequest".equals(typeOfRequest)) {
-            urlTemplate = "https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/pendingFriendRequests/decline";
+            urlTemplate = "https://%s.onrender.com/users/forwarded/pendingFriendRequests/decline";
         }
 
         List<URI> replicaURIs = buildURIForEachReplica(urlTemplate);
@@ -150,7 +150,7 @@ public class CommService {
     }
 
     private void addUserPOSTRequest(User user, int response) {
-        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/signUp");
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s.onrender.com/users/forwarded/signUp");
 
         // call post endpoint of other replicas
         HttpHeaders headers = new HttpHeaders();
@@ -192,7 +192,7 @@ public class CommService {
     }
 
     private void deleteUserRequest(ObjectId userId, int response) {
-        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/");
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s.onrender.com/users/forwarded/");
 
         List<Future<String>> futures = new ArrayList<>();
         for (URI replicaURI : replicaURIs) {
@@ -219,7 +219,7 @@ public class CommService {
     }
 
     private void sendFriendRequest(String userEmail, String friendEmail, int response) {
-        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/friendRequest");
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s.onrender.com/users/forwarded/friendRequest");
 
         HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
 
@@ -255,7 +255,7 @@ public class CommService {
     public void forwardCreateBoard(Board board) {
         int response = 0;
 
-        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded");
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s.onrender.com/boards/forwarded");
 
         // call post endpoint of other replicas
         HttpHeaders headers = new HttpHeaders();
@@ -297,7 +297,7 @@ public class CommService {
     public void forwardCreateMessage(ObjectId boardId, Message msg) {
         int response = 0;
 
-        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/" + boardId + "/messages");
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s.onrender.com/boards/forwarded/" + boardId + "/messages");
 
         // call post endpoint of other replicas
         HttpHeaders headers = new HttpHeaders();
@@ -370,7 +370,7 @@ public class CommService {
     public void forwardUpdateMessage(ObjectId boardId, ObjectId msgId, Map<String, String> payload) {
         int response = 0;
 
-        List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/" + boardId + "/messages/" + msgId);
+        List<URI> replicaURIs = buildURIForEachReplica("https://%s.onrender.com/boards/forwarded/" + boardId + "/messages/" + msgId);
 
         HttpEntity<?> request = new HttpEntity<>(payload, null);
 

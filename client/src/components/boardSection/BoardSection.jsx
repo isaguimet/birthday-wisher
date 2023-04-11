@@ -25,7 +25,7 @@ const BoardSection = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axiosInstance.get(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/byUserId/${props.profileUser}`).then((response) => {
+        axiosInstance.get(`https://proxy1-08e6.onrender.com/boards/byUserId/${props.profileUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
@@ -34,7 +34,7 @@ const BoardSection = (props) => {
                 setLoading(false);
                 setError(err8080.response.data);
             } else {
-                axiosInstance.get(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/byUserId/${props.profileUser}`).then((response) => {
+                axiosInstance.get(`https://proxy2-no3f.onrender.com/boards/byUserId/${props.profileUser}`).then((response) => {
                     setLoading(false);
                     setData(response.data);
                     setError(null);
@@ -60,7 +60,7 @@ const BoardSection = (props) => {
             userId: props.profileUser,
         };
         setLoading(true);
-        axiosInstance.post("https://proxy1-ey7sfy2hcq-wl.a.run.app/boards", data).then((response) => {
+        axiosInstance.post("https://proxy1-08e6.onrender.com/boards", data).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
@@ -69,7 +69,7 @@ const BoardSection = (props) => {
                 setLoading(false);
                 setError(err8080.response.data);
             } else {
-                axiosInstance.post("https://proxy2-ey7sfy2hcq-wl.a.run.app/boards", data).then((response) => {
+                axiosInstance.post("https://proxy2-no3f.onrender.com/boards", data).then((response) => {
                     setLoading(false);
                     setData(response.data);
                     setError(null);

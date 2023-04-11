@@ -25,13 +25,13 @@ export default function (props) {
             password: event.target.new_pass.value,
             birthdate: date
         };
-        axiosInstance.post(`https://proxy1-ey7sfy2hcq-wl.a.run.app/users/signUp`, data).then((response) => {
+        axiosInstance.post(`https://proxy1-08e6.onrender.com/users/signUp`, data).then((response) => {
             alert("Success! Try logging in with these credentials now.");
         }).catch((err8080) => {
             if (err8080.response) {
                 alert("Sign Up Error: " + err8080.response.data);
             } else {
-                axiosInstance.post(`https://proxy2-ey7sfy2hcq-wl.a.run.app/users/signUp`, data).then((response) => {
+                axiosInstance.post(`https://proxy2-no3f.onrender.com/users/signUp`, data).then((response) => {
                     alert("Success! Try logging in with these credentials now.");
                 }).catch((err) => {
                     let error = "";
@@ -55,7 +55,7 @@ export default function (props) {
             email: event.target.user_email.value,
             password: event.target.user_pass.value
         };
-        axiosInstance.post(`https://proxy1-ey7sfy2hcq-wl.a.run.app/users/login`, data).then((response) => {
+        axiosInstance.post(`https://proxy1-08e6.onrender.com/users/login`, data).then((response) => {
             dispatch(
                 setLogin({
                     user: response.data
@@ -66,7 +66,7 @@ export default function (props) {
             if (err8080.response) {
                 alert("Sign In Error: " + err8080.response.data);
             } else {
-                axiosInstance.post(`https://proxy2-ey7sfy2hcq-wl.a.run.app/users/login`, data).then((response) => {
+                axiosInstance.post(`https://proxy2-no3f.onrender.com/users/login`, data).then((response) => {
                     dispatch(
                         setLogin({
                             user: response.data

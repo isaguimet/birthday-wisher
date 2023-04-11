@@ -39,7 +39,7 @@ const BirthdayCard = (props) => {
     const handleSubmit = (event) => {
         const body = {msgText: input};
         props.setLoading(true);
-        axiosInstance.patch(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
+        axiosInstance.patch(`https://proxy1-08e6.onrender.com/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
@@ -48,7 +48,7 @@ const BirthdayCard = (props) => {
                 props.setLoading(false);
                 props.setError(err8080.response.data);
             } else {
-                axiosInstance.patch(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
+                axiosInstance.patch(`https://proxy2-no3f.onrender.com/boards/${props.boardId}/messages/${props.msgId}`, body).then((response) => {
                     props.setLoading(false);
                     props.setData(response.data);
                     props.setError(null);
@@ -67,7 +67,7 @@ const BirthdayCard = (props) => {
 
     const handleDelete = () => {
         props.setLoading(true);
-        axiosInstance.delete(`https://proxy1-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
+        axiosInstance.delete(`https://proxy1-08e6.onrender.com/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
             props.setLoading(false);
             props.setData(response.data);
             props.setError(null);
@@ -76,7 +76,7 @@ const BirthdayCard = (props) => {
                 props.setLoading(false);
                 props.setError(err8080.response.data);
             } else {
-                axiosInstance.delete(`https://proxy2-ey7sfy2hcq-wl.a.run.app/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
+                axiosInstance.delete(`https://proxy2-no3f.onrender.com/boards/${props.boardId}/messages/${props.msgId}`).then((response) => {
                     props.setLoading(false);
                     props.setData(response.data);
                     props.setError(null);

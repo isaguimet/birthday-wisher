@@ -23,7 +23,7 @@ const ProfileSection = (props) => {
 
     useEffect(() => {
         setLoading(true);
-        axiosInstance.get(`https://proxy1-ey7sfy2hcq-wl.a.run.app/users/${props.profileUser}`).then((response) => {
+        axiosInstance.get(`https://proxy1-08e6.onrender.com/users/${props.profileUser}`).then((response) => {
             setLoading(false);
             setData(response.data);
             setError(null);
@@ -32,7 +32,7 @@ const ProfileSection = (props) => {
                 setLoading(false);
                 setError(err8080.response.data);
             } else {
-                axiosInstance.get(`https://proxy2-ey7sfy2hcq-wl.a.run.app/users/${props.profileUser}`).then((response) => {
+                axiosInstance.get(`https://proxy2-no3f.onrender.com/users/${props.profileUser}`).then((response) => {
                     setLoading(false);
                     setData(response.data);
                     setError(null);

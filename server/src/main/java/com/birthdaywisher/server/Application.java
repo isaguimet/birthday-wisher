@@ -46,7 +46,7 @@ public class Application {
     @EventListener(ApplicationReadyEvent.class)
     public void registerServer() {
         HttpEntity<String> requestEntity = new HttpEntity<>(null, null);
-        String registrationUrl = "https://%s-ey7sfy2hcq-wl.a.run.app/serverRegistration/" + commService.getSystemId();
+        String registrationUrl = "https://%s.onrender.com/serverRegistration/" + commService.getSystemId();
 
         for (String proxyId : proxyGroup) {
             try {

@@ -37,7 +37,7 @@ public class ProxyApplication {
 	@EventListener(ApplicationReadyEvent.class)
 	public void getServerGroupList() {
 		HttpEntity<String> requestEntity = new HttpEntity<>(null, null);
-		String serverGroupUrl = "https://%s-ey7sfy2hcq-wl.a.run.app/serverGroup";
+		String serverGroupUrl = "https://%s.onrender.com/serverGroup";
 
 		for (String proxyId : proxyService.getProxies()) {
 			if (!proxyId.equals(proxyService.getSystemId())) {
