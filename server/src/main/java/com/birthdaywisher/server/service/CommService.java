@@ -62,7 +62,7 @@ public class CommService {
     }
 
     public synchronized void setServerGroup(String serverGroup) {
-        List<String> servers = new ArrayList<>(Arrays.asList(serverGroup.split(",")));
+        Set<String> servers = new LinkedHashSet<>(Arrays.asList(serverGroup.split(",")));
 
         this.serverGroup = servers;
         System.out.println("Server group: " + this.serverGroup);
