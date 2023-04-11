@@ -57,7 +57,6 @@ public class ProxyService {
         return this.systemId;
     }
 
-    // TODO: this reads "servers"...should it also be synchronized?
     public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) throws UnsupportedEncodingException {
         ResponseEntity<?> responseEntity = null;
 
@@ -98,6 +97,31 @@ public class ProxyService {
                 }
             } catch (Exception e) {
                 System.out.println("Failed to forward request to " + serverId + ": " + e.getMessage());
+
+                // assumes primary server failed, remove server from server group in all replicas
+                // remove server from my own group
+                removeServerFromGroup(serverId);
+
+                // remove server from all proxy backups
+                for (String proxyReplicaPort : getProxies()) {
+                    if (!Objects.equals(proxyReplicaPort, getSystemId())) {
+                        String url = "https://%s-ey7sfy2hcq-wl.a.run.app/removeServerFromGroup/" + serverId;
+                        URI portUri = URI.create(String.format(url, proxyReplicaPort));
+                        System.out.println("Removing " + serverId + " from server group at proxy " + proxyReplicaPort);
+                        restTemplate.exchange(portUri, HttpMethod.PATCH, new HttpEntity<>(null, null), String.class);
+                    }
+                }
+
+                // remove server from all server backups
+                for (String serverReplicaPort : getServers()) {
+                    // do not call this endpoint for serverId because this server has crashed
+                    if (!serverReplicaPort.equals(serverId)) {
+                        String url = "https://%s-ey7sfy2hcq-wl.a.run.app/comm/removeServerFromGroup/" + serverId;
+                        URI portUri = URI.create(String.format(url, serverReplicaPort));
+                        System.out.println("Removing " + serverId + " from server group at server " + serverReplicaPort);
+                        restTemplate.exchange(portUri, HttpMethod.PATCH, new HttpEntity<>(null, null), String.class);
+                    }
+                }
             }
         }
 

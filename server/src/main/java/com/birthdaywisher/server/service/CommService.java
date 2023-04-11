@@ -8,9 +8,9 @@ import com.birthdaywisher.server.repository.UserRepository;
 import org.bson.types.ObjectId;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -31,23 +31,18 @@ public class CommService {
 
     private final RestTemplate restTemplate;
 
-    private final ServerProperties serverProperties;
-
     private final BoardRepository boardRepository;
 
     private final UserRepository userRepository;
 
     // server group
     private final Set<String> serverGroup = new LinkedHashSet<>();
+    private List<String> proxies = Arrays.asList("proxy1", "proxy2");
 
     @Value("${systemId}")
     private String systemId;
 
-    public CommService(
-            ServerProperties serverProperties, RestTemplate restTemplate, BoardRepository boardRepository,
-            UserRepository userRepository
-    ) {
-        this.serverProperties = serverProperties;
+    public CommService(RestTemplate restTemplate, BoardRepository boardRepository, UserRepository userRepository) {
         this.restTemplate = restTemplate;
         this.boardRepository = boardRepository;
         this.userRepository = userRepository;
@@ -57,45 +52,41 @@ public class CommService {
         return this.systemId;
     }
 
-    public synchronized void addServerToGroup(String serverId) {
-        serverGroup.add(serverId);
-    }
-
     public synchronized void removeServerFromGroup(String serverId) {
         serverGroup.remove(serverId);
+        System.out.println("Server group: " + serverGroup);
     }
 
     public synchronized Set<String> getServerGroup() {
         return serverGroup;
     }
 
-    public void forwardUserReqToBackups(User user, String typeOfRequest) {
-        int response = 0;
+    public synchronized void setServerGroup(String serverGroup) {
+        List<String> servers = new ArrayList<>(Arrays.asList(serverGroup.split(",")));
 
+        this.serverGroup = servers;
+        System.out.println("Server group: " + this.serverGroup);
+    }
+
+    public void forwardUserReqToBackups(User user, String typeOfRequest) {
         if ("signUp".equals(typeOfRequest)) {
-            addUserPOSTRequest(user, response);
+            addUserPOSTRequest(user);
         }
     }
 
     public void forwardUserReqToBackups(ObjectId id, String typeOfRequest) {
-        int response = 0;
-
         if ("delete".equals(typeOfRequest)) {
-            deleteUserRequest(id, response);
+            deleteUserRequest(id);
         }
     }
 
     public void forwardUserReqToBackups(String userEmail, String friendEmail, String typeOfRequest) {
-        int response = 0;
-
         if ("friendRequest".equals(typeOfRequest)) {
-            sendFriendRequest(userEmail, friendEmail, response);
+            sendFriendRequest(userEmail, friendEmail);
         }
     }
 
     public void forwardUserReqToBackups(ObjectId userId, String friendEmail, String typeOfRequest) {
-        int response = 0;
-
         String urlTemplate = "";
         if ("acceptFriendRequest".equals(typeOfRequest)) {
             urlTemplate = "https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/pendingFriendRequests/accept";
@@ -118,26 +109,20 @@ public class CommService {
             try {
                 futures.add(asyncPatchForObject(url, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
         for (Future<String> future : futures) {
             try {
                 future.get();
-                response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println("I have received 1 ACK from the replicas");
         }
     }
 
-    // TODO: this reads serverGroup, so should it be synchronized too?
     private List<URI> buildURIForEachReplica(String urlTemplate) {
         List<URI> replicaURIs = new ArrayList<>();
         for (String serverId : serverGroup) {
@@ -149,7 +134,7 @@ public class CommService {
         return replicaURIs;
     }
 
-    private void addUserPOSTRequest(User user, int response) {
+    private void addUserPOSTRequest(User user) {
         List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/signUp");
 
         // call post endpoint of other replicas
@@ -171,7 +156,8 @@ public class CommService {
             try {
                 futures.add(asyncPostForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
@@ -179,19 +165,14 @@ public class CommService {
             try {
                 String result = future.get();
                 System.out.println("future result: " + result);
-                response++;
             } catch (Exception e) {
-                // handle the exception??
+                // I am not sure when this would be caught or if we have ever caught this exception before, but we can keep it
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println("I have received 1 ACKS from the replicas");
         }
     }
 
-    private void deleteUserRequest(ObjectId userId, int response) {
+    private void deleteUserRequest(ObjectId userId) {
         List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/");
 
         List<Future<String>> futures = new ArrayList<>();
@@ -199,26 +180,21 @@ public class CommService {
             try {
                 futures.add(asyncDelete(replicaURI + String.valueOf(userId)));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
         for (Future<String> future : futures) {
             try {
                 future.get();
-                response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println("I have received 1 ACK from the replicas");
         }
     }
 
-    private void sendFriendRequest(String userEmail, String friendEmail, int response) {
+    private void sendFriendRequest(String userEmail, String friendEmail) {
         List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/users/forwarded/friendRequest");
 
         HttpEntity<JSONObject> request = new HttpEntity<>(null, null);
@@ -233,28 +209,21 @@ public class CommService {
             try {
                 futures.add(asyncPatchForObject(url, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
         for (Future<String> future : futures) {
             try {
                 future.get();
-                response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println("I have received 1 ACK from the replicas");
         }
     }
 
     public void forwardCreateBoard(Board board) {
-        int response = 0;
-
         List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded");
 
         // call post endpoint of other replicas
@@ -275,28 +244,21 @@ public class CommService {
             try {
                 futures.add(asyncPostForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
         for (Future<String> future : futures) {
             try {
                 future.get();
-                response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
     public void forwardCreateMessage(ObjectId boardId, Message msg) {
-        int response = 0;
-
         List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/" + boardId + "/messages");
 
         // call post endpoint of other replicas
@@ -317,28 +279,21 @@ public class CommService {
             try {
                 futures.add(asyncPostForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
         for (Future<String> future : futures) {
             try {
                 future.get();
-                response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
     public void forwardBoardPatch(String url) {
-        int response = 0;
-
         List<URI> replicaURIs = buildURIForEachReplica(url);
 
         HttpEntity<String> request = new HttpEntity<>(null, null);
@@ -348,28 +303,21 @@ public class CommService {
             try {
                 futures.add(asyncPatchForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
         for (Future<String> future : futures) {
             try {
                 future.get();
-                response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
     public void forwardUpdateMessage(ObjectId boardId, ObjectId msgId, Map<String, String> payload) {
-        int response = 0;
-
         List<URI> replicaURIs = buildURIForEachReplica("https://%s-ey7sfy2hcq-wl.a.run.app/boards/forwarded/" + boardId + "/messages/" + msgId);
 
         HttpEntity<?> request = new HttpEntity<>(payload, null);
@@ -379,28 +327,21 @@ public class CommService {
             try {
                 futures.add(asyncPatchForObject(replicaURI, request));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
         for (Future<String> future : futures) {
             try {
                 future.get();
-                response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
             }
-        }
-
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
         }
     }
 
     public void forwardDeleteReq(String url) {
-        int response = 0;
-
         List<URI> replicaURIs = buildURIForEachReplica(url);
 
         List<Future<String>> futures = new ArrayList<>();
@@ -408,22 +349,46 @@ public class CommService {
             try {
                 futures.add(asyncDelete(replicaURI));
             } catch (Exception e) {
-                // handle?
+                System.out.println("Failed to connect to server backup: " + e.getMessage());
+                removeBackupServerFromReplicas(replicaURI);
             }
         }
 
         for (Future<String> future : futures) {
             try {
                 future.get();
-                response++;
             } catch (Exception e) {
-                // handle the exception??
+                System.out.println("Future.get() exception " + e.getMessage());
+            }
+        }
+    }
+
+    private void removeBackupServerFromReplicas(URI replicaURI) {
+        String backupServerId = replicaURI.getPath().split("//")[1].split("-")[0];
+        System.out.println("Server to remove: " + backupServerId);
+
+        HttpEntity<?> httpEntity = new HttpEntity<>(null, null);
+
+        // remove backup server from my own group (primary server)
+        removeServerFromGroup(backupServerId);
+
+        // remove backup server from all other backup servers
+        for (String serverReplicaPort : getServerGroup()) {
+            if (!serverReplicaPort.equals(getSystemId())) {
+                // do not call endpoint to remove crashed server on primary server (we just removed it)
+                String url = "https://%s-ey7sfy2hcq-wl.a.run.app/comm/removeServerFromGroup/" + backupServerId;
+                URI portUri = URI.create(String.format(url, serverReplicaPort));
+                System.out.println("Removing " + backupServerId + " from server group at server " + serverReplicaPort);
+                restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
             }
         }
 
-        // if response == number of replicas (for now), then we get all acks
-        if (response == 1) {
-            System.out.println(" I have received 1 ACKS from the replicas");
+        // remove backup server from all proxies
+        for (String proxyPort : proxies) {
+            String url = "https://%s-ey7sfy2hcq-wl.a.run.app/removeServerFromGroup/" + backupServerId;
+            URI portUri = URI.create(String.format(url, proxyPort));
+            System.out.println("Removing " + backupServerId + " from server group at proxy " + proxyPort);
+            restTemplate.exchange(portUri, HttpMethod.PATCH, httpEntity, String.class);
         }
     }
 
