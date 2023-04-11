@@ -104,7 +104,7 @@ public class ProxyService {
 
                 // remove server from all proxy backups
                 for (String proxyReplicaPort : getProxies()) {
-                    if (!Objects.equals(proxyReplicaPort, getSystemId())) {
+                    if (!proxyReplicaPort.equals(getSystemId())) {
                         String url = "https://%s-ey7sfy2hcq-wl.a.run.app/removeServerFromGroup/" + serverId;
                         URI portUri = URI.create(String.format(url, proxyReplicaPort));
                         System.out.println("Removing " + serverId + " from server group at proxy " + proxyReplicaPort);

@@ -36,7 +36,7 @@ public class CommService {
     private final UserRepository userRepository;
 
     // server group
-    private final Set<String> serverGroup = new LinkedHashSet<>();
+    private Set<String> serverGroup = new LinkedHashSet<>();
     private List<String> proxies = Arrays.asList("proxy1", "proxy2");
 
     @Value("${systemId}")
@@ -62,7 +62,7 @@ public class CommService {
     }
 
     public synchronized void setServerGroup(String serverGroup) {
-        List<String> servers = new ArrayList<>(Arrays.asList(serverGroup.split(",")));
+        Set<String> servers = new LinkedHashSet<>(Arrays.asList(serverGroup.split(",")));
 
         this.serverGroup = servers;
         System.out.println("Server group: " + this.serverGroup);
