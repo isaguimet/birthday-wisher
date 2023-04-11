@@ -124,7 +124,7 @@ public class CommService {
         }
     }
 
-    private synchronized List<URI> buildURIForEachReplica(String urlTemplate) {
+    private List<URI> buildURIForEachReplica(String urlTemplate) {
         List<URI> replicaURIs = new ArrayList<>();
         for (String serverId : serverGroup) {
             if (!serverId.equals(systemId)) {

@@ -54,7 +54,7 @@ public class ProxyService {
         return this.systemId;
     }
 
-    public synchronized ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) throws UnsupportedEncodingException {
+    public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) throws UnsupportedEncodingException {
         ResponseEntity<?> responseEntity = null;
 
         // copy request headers
