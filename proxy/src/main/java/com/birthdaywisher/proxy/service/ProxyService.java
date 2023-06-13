@@ -1,6 +1,7 @@
 package com.birthdaywisher.proxy.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -10,20 +11,45 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class ProxyService {
 
     private final RestTemplate restTemplate;
-    private List<Integer> servers = Arrays.asList(8082, 8083, 8084, 8085, 8086, 8087);
+    private List<Integer> servers = new ArrayList<>();
+    private final List<Integer> proxies = Arrays.asList(8080, 8081);
+    private final Integer myPortNum;
 
-    public ProxyService(RestTemplate restTemplate) {
+    public ProxyService(RestTemplate restTemplate, ServerProperties serverProperties) {
         this.restTemplate = restTemplate;
+        this.myPortNum = serverProperties.getPort();
     }
 
+    public List<Integer> getProxies() {
+        return this.proxies;
+    }
+
+    public synchronized void addServerToGroup(Integer portNum) {
+        servers.add(portNum);
+        System.out.println("Server Group: " + servers);
+    }
+
+    public synchronized void removeServerFromGroup(Integer portNum) {
+        servers.remove(portNum);
+        System.out.println("Server Group: " + servers);
+    }
+
+    public synchronized List<Integer> getServers() {
+        return this.servers;
+    }
+
+    public synchronized void setServers(List<Integer> serverGroup) {
+        this.servers = serverGroup;
+        System.out.println("Server Group: " + servers);
+    }
+
+    // TODO: this reads "servers"...should it also be synchronized?
     public ResponseEntity<?> forwardReqToPrimary(String body, HttpMethod method, HttpServletRequest request) throws UnsupportedEncodingException {
         ResponseEntity<?> responseEntity = null;
 
@@ -63,6 +89,31 @@ public class ProxyService {
                 }
             } catch (Exception e) {
                 System.out.println("Failed to forward request to " + serverPort + ": " + e.getMessage());
+
+                // assumes primary server failed, remove server from server group in all replicas
+                // remove server from my own group
+                removeServerFromGroup(serverPort);
+
+                // remove server from all proxy backups
+                for (Integer proxyReplicaPort : getProxies()) {
+                    if (!Objects.equals(proxyReplicaPort, myPortNum)) {
+                        uri = URI.create("http://localhost/removeServerFromGroup/" + serverPort);
+                        URI portUri = UriComponentsBuilder.fromUri(uri).port(proxyReplicaPort).build().toUri();
+                        System.out.println("Removing " + serverPort + " from server group at proxy " + proxyReplicaPort);
+                        restTemplate.exchange(portUri, HttpMethod.PATCH, new HttpEntity<>(null, null), String.class);
+                    }
+                }
+
+                // remove server from all server backups
+                for (Integer serverReplicaPort : getServers()) {
+                    // do not call this endpoint for serverPort because this server has crashed
+                    if (!serverReplicaPort.equals(serverPort)) {
+                        uri = URI.create("http://localhost/comm/removeServerFromGroup/" + serverPort);
+                        URI portUri = UriComponentsBuilder.fromUri(uri).port(serverReplicaPort).build().toUri();
+                        System.out.println("Removing " + serverPort + " from server group at server " + serverReplicaPort);
+                        restTemplate.exchange(portUri, HttpMethod.PATCH, new HttpEntity<>(null, null), String.class);
+                    }
+                }
             }
         }
 
